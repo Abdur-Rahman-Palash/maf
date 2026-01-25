@@ -1,6 +1,6 @@
 {
-  "name": "szgmc-clone",
-  "version": "0.1.0",
+  "name": "maf",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
