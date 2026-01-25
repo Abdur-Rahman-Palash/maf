@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FaInfoCircle, FaCamera, FaCalendarAlt, FaClock, FaMapMarkerAlt, FaUser, FaEnvelope, FaPhone, FaFlag, FaSearch, FaTimes } from 'react-icons/fa';
 
 interface LostItem {
@@ -31,6 +31,7 @@ const LostAndFound: React.FC = () => {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const itemTypes = [
     { value: '77', label: 'Mobile Phone' },
@@ -184,23 +185,29 @@ const LostAndFound: React.FC = () => {
     if (isValid) {
       // Here you would normally submit to your backend
       console.log('Form submitted:', formData);
-      alert('Lost item report submitted successfully! We will contact you within 3 working days.');
       
-      // Reset form
-      setFormData({
-        ticketNumber: '',
-        name: '',
-        email: '',
-        phoneNumber: '',
-        nationalityCode: '',
-        items: {
-          typeCode: '',
-          location: '',
-          description: '',
-          lostDate: '',
-          lostTime: ''
-        }
-      });
+      // Show success message
+      setShowSuccess(true);
+      
+      // Reset form after 2 seconds
+      setTimeout(() => {
+        setFormData({
+          ticketNumber: '',
+          name: '',
+          email: '',
+          phoneNumber: '',
+          nationalityCode: '',
+          items: {
+            typeCode: '',
+            location: '',
+            description: '',
+            lostDate: '',
+            lostTime: ''
+          }
+        });
+        setErrors({});
+        setShowSuccess(false);
+      }, 2000);
     }
 
     setIsSubmitting(false);
@@ -268,6 +275,25 @@ const LostAndFound: React.FC = () => {
           </div>
         </motion.div>
 
+        {/* Success Message */}
+        <AnimatePresence>
+          {showSuccess && (
+            <motion.div
+              className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center space-x-3"
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 100 }}
+              transition={{ duration: 0.3 }}
+            >
+              <FaSearch className="text-xl" />
+              <div>
+                <p className="font-bold">Report Submitted Successfully!</p>
+                <p className="text-sm">We will contact you within 3 working days.</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Form */}
         <motion.form
           onSubmit={handleSubmit}
@@ -282,7 +308,7 @@ const LostAndFound: React.FC = () => {
             Personal Information
           </h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {/* Access Pass Number */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-slate-700">
@@ -403,7 +429,7 @@ const LostAndFound: React.FC = () => {
             Lost Items Details
           </h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {/* Lost Item Type */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-slate-700">

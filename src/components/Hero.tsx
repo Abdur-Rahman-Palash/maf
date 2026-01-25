@@ -1,472 +1,273 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, EffectFade } from 'swiper/modules';
-import { motion, easeOut } from 'framer-motion';
-import { useLenis } from 'lenis/react';
-import 'swiper/css';
-import 'swiper/css/effect-fade';
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaTicketAlt, FaPlay, FaChevronDown, FaMosque, FaTimes, FaMoon, FaSun, FaCloudSun, FaCloudMoon } from 'react-icons/fa';
 
-// Professional USA Masjid Salman al Farsi images - Beautiful mosque backgrounds
-const slides = [
-  { 
-    id: 1, 
-    image: '/moon-light-shine-through-window-into-islamic-mosque-interior.jpg', 
-    alt: 'Masjid Salman al Farsi - Moon Light Shine Through Window Into Islamic Mosque Interior' 
-  },
-  { 
-    id: 2, 
-    image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1920&h=1080&fit=crop', 
-    alt: 'Masjid Salman al Farsi - Grand Mosque Interior' 
-  },
-  { 
-    id: 3, 
-    image: 'https://images.unsplash.com/photo-1542042958-3d5f9919c013?w=1920&h=1080&fit=crop', 
-    alt: 'Masjid Salman al Farsi - Prayer Hall with Islamic Architecture' 
-  },
-  { 
-    id: 4, 
-    image: 'https://images.unsplash.com/photo-1596706059274-123403d1591d?w=1920&h=1080&fit=crop', 
-    alt: 'Masjid Salman al Farsi - Islamic Calligraphy & Art' 
-  },
-  { 
-    id: 5, 
-    image: 'https://images.unsplash.com/photo-1586962434213-cee7e4fe3b56?w=1920&h=1080&fit=crop', 
-    alt: 'Masjid Salman al Farsi - Community Prayer Space' 
-  },
-];
+const Hero = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [showPrayerTimes, setShowPrayerTimes] = useState(false);
 
-// Mosque video URL - using 12081478_3840_2160_60fps.mp4 as background
-const mosqueVideoUrl = '/12081478_3840_2160_60fps.mp4';
+  // Prayer times for Masjid Salman al Farsi
+  const prayerTimes = {
+    Fajr: '5:15 AM',
+    Sunrise: '6:30 AM', 
+    Dhuhr: '12:30 PM',
+    Asr: '3:45 PM',
+    Maghrib: '6:00 PM',
+    Isha: '7:15 PM'
+  };
 
-// Framer Motion variants
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2,
-      delayChildren: 0.3,
+  const [nextPrayer, setNextPrayer] = useState({ name: 'DHUHR', time: '12:30 PM' });
+
+  // Prayer icons mapping
+  const prayerIcons = {
+    Fajr: <FaMoon className="text-blue-200" />,
+    Sunrise: <FaSun className="text-orange-200" />,
+    Dhuhr: <FaSun className="text-yellow-200" />,
+    Asr: <FaCloudSun className="text-orange-200" />,
+    Maghrib: <FaCloudMoon className="text-purple-200" />,
+    Isha: <FaMoon className="text-indigo-200" />
+  };
+
+  const slides = [
+    {
+      id: 1,
+      image: 'https://images.unsplash.com/photo-1586379972525-4d69b0c3d2a1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+      title: 'Prayer Hall',
+      description: 'Beautiful mosque interior with Islamic architecture'
     },
-  },
-};
-
-const itemVariants = {
-  hidden: { scale: 0.9, opacity: 0 },
-  visible: {
-    scale: 1,
-    opacity: 1,
-    transition: {
-      duration: 0.8,
-      ease: easeOut,
+    {
+      id: 2,
+      image: 'https://images.unsplash.com/photo-1610057099431-d73e0c007d38?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+      title: 'Golden Hour',
+      description: 'Sunlight streaming through mosque windows'
     },
-  },
-};
-
-export default function Hero() {
-  const swiperRef = useRef<any>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const lenis = useLenis();
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-  const [useVideo, setUseVideo] = useState(true);
-  const [userInteracted, setUserInteracted] = useState(false);
-
-  // Handle user interaction to enable video autoplay
-  useEffect(() => {
-    const handleUserInteraction = () => {
-      setUserInteracted(true);
-      // Try to play video after user interaction
-      if (videoRef.current && userInteracted === false) {
-        videoRef.current.play().catch(error => {
-          console.log('Video play after interaction failed:', error);
-        });
-      }
-    };
-
-    // Add event listeners for user interaction
-    document.addEventListener('click', handleUserInteraction, { once: true });
-    document.addEventListener('scroll', handleUserInteraction, { once: true });
-    document.addEventListener('keydown', handleUserInteraction, { once: true });
-
-    return () => {
-      document.removeEventListener('click', handleUserInteraction);
-      document.removeEventListener('scroll', handleUserInteraction);
-      document.removeEventListener('keydown', handleUserInteraction);
-    };
-  }, [userInteracted]);
-
-  // Parallax effect on scroll
-  useEffect(() => {
-    const handleScroll = () => {
-      if (swiperRef.current) {
-        const scrolled = window.scrollY;
-        const swiper = swiperRef.current.swiper;
-        if (swiper && swiper.slides) {
-          swiper.slides.forEach((slide: any) => {
-            const img = slide.querySelector('img');
-            if (img) {
-              img.style.transform = `translateY(${scrolled * 0.5}px)`;
-            }
-          });
-        }
-      }
-    };
-
-    if (lenis) {
-      lenis.on('scroll', handleScroll);
-    } else {
-      window.addEventListener('scroll', handleScroll);
+    {
+      id: 3,
+      image: 'https://images.unsplash.com/photo-1528722828814-77b9b83aafb2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+      title: 'Dusk View',
+      description: 'Mosque minarets silhouetted against sunset'
     }
+  ];
 
-    return () => {
-      if (lenis) {
-        lenis.off('scroll', handleScroll);
-      } else {
-        window.removeEventListener('scroll', handleScroll);
-      }
-    };
-  }, [lenis]);
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [slides.length]);
 
   return (
-    <section className="relative h-[70vh] sm:h-[80vh] md:h-[90vh] lg:h-screen overflow-hidden">
-      {/* Premium Overlay Effects */}
-      <div className="absolute inset-0 z-20">
-        <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30" />
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"
-          animate={{
-            opacity: [0.3, 0.5, 0.3]
-          }}
-          transition={{
-            duration: 4,
-            repeat: 2,
-            ease: "easeInOut"
-          }}
-        />
-      </div>
-
-      {/* Video Background */}
-      {useVideo ? (
-        <div className="absolute inset-0 z-0">
-          <video
-            ref={videoRef}
-            className="absolute inset-0 h-full w-full object-cover"
-            autoPlay
-            muted
-            loop
-            playsInline
-            onLoadedData={() => {
-              console.log('Hero video loaded successfully:', mosqueVideoUrl);
-              setIsVideoLoaded(true);
-            }}
-            onError={(e) => {
-              console.error('Hero video error:', e);
-              console.log('Video URL:', mosqueVideoUrl);
-              console.log('Video file exists:', '/12081478_3840_2160_60fps.mp4');
-              setUseVideo(false); // Fallback to image slider
-            }}
-            style={{
-              transform: 'translateZ(0) scale(1.05)',
-              willChange: 'transform',
-            }}
+    <section className="relative h-screen w-full overflow-hidden">
+      {/* Background Slideshow */}
+      <div className="absolute inset-0 z-0">
+        {slides.map((slide, index) => (
+          <div
+            key={slide.id}
+            className={`absolute inset-0 transition-opacity duration-1000 ${
+              index === currentSlide ? 'opacity-100' : 'opacity-0'
+            }`}
           >
-            <source src={mosqueVideoUrl} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-          
-          {/* Video loading placeholder with premium animation */}
-          {!isVideoLoaded && (
-            <motion.div 
-              className="absolute inset-0 bg-gradient-to-br from-slate-900 via-amber-900 to-slate-800"
-              animate={{
-                background: [
-                  'linear-gradient(to bottom right, #1e293b, #92400e, #1e293b)',
-                  'linear-gradient(to bottom right, #92400e, #1e293b, #92400e)',
-                  'linear-gradient(to bottom right, #1e293b, #92400e, #1e293b)'
-                ]
-              }}
-              transition={{
-                duration: 3,
-                repeat: 2,
-                ease: "easeInOut"
-              }}
+            <img
+              src={slide.image}
+              alt={slide.title}
+              className="w-full h-full object-cover"
+              loading="eager"
             />
-          )}
-        </div>
-      ) : (
-        /* Fallback to Image Slider with premium effects */
-        <Swiper
-          ref={swiperRef}
-          modules={[Autoplay, EffectFade]}
-          effect="fade"
-          speed={1000}
-          autoplay={{ 
-            delay: 5000, 
-            disableOnInteraction: false 
-          }}
-          loop={true}
-          className="h-full w-full"
-        >
-          {slides.map((slide, index) => (
-            <SwiperSlide key={slide.id}>
-              <div className="relative h-full w-full">
-                <motion.div
-                  className="absolute inset-0"
-                  initial={{ scale: 1.1 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 8, delay: index * 0.2 }}
-                >
-                  <img
-                    src={slide.image}
-                    alt={slide.alt}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    style={{
-                      transform: 'translateZ(0) scale(1.05)',
-                      willChange: 'transform',
-                    }}
-                  />
-                </motion.div>
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 2 }}
-                />
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      )}
-
-      {/* Premium Floating Particles - Optimized */}
-      <div className="absolute inset-0 z-10 pointer-events-none">
-        {[...Array(15)].map((_, i) => {
-          const seed = i * 137.5; // Deterministic seed based on index
-          const left = ((seed * 9.7) % 100);
-          const top = ((seed * 13.3) % 100);
-          const duration = 3 + ((seed * 7) % 5);
-          const delay = ((seed * 11) % 3);
-          const xMove = ((seed * 17) % 50) - 25;
-          const scale = 0.5 + ((seed * 3) % 15) / 10;
-          
-          return (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-amber-400 rounded-full"
-              style={{
-                left: `${left}%`,
-                top: `${top}%`,
-              }}
-              animate={{
-                y: [0, -50, 0],
-                x: [0, xMove, 0],
-                opacity: [0, 0.8, 0],
-                scale: [1, scale, 1]
-              }}
-              transition={{
-                duration,
-                repeat: 2,
-                delay,
-                ease: "easeInOut"
-              }}
-            />
-          );
-        })}
+            {/* Dark gradient overlay for readability */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-transparent" />
+          </div>
+        ))}
       </div>
 
-      {/* Premium Content */}
-      <motion.div 
-        className="absolute inset-0 z-30 flex items-center justify-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.5 }}
+      {/* Subtle dome silhouette watermark */}
+      <div className="absolute inset-0 z-10 opacity-5 pointer-events-none">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xMDAgMjBDMTQ0LjE4IDIwIDE4MCA1NS44MTgyIDE4MCAxMDBDMTgwIDE0NC4xODIgMTQ0LjE4IDE4MCAxMDAgMTgwQzU1LjgxODIgMTgwIDIwIDE0NC4xODIgMjAgMTAwQzIwIDU1LjgxODIgNTUuODE4MiAyMCAxMDAgMjBaIiBmaWxsPSIjRkZEN0AwIi8+Cjwvc3ZnPgo=')] bg-center bg-no-repeat bg-contain" />
+      </div>
+
+      {/* Prayer Time Widget - Left Side */}
+      <motion.div
+        className="absolute left-8 top-1/2 transform -translate-y-1/2 z-30"
+        initial={{ x: -100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.8, delay: 1.5 }}
       >
-        <div className="text-center text-white px-4 sm:px-6 max-w-4xl sm:max-w-5xl mx-auto">
-          {/* Animated Title */}
-          <motion.h1 
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 leading-tight"
-            style={{ fontFamily: 'var(--font-amiri)' }}
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ 
-              duration: 1.2, 
-              delay: 0.5,
-              type: "spring",
-              stiffness: 100
+        <AnimatePresence>
+          {showPrayerTimes ? (
+            <motion.div
+              className="bg-black/95 backdrop-blur-md rounded-2xl p-8 border border-yellow-400/50 shadow-2xl"
+              initial={{ width: 100, height: 100 }}
+              animate={{ width: 450, height: 'auto' }}
+              exit={{ width: 100, height: 100 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            >
+              <div className="flex justify-between items-start mb-6">
+                <h3 className="text-yellow-400 font-bold text-xl">Prayer Times</h3>
+                <motion.button
+                  onClick={() => setShowPrayerTimes(false)}
+                  className="text-white/60 hover:text-white transition-colors"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <FaTimes className="w-5 h-5" />
+                </motion.button>
+              </div>
+              
+              <div className="space-y-4">
+                {Object.entries(prayerTimes).map(([prayer, time]) => (
+                  <motion.div
+                    key={prayer}
+                    className="flex items-center justify-between text-white/90 text-base"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 }}
+                  >
+                    <div className="flex items-center gap-4">
+                      {prayerIcons[prayer as keyof typeof prayerIcons]}
+                      <span className="font-bold text-lg">{prayer}</span>
+                    </div>
+                    <span className="text-yellow-300 font-bold text-lg">{time}</span>
+                  </motion.div>
+                ))}
+              </div>
+              
+              <div className="mt-6 pt-6 border-t border-yellow-400/40">
+                <div className="text-base text-yellow-400">
+                  <div className="font-bold text-lg">Next: {nextPrayer.name}</div>
+                  <div className="text-yellow-300 font-bold text-lg">{nextPrayer.time}</div>
+                </div>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.button
+              onClick={() => setShowPrayerTimes(true)}
+              className="bg-black/95 backdrop-blur-md rounded-full p-6 border border-yellow-400/50 shadow-2xl hover:bg-black/100 transition-colors"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <FaMosque className="w-10 h-10 text-yellow-400" />
+            </motion.button>
+          )}
+        </AnimatePresence>
+      </motion.div>
+
+      {/* Main Content */}
+      <div className="relative z-20 h-full flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <motion.div
+          className="text-center max-w-5xl mx-auto"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2, delay: 0.5 }}
+        >
+          {/* Main Heading */}
+          <motion.h1
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 mb-6 leading-tight"
+            style={{
+              fontFamily: 'Georgia, serif',
+              textShadow: '0 0 30px rgba(255, 215, 0, 0.5)'
             }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.5, delay: 0.8 }}
           >
-            <motion.span
-              className="inline-block"
-              animate={{
-                textShadow: [
-                  "0 0 20px rgba(251, 191, 36, 0.5)",
-                  "0 0 40px rgba(251, 191, 36, 0.8)",
-                  "0 0 20px rgba(251, 191, 36, 0.5)"
-                ]
-              }}
-              transition={{
-                duration: 3,
-                repeat: 2,
-                ease: "easeInOut"
-              }}
-            >
-              Welcome to
-            </motion.span>
+            Welcome to our
             <br />
-            <motion.span
-              className="inline-block bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 bg-clip-text text-transparent"
-              animate={{
-                backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-              }}
-              transition={{
-                duration: 5,
-                repeat: 2,
-                ease: "easeInOut"
-              }}
-              style={{
-                backgroundSize: "200% 200%"
-              }}
-            >
-              Masjid Salman al Farsi
-            </motion.span>
+            Masjid Salman al Farsi
           </motion.h1>
 
-          {/* Animated Subtitle */}
-          <motion.p 
-            className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 sm:mb-8 font-light text-amber-100 max-w-2xl sm:max-w-3xl mx-auto"
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ 
-              duration: 1.2, 
-              delay: 0.8,
-              type: "spring",
-              stiffness: 100
-            }}
+          {/* Subtitle */}
+          <motion.p
+            className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-white/90 mb-12 max-w-4xl mx-auto leading-relaxed"
+            style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.2, delay: 1.2 }}
           >
-            Experience the beauty and tranquility of Islamic heritage
+ From Modern Architecture to Spiritual Masterpiece –
+            <br />
+            Experience the Beauty of Islamic Worship
           </motion.p>
 
-          {/* Premium CTA Buttons */}
-          <motion.div 
-            className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center"
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ 
-              duration: 1.2, 
-              delay: 1.1,
-              type: "spring",
-              stiffness: 100
-            }}
+          {/* CTA Buttons */}
+          <motion.div
+            className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.2, delay: 1.6 }}
           >
+            {/* Primary CTA */}
             <motion.button
-              className="group relative overflow-hidden bg-gradient-to-r from-amber-500 to-amber-600 text-white px-6 sm:px-8 lg:px-10 py-2.5 sm:py-3 lg:py-4 rounded-full font-semibold text-sm sm:text-base lg:text-lg shadow-2xl hover:shadow-amber-500/50 transition-all duration-300"
+              className="group relative overflow-hidden bg-gradient-to-r from-yellow-500 to-yellow-600 text-white px-8 sm:px-10 lg:px-12 py-4 sm:py-5 lg:py-6 rounded-full font-bold text-lg sm:text-xl lg:text-2xl shadow-2xl hover:shadow-yellow-500/50 transition-all duration-300"
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              animate={{
+                boxShadow: [
+                  '0 0 20px rgba(255, 215, 0, 0.3)',
+                  '0 0 40px rgba(255, 215, 0, 0.6)',
+                  '0 0 20px rgba(255, 215, 0, 0.3)'
+                ]
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity
+              }}
+            >
+              <span className="relative z-10 flex items-center gap-3">
+                <FaTicketAlt className="text-xl sm:text-2xl" />
+                Book Skip-the-Line Tickets
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-600 to-yellow-700 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+            </motion.button>
+
+            {/* Secondary CTA */}
+            <motion.button
+              className="group relative overflow-hidden bg-transparent border-2 border-white/60 text-white px-8 sm:px-10 lg:px-12 py-4 sm:py-5 lg:py-6 rounded-full font-bold text-lg sm:text-xl lg:text-2xl hover:bg-white hover:text-gray-900 transition-all duration-300"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.98 }}
             >
-              <span className="relative z-10 flex items-center">
-                Explore Mosque
-                <motion.svg
-                  className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 ml-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  animate={{ x: [0, 5, 0] }}
-                  transition={{ duration: 1.5, repeat: 2 }}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </motion.svg>
+              <span className="relative z-10 flex items-center gap-3">
+                <FaPlay className="text-xl sm:text-2xl" />
+                Explore Hidden Stories
               </span>
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-amber-600 to-amber-700"
-                initial={{ x: "-100%" }}
-                whileHover={{ x: "0%" }}
-                transition={{ duration: 0.3 }}
-              />
-            </motion.button>
-
-            <motion.button
-              className="group relative overflow-hidden bg-white/10 backdrop-blur-md text-white px-6 sm:px-8 lg:px-10 py-2.5 sm:py-3 lg:py-4 rounded-full font-semibold text-sm sm:text-base lg:text-lg border border-white/20 hover:bg-white/20 transition-all duration-300"
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <span className="relative z-10 flex items-center">
-                Prayer Times
-                <motion.div
-                  className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 ml-2 rounded-full bg-amber-400"
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: 2 }}
-                />
-              </span>
-              <motion.div
-                className="absolute inset-0 bg-white/20"
-                initial={{ x: "-100%" }}
-                whileHover={{ x: "0%" }}
-                transition={{ duration: 0.3 }}
-              />
             </motion.button>
           </motion.div>
+        </motion.div>
+      </div>
 
-          {/* Premium Decorative Elements */}
-          <motion.div
-            className="absolute -bottom-10 left-10 text-4xl sm:text-5xl lg:text-6xl opacity-20 hidden sm:block"
-            animate={{
-              y: [0, -20, 0],
-              rotate: [0, 10, -10, 0]
-            }}
-            transition={{
-              duration: 6,
-              repeat: 2,
-              ease: "easeInOut"
-            }}
-          >
-            🕌
-          </motion.div>
-
-          <motion.div
-            className="absolute -bottom-10 right-10 text-3xl sm:text-4xl lg:text-5xl opacity-20 hidden sm:block"
-            animate={{
-              y: [0, -15, 0],
-              rotate: [0, -10, 10, 0]
-            }}
-            transition={{
-              duration: 8,
-              repeat: 2,
-              ease: "easeInOut",
-              delay: 2
-            }}
-          >
-            🌙
-          </motion.div>
-        </div>
-      </motion.div>
-
-      {/* Premium Scroll Indicator */}
+      {/* Scroll Indicator */}
       <motion.div
-        className="absolute bottom-4 sm:bottom-6 lg:bottom-8 left-1/2 transform -translate-x-1/2 z-30"
-        animate={{
-          y: [0, 10, 0]
-        }}
-        transition={{
-          duration: 2,
-          repeat: 2,
-          ease: "easeInOut"
-        }}
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30 text-center"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1, delay: 2 }}
       >
-        <div className="w-5 h-8 sm:w-6 sm:h-10 lg:w-6 lg:h-10 border-2 border-white/30 rounded-full flex justify-center">
-          <motion.div
-            className="w-1 h-2 sm:h-3 lg:h-3 bg-white/60 rounded-full mt-1 sm:mt-2 lg:mt-2"
-            animate={{
-              y: [0, 6, 0]
-            }}
-            transition={{
-              duration: 2,
-              repeat: 2,
-              ease: "easeInOut"
-            }}
-          />
-        </div>
+        <motion.div
+          className="flex flex-col items-center gap-2 text-white/70"
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
+          <FaChevronDown className="text-2xl" />
+          <span className="text-sm font-medium">Journey Begins Here</span>
+        </motion.div>
       </motion.div>
+
+      {/* Slide Indicators */}
+      <div className="absolute bottom-8 right-8 z-30 flex gap-2">
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentSlide(index)}
+            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+              index === currentSlide
+                ? 'bg-yellow-500 w-8'
+                : 'bg-white/50 hover:bg-white/70'
+            }`}
+          />
+        ))}
+      </div>
     </section>
   );
-}
+};
+
+export default Hero;

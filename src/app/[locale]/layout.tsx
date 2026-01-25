@@ -40,15 +40,15 @@ export default async function LocaleLayout({
     <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       <body className={`${amiri.variable} font-serif bg-slate-50 text-slate-900 overflow-x-hidden antialiased relative`}>
         <NextIntlClientProvider messages={messages}>
-          <UltraPremiumPageTransitions>
+          {/* <UltraPremiumPageTransitions>
             <UltraPremiumAnimations>
-              <UltraPremiumInteractions>
+              <UltraPremiumInteractions> */}
                 <SmoothScroll>
                   {children}
                 </SmoothScroll>
-              </UltraPremiumInteractions>
+              {/* </UltraPremiumInteractions>
             </UltraPremiumAnimations>
-          </UltraPremiumPageTransitions>
+          </UltraPremiumPageTransitions> */}
         </NextIntlClientProvider>
       </body>
     </html>
