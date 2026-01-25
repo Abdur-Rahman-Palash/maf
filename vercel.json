@@ -1,41 +1,6 @@
 {
+  "framework": "nextjs",
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
-  "installCommand": "npm install",
-  "framework": "nextjs",
-  "regions": ["hkg1", "sin1"],
-  "functions": {
-    "src/app/**/*.ts": {
-      "maxDuration": 30
-    },
-    "src/app/**/*.tsx": {
-      "maxDuration": 30
-    }
-  },
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "s-maxage=86400"
-        }
-      ]
-    },
-    {
-      "source": "/(.*\\.(?:jpg|jpeg|gif|png|svg|ico|webp))",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/",
-      "destination": "/en"
-    }
-  ]
+  "installCommand": "npm ci"
 }
