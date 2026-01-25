@@ -10,30 +10,44 @@ const servicesData = [
     id: 1, 
     title: 'Guided Tours', 
     image: '/mosque-visitors-bg.svg',
-    description: 'Explore our magnificent mosque with expert guides',
+    description: 'Book to join us on weekend mornings for a guided walk through our mosque, or on weekdays if you are part of an organisation such as a school or a local community group.',
     icon: '🕌'
   },
   { 
     id: 2, 
-    title: 'Library', 
+    title: 'Shahadas', 
     image: 'https://images.unsplash.com/photo-1541963463532-d68292c34b19?auto=format&fit=crop&q=80&w=800',
-    description: 'Discover our collection of Islamic literature and knowledge',
-    icon: '📚'
+    description: 'Whether you are just interested in Islam, have some questions or are ready to convert, we are happy to speak to you and guide you through the Shahada. Learn more and book here.',
+    icon: '🤝'
   },
   { 
     id: 3, 
-    title: 'Souq', 
-    image: 'https://images.unsplash.com/photo-1580820267682-426da823b514?auto=format&fit=crop&q=80&w=800',
-    description: 'Shop for authentic Islamic items and souvenirs',
-    icon: '🛍️'
+    title: 'Nikahs', 
+    image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=800',
+    description: 'Offering a unique & stunning yet economical & eco-friendly venue, getting married at Cambridge Central Mosque is the experience of a lifetime. Find out more here.',
+    icon: '💒'
   },
   { 
     id: 4, 
-    title: 'Visitor Center', 
-    image: '/mosque-updates-bg.svg',
-    description: 'Your gateway to understanding Islamic culture',
-    icon: '🏛️'
+    title: 'Madrasa', 
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800',
+    description: 'We have a range of educational programmes being offered for both children and adults. Find out more.',
+    icon: '📖'
   },
+  { 
+    id: 5, 
+    title: 'General Events', 
+    image: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&q=80&w=800',
+    description: 'To book rooms for other events or Islamic celebrations, from \'aqiqas and private gatherings to conferences, we offer rooms at reasonable rates of hire. Book here.',
+    icon: '🎉'
+  },
+  { 
+    id: 6, 
+    title: 'Meet an Imam', 
+    image: 'https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&q=80&w=800',
+    description: 'Book a meeting up to two weeks in advance with one of our Imams to discuss one of a range of topics. Learn more here.',
+    icon: '👳‍♂️'
+  }
 ];
 
 interface Service {
