@@ -158,7 +158,7 @@ export default function Services() {
             }}
             transition={{ 
               duration: 2, 
-              repeat: Infinity 
+              repeat: 2 
             }}
           >
             📖
@@ -229,7 +229,7 @@ export default function Services() {
               }}
               transition={{
                 duration,
-                repeat: Infinity,
+                repeat: 2,
                 delay,
                 ease: "easeInOut"
               }}

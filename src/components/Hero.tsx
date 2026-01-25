@@ -140,7 +140,7 @@ export default function Hero() {
           }}
           transition={{
             duration: 4,
-            repeat: Infinity,
+            repeat: 2,
             ease: "easeInOut"
           }}
         />
@@ -188,7 +188,7 @@ export default function Hero() {
               }}
               transition={{
                 duration: 3,
-                repeat: Infinity,
+                repeat: 2,
                 ease: "easeInOut"
               }}
             />
@@ -266,7 +266,7 @@ export default function Hero() {
               }}
               transition={{
                 duration,
-                repeat: Infinity,
+                repeat: 2,
                 delay,
                 ease: "easeInOut"
               }}
@@ -307,7 +307,7 @@ export default function Hero() {
               }}
               transition={{
                 duration: 3,
-                repeat: Infinity,
+                repeat: 2,
                 ease: "easeInOut"
               }}
             >
@@ -321,7 +321,7 @@ export default function Hero() {
               }}
               transition={{
                 duration: 5,
-                repeat: Infinity,
+                repeat: 2,
                 ease: "easeInOut"
               }}
               style={{
@@ -372,7 +372,7 @@ export default function Hero() {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                   animate={{ x: [0, 5, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
+                  transition={{ duration: 1.5, repeat: 2 }}
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </motion.svg>
@@ -395,7 +395,7 @@ export default function Hero() {
                 <motion.div
                   className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 ml-2 rounded-full bg-amber-400"
                   animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
+                  transition={{ duration: 2, repeat: 2 }}
                 />
               </span>
               <motion.div
@@ -416,7 +416,7 @@ export default function Hero() {
             }}
             transition={{
               duration: 6,
-              repeat: Infinity,
+              repeat: 2,
               ease: "easeInOut"
             }}
           >
@@ -431,7 +431,7 @@ export default function Hero() {
             }}
             transition={{
               duration: 8,
-              repeat: Infinity,
+              repeat: 2,
               ease: "easeInOut",
               delay: 2
             }}
@@ -449,7 +449,7 @@ export default function Hero() {
         }}
         transition={{
           duration: 2,
-          repeat: Infinity,
+          repeat: 2,
           ease: "easeInOut"
         }}
       >
@@ -461,7 +461,7 @@ export default function Hero() {
             }}
             transition={{
               duration: 2,
-              repeat: Infinity,
+              repeat: 2,
               ease: "easeInOut"
             }}
           />

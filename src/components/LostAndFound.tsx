@@ -237,7 +237,7 @@ const LostAndFound: React.FC = () => {
               }}
               transition={{ 
                 duration: 2, 
-                repeat: Infinity 
+                repeat: 2 
               }}
             >
               <FaSearch />

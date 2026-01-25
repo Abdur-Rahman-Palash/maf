@@ -10,7 +10,6 @@ interface UltraPremiumAnimationsProps {
 export default function UltraPremiumAnimations({ children }: UltraPremiumAnimationsProps) {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [scrollY, setScrollY] = useState(0);
-  const [time, setTime] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
@@ -27,14 +26,6 @@ export default function UltraPremiumAnimations({ children }: UltraPremiumAnimati
     damping: 30,
     restDelta: 0.001
   });
-
-  // Time-based animations with higher precision
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTime(prev => prev + 0.005);
-    }, 16); // ~60fps
-    return () => clearInterval(interval);
-  }, []);
 
   // Advanced mouse tracking with smoothing
   useEffect(() => {
@@ -118,7 +109,7 @@ export default function UltraPremiumAnimations({ children }: UltraPremiumAnimati
             }}
             transition={{
               duration,
-              repeat: Infinity,
+              repeat: 3,
               delay,
               ease: [0.25, 0.46, 0.45, 0.94],
               times: [0, 0.2, 0.4, 0.7, 1]
@@ -146,7 +137,7 @@ export default function UltraPremiumAnimations({ children }: UltraPremiumAnimati
               top: `${top}%`,
               width: `${size}px`,
               height: `${size}px`,
-              background: `conic-gradient(from ${time * 360}deg, rgba(59, 130, 246, ${opacity}), rgba(14, 165, 233, ${opacity * 0.8}), rgba(99, 102, 241, ${opacity * 0.6}), rgba(59, 130, 246, ${opacity}))`,
+              background: `conic-gradient(from 45deg, rgba(59, 130, 246, ${opacity}), rgba(14, 165, 233, ${opacity * 0.8}), rgba(99, 102, 241, ${opacity * 0.6}), rgba(59, 130, 246, ${opacity}))`,
               boxShadow: `0 0 ${size * 3}px rgba(59, 130, 246, 0.5), 0 0 ${size * 6}px rgba(14, 165, 233, 0.3)`,
             }}
             animate={{
@@ -159,7 +150,7 @@ export default function UltraPremiumAnimations({ children }: UltraPremiumAnimati
             }}
             transition={{
               duration,
-              repeat: Infinity,
+              repeat: 2,
               delay,
               ease: [0.68, -0.55, 0.265, 1.55],
               times: [0, 0.25, 0.5, 0.75, 1]
@@ -199,7 +190,7 @@ export default function UltraPremiumAnimations({ children }: UltraPremiumAnimati
             }}
             transition={{
               duration,
-              repeat: Infinity,
+              repeat: 2,
               delay,
               ease: "easeInOut",
               times: [0, 0.2, 0.5, 0.8, 1]
@@ -238,7 +229,7 @@ export default function UltraPremiumAnimations({ children }: UltraPremiumAnimati
             }}
             transition={{
               duration,
-              repeat: Infinity,
+              repeat: 3,
               delay,
               ease: "easeInOut"
             }}
@@ -275,7 +266,7 @@ export default function UltraPremiumAnimations({ children }: UltraPremiumAnimati
         }}
         transition={{
           duration: 15,
-          repeat: Infinity,
+          repeat: 2,
           ease: "linear"
         }}
       />
@@ -297,7 +288,7 @@ export default function UltraPremiumAnimations({ children }: UltraPremiumAnimati
         }}
         transition={{
           duration: 12,
-          repeat: Infinity,
+          repeat: 2,
           ease: "easeInOut"
         }}
       />
@@ -305,16 +296,16 @@ export default function UltraPremiumAnimations({ children }: UltraPremiumAnimati
       {/* Dynamic rotating gradient fields */}
       <motion.div
         className="fixed inset-0 pointer-events-none z-18 opacity-30"
-        animate={{
+          animate={{
           background: [
-            `conic-gradient(from ${time * 180}deg at 20% 20%, rgba(251, 191, 36, 0.03) 0deg, transparent 90deg, rgba(59, 130, 246, 0.02) 180deg, transparent 270deg)`,
-            `conic-gradient(from ${time * 180 + 90}deg at 80% 80%, rgba(59, 130, 246, 0.03) 0deg, transparent 90deg, rgba(16, 185, 129, 0.02) 180deg, transparent 270deg)`,
-            `conic-gradient(from ${time * 180 + 180}deg at 50% 50%, rgba(16, 185, 129, 0.03) 0deg, transparent 90deg, rgba(251, 191, 36, 0.02) 180deg, transparent 270deg)`,
+            `conic-gradient(from 45deg at 20% 20%, rgba(251, 191, 36, 0.03) 0deg, transparent 90deg, rgba(59, 130, 246, 0.02) 180deg, transparent 270deg)`,
+            `conic-gradient(from 135deg at 80% 80%, rgba(59, 130, 246, 0.03) 0deg, transparent 90deg, rgba(16, 185, 129, 0.02) 180deg, transparent 270deg)`,
+            `conic-gradient(from 225deg at 50% 50%, rgba(16, 185, 129, 0.03) 0deg, transparent 90deg, rgba(251, 191, 36, 0.02) 180deg, transparent 270deg)`,
           ],
         }}
         transition={{
           duration: 8,
-          repeat: Infinity,
+          repeat: 3,
           ease: "linear"
         }}
       />
@@ -324,13 +315,14 @@ export default function UltraPremiumAnimations({ children }: UltraPremiumAnimati
         className="fixed inset-0 pointer-events-none z-17 opacity-40"
         animate={{
           background: [
-            `linear-gradient(${time * 360}deg, rgba(251, 191, 36, 0.02) 0%, transparent 25%, rgba(59, 130, 246, 0.03) 50%, transparent 75%, rgba(16, 185, 129, 0.02) 100%)`,
-            `linear-gradient(${time * 360 + 120}deg, rgba(59, 130, 246, 0.02) 0%, transparent 25%, rgba(16, 185, 129, 0.03) 50%, transparent 75%, rgba(251, 191, 36, 0.02) 100%)`,
-            `linear-gradient(${time * 360 + 240}deg, rgba(16, 185, 129, 0.02) 0%, transparent 25%, rgba(251, 191, 36, 0.03) 50%, transparent 75%, rgba(59, 130, 246, 0.02) 100%)`,
+            `linear-gradient(45deg, rgba(251, 191, 36, 0.02) 0%, transparent 25%, rgba(59, 130, 246, 0.03) 50%, transparent 75%, rgba(16, 185, 129, 0.02) 100%)`,
+            `linear-gradient(165deg, rgba(59, 130, 246, 0.02) 0%, transparent 25%, rgba(16, 185, 129, 0.03) 50%, transparent 75%, rgba(251, 191, 36, 0.02) 100%)`,
+            `linear-gradient(285deg, rgba(16, 185, 129, 0.02) 0%, transparent 25%, rgba(251, 191, 36, 0.03) 50%, transparent 75%, rgba(59, 130, 246, 0.02) 100%)`,
           ],
         }}
         transition={{
           duration: 6,
+          repeat: 2,
           ease: "linear"
         }}
       />
@@ -347,7 +339,7 @@ export default function UltraPremiumAnimations({ children }: UltraPremiumAnimati
         }}
         transition={{
           duration: 10,
-          repeat: Infinity,
+          repeat: 2,
           ease: "easeInOut"
         }}
       />
@@ -375,7 +367,7 @@ export default function UltraPremiumAnimations({ children }: UltraPremiumAnimati
       }}
       transition={{
         duration: 8,
-        repeat: Infinity,
+        repeat: 2,
         ease: "easeInOut"
       }}
     >
@@ -390,7 +382,7 @@ export default function UltraPremiumAnimations({ children }: UltraPremiumAnimati
         }}
         transition={{
           duration: 4,
-          repeat: Infinity,
+          repeat: 3,
           ease: "linear"
         }}
       />
@@ -402,7 +394,7 @@ export default function UltraPremiumAnimations({ children }: UltraPremiumAnimati
         }}
         transition={{
           duration: 3,
-          repeat: Infinity,
+          repeat: 2,
           ease: "easeInOut"
         }}
       />
@@ -451,8 +443,8 @@ export default function UltraPremiumAnimations({ children }: UltraPremiumAnimati
               ],
             }}
             transition={{
-              duration,
-              repeat: Infinity,
+              duration: 40,
+              repeat: 2,
               delay,
               ease: [0.25, 0.46, 0.45, 0.94],
               times: [0, 0.25, 0.5, 0.75, 1]
@@ -493,7 +485,7 @@ export default function UltraPremiumAnimations({ children }: UltraPremiumAnimati
         }}
         transition={{
           duration: 8,
-          repeat: Infinity,
+          repeat: 2,
           ease: "easeInOut"
         }}
       />
@@ -506,7 +498,7 @@ export default function UltraPremiumAnimations({ children }: UltraPremiumAnimati
         }}
         transition={{
           duration: 8,
-          repeat: Infinity,
+          repeat: 2,
           ease: "easeInOut",
           delay: 2
         }}
@@ -520,7 +512,7 @@ export default function UltraPremiumAnimations({ children }: UltraPremiumAnimati
         }}
         transition={{
           duration: 8,
-          repeat: Infinity,
+          repeat: 2,
           ease: "easeInOut",
           delay: 1
         }}
@@ -534,7 +526,7 @@ export default function UltraPremiumAnimations({ children }: UltraPremiumAnimati
         }}
         transition={{
           duration: 8,
-          repeat: Infinity,
+          repeat: 2,
           ease: "easeInOut",
           delay: 3
         }}
@@ -583,7 +575,7 @@ export default function UltraPremiumAnimations({ children }: UltraPremiumAnimati
         }}
         transition={{
           duration: 3,
-          repeat: Infinity,
+          repeat: 2,
           ease: "linear"
         }}
       />

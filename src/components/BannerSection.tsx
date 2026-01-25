@@ -178,7 +178,7 @@ const BannerSection = () => {
                 }}
                 transition={{
                   duration: 2,
-                  repeat: activeSection === 'worshippers' ? Infinity : 0,
+                  repeat: activeSection === 'worshippers' ? 2 : 0,
                   ease: "easeInOut"
                 }}
               />
@@ -191,21 +191,21 @@ const BannerSection = () => {
                     <motion.div
                       className="absolute top-10 left-10 text-4xl sm:text-5xl lg:text-6xl opacity-20"
                       animate={{ y: [0, -20, 0], rotate: [0, 10, -10, 0] }}
-                      transition={{ duration: 4, repeat: Infinity }}
+                      transition={{ duration: 4, repeat: 2 }}
                     >
                       🕌
                     </motion.div>
                     <motion.div
                       className="absolute bottom-10 right-10 text-3xl sm:text-4xl lg:text-5xl opacity-20"
                       animate={{ y: [0, -15, 0], rotate: [0, -10, 10, 0] }}
-                      transition={{ duration: 5, repeat: Infinity, delay: 1 }}
+                      transition={{ duration: 5, repeat: 2, delay: 1 }}
                     >
                       🌙
                     </motion.div>
                     <motion.div
                       className="absolute top-1/2 left-1/4 text-2xl sm:text-3xl lg:text-4xl opacity-15"
                       animate={{ y: [0, -25, 0], rotate: [0, 15, -15, 0] }}
-                      transition={{ duration: 6, repeat: Infinity, delay: 2 }}
+                      transition={{ duration: 6, repeat: 2, delay: 2 }}
                     >
                       📖
                     </motion.div>
@@ -281,7 +281,7 @@ const BannerSection = () => {
                         stroke="currentColor" 
                         viewBox="0 0 24 24"
                         animate={{ x: activeSection === 'worshippers' ? [0, 3, 0] : 0 }}
-                        transition={{ duration: 1, repeat: activeSection === 'worshippers' ? Infinity : 0 }}
+                        transition={{ duration: 1, repeat: activeSection === 'worshippers' ? 2 : 0 }}
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </motion.svg>
@@ -319,7 +319,7 @@ const BannerSection = () => {
                 }}
                 transition={{
                   duration: 2,
-                  repeat: activeSection === 'visitors' ? Infinity : 0,
+                  repeat: activeSection === 'visitors' ? 2 : 0,
                   ease: "easeInOut"
                 }}
               />
@@ -332,21 +332,21 @@ const BannerSection = () => {
                     <motion.div
                       className="absolute top-10 left-10 text-3xl sm:text-4xl lg:text-5xl opacity-20"
                       animate={{ y: [0, -20, 0], rotate: [0, 10, -10, 0] }}
-                      transition={{ duration: 4, repeat: Infinity }}
+                      transition={{ duration: 4, repeat: 2 }}
                     >
                       🕌
                     </motion.div>
                     <motion.div
                       className="absolute bottom-10 right-10 text-2xl sm:text-3xl lg:text-4xl opacity-20"
                       animate={{ y: [0, -15, 0], rotate: [0, -10, 10, 0] }}
-                      transition={{ duration: 5, repeat: Infinity, delay: 1 }}
+                      transition={{ duration: 5, repeat: 2, delay: 1 }}
                     >
                       🌙
                     </motion.div>
                     <motion.div
                       className="absolute top-1/3 right-1/4 text-xl sm:text-2xl lg:text-3xl opacity-15"
                       animate={{ y: [0, -25, 0], rotate: [0, 15, -15, 0] }}
-                      transition={{ duration: 6, repeat: Infinity, delay: 2 }}
+                      transition={{ duration: 6, repeat: 2, delay: 2 }}
                     >
                       🤲
                     </motion.div>
@@ -422,7 +422,7 @@ const BannerSection = () => {
                         stroke="currentColor" 
                         viewBox="0 0 24 24"
                         animate={{ x: activeSection === 'visitors' ? [0, 3, 0] : 0 }}
-                        transition={{ duration: 1, repeat: activeSection === 'visitors' ? Infinity : 0 }}
+                        transition={{ duration: 1, repeat: activeSection === 'visitors' ? 2 : 0 }}
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </motion.svg>

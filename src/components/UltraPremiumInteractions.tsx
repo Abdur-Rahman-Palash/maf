@@ -117,7 +117,7 @@ export default function UltraPremiumInteractions({ children }: UltraPremiumInter
         }}
         transition={{
           duration: 2,
-          repeat: Infinity,
+          repeat: 2,
           ease: "easeInOut"
         }}
       />
@@ -184,7 +184,7 @@ export default function UltraPremiumInteractions({ children }: UltraPremiumInter
           }}
           transition={{
             duration: 3,
-            repeat: Infinity,
+            repeat: 2,
             ease: "easeInOut"
           }}
         />

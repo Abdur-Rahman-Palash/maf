@@ -82,7 +82,7 @@ const PremiumAnimatedBackground: React.FC = () => {
         }}
         transition={{
           duration: 20,
-          repeat: Infinity,
+          repeat: 2,
           ease: "easeInOut"
         }}
       />
@@ -105,7 +105,7 @@ const PremiumAnimatedBackground: React.FC = () => {
         }}
         transition={{
           duration: 25,
-          repeat: Infinity,
+          repeat: 2,
           ease: "easeInOut",
           delay: 2
         }}
@@ -134,7 +134,7 @@ const PremiumAnimatedBackground: React.FC = () => {
           }}
           transition={{
             duration: 15 + Math.random() * 10,
-            repeat: Infinity,
+            repeat: 2,
             delay: particle.delay,
             ease: "easeInOut"
           }}
@@ -156,7 +156,7 @@ const PremiumAnimatedBackground: React.FC = () => {
         }}
         transition={{
           duration: 20,
-          repeat: Infinity,
+          repeat: 2,
           ease: "linear"
         }}
       />
@@ -170,7 +170,7 @@ const PremiumAnimatedBackground: React.FC = () => {
         }}
         transition={{
           duration: 8,
-          repeat: Infinity,
+          repeat: 2,
           ease: "easeInOut"
         }}
       >
@@ -190,7 +190,7 @@ const PremiumAnimatedBackground: React.FC = () => {
         }}
         transition={{
           duration: 12,
-          repeat: Infinity,
+          repeat: 2,
           ease: "easeInOut",
           delay: 3
         }}

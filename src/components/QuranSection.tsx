@@ -77,7 +77,7 @@ export default function QuranSection() {
             }}
             transition={{ 
               duration: 20, 
-              repeat: Infinity,
+              repeat: 2,
               ease: "linear"
             }}
           >
@@ -92,7 +92,7 @@ export default function QuranSection() {
             }}
             transition={{ 
               duration: 15, 
-              repeat: Infinity,
+              repeat: 2,
               ease: "linear"
             }}
           >
@@ -122,7 +122,7 @@ export default function QuranSection() {
                   }}
                   transition={{
                     duration,
-                    repeat: Infinity,
+                    repeat: 2,
                     delay,
                     ease: "easeInOut"
                   }}
@@ -154,7 +154,7 @@ export default function QuranSection() {
                     }}
                     transition={{ 
                       duration: 2, 
-                      repeat: Infinity 
+                      repeat: 2 
                     }}
                   >
                     📖
@@ -209,7 +209,7 @@ export default function QuranSection() {
                                         initial={{ rotate: 0 }}
                                         animate={{ rotate: 360 }}
                                         exit={{ rotate: 0 }}
-                                        transition={{ duration: 1, repeat: Infinity }}
+                                        transition={{ duration: 1, repeat: 2 }}
                                     >
                                         <FaVolumeUp />
                                     </motion.div>
@@ -243,7 +243,7 @@ export default function QuranSection() {
                                     <motion.div
                                         className="w-8 h-8 border-3 border-amber-500 border-t-transparent rounded-full"
                                         animate={{ rotate: 360 }}
-                                        transition={{ duration: 1, repeat: Infinity }}
+                                        transition={{ duration: 1, repeat: 2 }}
                                     />
                                 </div>
                             )}
@@ -277,7 +277,7 @@ export default function QuranSection() {
                                         <motion.div
                                             className="w-3 h-3 bg-amber-500 rounded-full"
                                             animate={{ scale: [1, 1.5, 1] }}
-                                            transition={{ duration: 1, repeat: Infinity }}
+                                            transition={{ duration: 1, repeat: 2 }}
                                         />
                                     )}
                                 </div>

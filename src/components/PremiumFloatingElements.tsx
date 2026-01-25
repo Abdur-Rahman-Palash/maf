@@ -90,7 +90,7 @@ const PremiumFloatingElements: React.FC = () => {
               transition={{
                 duration: element.duration * 1.2,
                 delay: element.delay,
-                repeat: Infinity,
+                repeat: 2,
                 ease: "easeInOut"
               }}
             >
@@ -125,7 +125,7 @@ const PremiumFloatingElements: React.FC = () => {
             transition={{
               duration: element.duration,
               delay: element.delay,
-              repeat: Infinity,
+              repeat: 2,
               ease: [0.68, -0.55, 0.265, 1.55],
               times: [0, 0.2, 0.5, 0.8, 1]
             }}
@@ -158,7 +158,7 @@ const PremiumFloatingElements: React.FC = () => {
             transition={{
               duration: element.duration * 0.8,
               delay: element.delay + element.duration * 0.1,
-              repeat: Infinity,
+              repeat: 2,
               ease: "easeOut"
             }}
           />
@@ -183,7 +183,7 @@ const PremiumFloatingElements: React.FC = () => {
           }}
           transition={{
             duration: 3,
-            repeat: Infinity,
+            repeat: 2,
             ease: "easeInOut"
           }}
         />

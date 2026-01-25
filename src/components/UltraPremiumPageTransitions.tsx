@@ -51,7 +51,7 @@ export default function UltraPremiumPageTransitions({ children }: UltraPremiumPa
           }}
           transition={{
             duration: 20,
-            repeat: Infinity,
+            repeat: 2,
             ease: "linear"
           }}
         >
@@ -64,7 +64,7 @@ export default function UltraPremiumPageTransitions({ children }: UltraPremiumPa
             }}
             transition={{
               duration: 3,
-              repeat: Infinity,
+              repeat: 2,
               ease: "easeInOut"
             }}
           />
@@ -78,7 +78,7 @@ export default function UltraPremiumPageTransitions({ children }: UltraPremiumPa
             }}
             transition={{
               duration: 2.5,
-              repeat: Infinity,
+              repeat: 2,
               ease: "easeInOut",
               delay: 0.5
             }}
@@ -92,7 +92,7 @@ export default function UltraPremiumPageTransitions({ children }: UltraPremiumPa
             }}
             transition={{
               duration: 15,
-              repeat: Infinity,
+              repeat: 2,
               ease: "linear"
             }}
           >
@@ -115,7 +115,7 @@ export default function UltraPremiumPageTransitions({ children }: UltraPremiumPa
               }}
               transition={{
                 duration: 4,
-                repeat: Infinity,
+                repeat: 2,
                 delay: i * 0.5,
                 ease: "easeInOut"
               }}
@@ -143,7 +143,7 @@ export default function UltraPremiumPageTransitions({ children }: UltraPremiumPa
             }}
             transition={{
               duration: 2,
-              repeat: Infinity,
+              repeat: 2,
               ease: "easeInOut"
             }}
           >
