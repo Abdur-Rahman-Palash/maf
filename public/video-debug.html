@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Debug Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: white;
+        }
+        .video-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+            border: 2px solid #333;
+        }
+        video {
+            width: 100%;
+            height: auto;
+            border: 2px solid #333;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { background: #4CAF50; }
+        .error { background: #f44336; }
+        .info { background: #2196F3; }
+        .warning { background: #ff9800; }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover { background: #45a049; }
+    </style>
+</head>
+<body>
+    <h1>Video Debug Test - All Three Videos</h1>
+    
+    <!-- Hero Video Test -->
+    <div class="video-container">
+        <h2>1. Hero Video: 12081478_3840_2160_60fps.mp4 (81MB)</h2>
+        <video id="heroVideo" controls muted loop playsInline>
+            <source src="/12081478_3840_2160_60fps.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div id="heroStatus" class="status info">Loading...</div>
+        <button onclick="playVideo('heroVideo')">Play Hero Video</button>
+        <button onclick="testAutoplay('heroVideo')">Test Autoplay</button>
+    </div>
+
+    <!-- Worshippers Video Test -->
+    <div class="video-container">
+        <h2>2. Worshippers Video: 13245924_2160_3840_30fps.mp4 (38MB)</h2>
+        <video id="worshippersVideo" controls muted loop playsInline>
+            <source src="/13245924_2160_3840_30fps.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div id="worshippersStatus" class="status info">Loading...</div>
+        <button onclick="playVideo('worshippersVideo')">Play Worshippers Video</button>
+        <button onclick="testAutoplay('worshippersVideo')">Test Autoplay</button>
+    </div>
+
+    <!-- Visitors Video Test -->
+    <div class="video-container">
+        <h2>3. Visitors Video: 18414894-hd_1080_1920_30fps.mp4 (6MB)</h2>
+        <video id="visitorsVideo" controls muted loop playsInline>
+            <source src="/18414894-hd_1080_1920_30fps.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div id="visitorsStatus" class="status info">Loading...</div>
+        <button onclick="playVideo('visitorsVideo')">Play Visitors Video</button>
+        <button onclick="testAutoplay('visitorsVideo')">Test Autoplay</button>
+    </div>
+
+    <!-- Combined Test -->
+    <div class="video-container">
+        <h2>4. Combined Autoplay Test (All Videos Together)</h2>
+        <button onclick="testAllVideos()">Test All Videos Autoplay</button>
+        <button onclick="stopAllVideos()">Stop All Videos</button>
+        <div id="combinedStatus" class="status info">Ready to test...</div>
+    </div>
+
+    <!-- Debug Information -->
+    <div class="video-container">
+        <h2>5. Browser Information</h2>
+        <div id="browserInfo" class="status info">Checking browser...</div>
+        <button onclick="checkBrowser()">Check Browser Support</button>
+    </div>
+
+    <script>
+        // Track video states
+        const videoStates = {
+            heroVideo: false,
+            worshippersVideo: false,
+            visitorsVideo: false
+        };
+
+        // Setup video event listeners
+        function setupVideoListeners(videoId, statusId) {
+            const video = document.getElementById(videoId);
+            const status = document.getElementById(statusId);
+            
+            video.addEventListener('loadstart', () => {
+                status.textContent = 'Loading started...';
+                status.className = 'status info';
+            });
+            
+            video.addEventListener('loadeddata', () => {
+                status.textContent = 'Video loaded successfully!';
+                status.className = 'status success';
+                videoStates[videoId] = true;
+            });
+            
+            video.addEventListener('canplay', () => {
+                status.textContent = 'Video can play!';
+                status.className = 'status success';
+            });
+            
+            video.addEventListener('error', (e) => {
+                status.textContent = `Error: ${e.message || 'Unknown error'}`;
+                status.className = 'status error';
+                console.error(`${videoId} error:`, e);
+            });
+            
+            video.addEventListener('play', () => {
+                status.textContent = 'Video is playing!';
+                status.className = 'status success';
+            });
+            
+            video.addEventListener('pause', () => {
+                status.textContent = 'Video is paused';
+                status.className = 'status warning';
+            });
+        }
+
+        // Play video manually
+        function playVideo(videoId) {
+            const video = document.getElementById(videoId);
+            video.play().then(() => {
+                console.log(`${videoId} played successfully`);
+            }).catch(error => {
+                console.error(`${videoId} play failed:`, error);
+                alert(`${videoId} play failed: ${error.message}`);
+            });
+        }
+
+        // Test autoplay
+        function testAutoplay(videoId) {
+            const video = document.getElementById(videoId);
+            video.muted = true;
+            video.play().then(() => {
+                console.log(`${videoId} autoplay successful`);
+                alert(`${videoId} autoplay successful!`);
+            }).catch(error => {
+                console.error(`${videoId} autoplay failed:`, error);
+                alert(`${videoId} autoplay failed: ${error.message}`);
+            });
+        }
+
+        // Test all videos together
+        function testAllVideos() {
+            const videos = ['heroVideo', 'worshippersVideo', 'visitorsVideo'];
+            const combinedStatus = document.getElementById('combinedStatus');
+            
+            Promise.all(videos.map(videoId => {
+                const video = document.getElementById(videoId);
+                video.muted = true;
+                return video.play();
+            })).then(() => {
+                combinedStatus.textContent = 'All videos playing successfully!';
+                combinedStatus.className = 'status success';
+            }).catch(error => {
+                combinedStatus.textContent = `Combined autoplay failed: ${error.message}`;
+                combinedStatus.className = 'status error';
+                console.error('Combined autoplay failed:', error);
+            });
+        }
+
+        // Stop all videos
+        function stopAllVideos() {
+            const videos = ['heroVideo', 'worshippersVideo', 'visitorsVideo'];
+            videos.forEach(videoId => {
+                const video = document.getElementById(videoId);
+                video.pause();
+                video.currentTime = 0;
+            });
+            document.getElementById('combinedStatus').textContent = 'All videos stopped';
+            document.getElementById('combinedStatus').className = 'status info';
+        }
+
+        // Check browser support
+        function checkBrowser() {
+            const browserInfo = document.getElementById('browserInfo');
+            const video = document.createElement('video');
+            
+            let info = `Browser: ${navigator.userAgent}\n`;
+            info += `Video Support: ${typeof HTMLVideoElement !== 'undefined' ? '✅' : '❌'}\n`;
+            info += `Autoplay Support: ${video.autoplay ? '✅' : '❌'}\n`;
+            info += `Muted Autoplay: ${video.muted ? '✅' : '❌'}\n`;
+            info += `PlaysInline: ${video.playsInline ? '✅' : '❌'}\n`;
+            
+            // Check if user has interacted with the page
+            info += `User Interaction: ${document.hasStoredUserActivation ? '✅' : '❌'}\n`;
+            
+            browserInfo.textContent = info;
+            browserInfo.className = 'status info';
+        }
+
+        // Initialize all video listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            setupVideoListeners('heroVideo', 'heroStatus');
+            setupVideoListeners('worshippersVideo', 'worshippersStatus');
+            setupVideoListeners('visitorsVideo', 'visitorsStatus');
+            checkBrowser();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Islamic Worshippers Animation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow: hidden;
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 50%, #92400E 100%);
+        }
+        
+        .container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mosque {
+            position: absolute;
+            font-size: 200px;
+            animation: float 8s ease-in-out infinite;
+            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.3));
+        }
+        
+        .prayer-symbols {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .symbol {
+            position: absolute;
+            font-size: 60px;
+            opacity: 0;
+            animation: appear 4s ease-in-out infinite;
+        }
+        
+        .symbol:nth-child(1) {
+            top: 20%;
+            left: 15%;
+            animation-delay: 0s;
+        }
+        
+        .symbol:nth-child(2) {
+            top: 30%;
+            right: 20%;
+            animation-delay: 1s;
+        }
+        
+        .symbol:nth-child(3) {
+            bottom: 25%;
+            left: 25%;
+            animation-delay: 2s;
+        }
+        
+        .symbol:nth-child(4) {
+            bottom: 20%;
+            right: 15%;
+            animation-delay: 3s;
+        }
+        
+        .light-rays {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, 
+                rgba(255,255,255,0.1) 0%, 
+                rgba(255,255,255,0.05) 30%, 
+                transparent 70%);
+            animation: pulse 6s ease-in-out infinite;
+        }
+        
+        .arabic-text {
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 48px;
+            color: rgba(255,255,255,0.8);
+            font-family: 'Amiri', serif;
+            animation: glow 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-30px) scale(1.05); }
+        }
+        
+        @keyframes appear {
+            0%, 100% { opacity: 0; transform: scale(0.8) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1.2) rotate(10deg); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+        
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 20px rgba(255,255,255,0.5); }
+            50% { text-shadow: 0 0 40px rgba(255,255,255,0.8); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="light-rays"></div>
+        <div class="mosque">🕌</div>
+        <div class="prayer-symbols">
+            <div class="symbol">🙏</div>
+            <div class="symbol">📖</div>
+            <div class="symbol">🌙</div>
+            <div class="symbol">⭐</div>
+        </div>
+        <div class="arabic-text">بسم الله الرحمن الرحيم</div>
+    </div>
+</body>
+</html>

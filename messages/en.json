@@ -1,0 +1,23 @@
+{
+  "Navbar": {
+    "home": "Home",
+    "services": "Services",
+    "news": "News & Media",
+    "calendar": "Calendar",
+    "architecture": "Architecture",
+    "library": "Library",
+    "souq": "Souq",
+    "visit": "Visit"
+  },
+  "Hero": {
+    "title": "Masjid Salman al Farsi",
+    "subtitle": "A Place of Peace, Prayer, and Community",
+    "cta": "Plan Your Visit"
+  },
+  "Services": {
+    "title": "Our Services"
+  },
+  "News": {
+    "title": "Latest News"
+  }
+}

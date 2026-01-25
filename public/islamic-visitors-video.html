@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Islamic Visitors Video Generator</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: linear-gradient(45deg, #3B82F6, #1E40AF); }
+        .mosque { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            font-size: 100px; 
+            animation: float 6s ease-in-out infinite;
+        }
+        .visitor {
+            position: absolute;
+            font-size: 35px;
+            animation: visitor 5s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
+            50% { transform: translate(-50%, -50%) translateY(-15px); }
+        }
+        @keyframes visitor {
+            0%, 100% { opacity: 0.4; transform: scale(0.9) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1.1) rotate(5deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="mosque">🕌</div>
+    <div class="visitor" style="top: 15%; left: 15%; animation-delay: 0s;">👥</div>
+    <div class="visitor" style="top: 25%; right: 20%; animation-delay: 1s;">🗺️</div>
+    <div class="visitor" style="bottom: 30%; left: 25%; animation-delay: 2s;">📸</div>
+    <div class="visitor" style="bottom: 20%; right: 15%; animation-delay: 3s;">🎭</div>
+    <div class="visitor" style="top: 50%; left: 10%; animation-delay: 4s;">📱</div>
+    
+    <script>
+        // This creates a visual placeholder for the video
+        // Replace this with actual Islamic video content
+    </script>
+</body>
+</html>

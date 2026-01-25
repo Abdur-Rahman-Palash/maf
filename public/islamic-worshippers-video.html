@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Islamic Worshippers Video Generator</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: linear-gradient(45deg, #F59E0B, #D97706); }
+        .mosque { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            font-size: 120px; 
+            animation: float 6s ease-in-out infinite;
+        }
+        .prayer {
+            position: absolute;
+            font-size: 40px;
+            animation: prayer 4s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
+            50% { transform: translate(-50%, -50%) translateY(-20px); }
+        }
+        @keyframes prayer {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+    </style>
+</head>
+<body>
+    <div class="mosque">🕌</div>
+    <div class="prayer" style="top: 20%; left: 20%;">🙏</div>
+    <div class="prayer" style="top: 30%; right: 25%; animation-delay: 1s;">📖</div>
+    <div class="prayer" style="bottom: 25%; left: 30%; animation-delay: 2s;">🌙</div>
+    <div class="prayer" style="bottom: 20%; right: 20%; animation-delay: 3s;">⭐</div>
+    
+    <script>
+        // This creates a visual placeholder for the video
+        // Replace this with actual Islamic video content
+    </script>
+</body>
+</html>

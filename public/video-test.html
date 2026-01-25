@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: white;
+        }
+        .video-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        video {
+            width: 100%;
+            height: auto;
+            border: 2px solid #333;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { background: #4CAF50; }
+        .error { background: #f44336; }
+        .info { background: #2196F3; }
+    </style>
+</head>
+<body>
+    <h1>Video Integration Test</h1>
+    
+    <div class="video-container">
+        <h2>Test 1: Direct Video Load</h2>
+        <video id="video1" controls autoplay muted loop>
+            <source src="/12081478_3840_2160_60fps.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div id="status1" class="status info">Loading...</div>
+    </div>
+
+    <div class="video-container">
+        <h2>Test 2: Background Video (like Hero section)</h2>
+        <div style="position: relative; width: 100%; height: 400px; overflow: hidden;">
+            <video id="video2" autoplay muted loop style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+                <source src="/12081478_3840_2160_60fps.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div style="position: relative; z-index: 1; text-align: center; padding: 50px; background: rgba(0,0,0,0.5);">
+                <h2 style="color: white; font-size: 2em;">Welcome to Masjid Salman al Farsi</h2>
+                <p style="color: white;">This should appear over the video background</p>
+            </div>
+        </div>
+        <div id="status2" class="status info">Loading...</div>
+    </div>
+
+    <div class="video-container">
+        <h2>Debug Information</h2>
+        <div id="debug" class="status info">
+            Checking video file...
+        </div>
+    </div>
+
+    <script>
+        // Test video 1
+        const video1 = document.getElementById('video1');
+        const status1 = document.getElementById('status1');
+        
+        video1.addEventListener('loadstart', () => {
+            status1.textContent = 'Loading started...';
+            status1.className = 'status info';
+        });
+        
+        video1.addEventListener('loadeddata', () => {
+            status1.textContent = 'Video loaded successfully!';
+            status1.className = 'status success';
+        });
+        
+        video1.addEventListener('error', (e) => {
+            status1.textContent = 'Error loading video: ' + e.message;
+            status1.className = 'status error';
+        });
+
+        // Test video 2
+        const video2 = document.getElementById('video2');
+        const status2 = document.getElementById('status2');
+        
+        video2.addEventListener('loadstart', () => {
+            status2.textContent = 'Background video loading...';
+            status2.className = 'status info';
+        });
+        
+        video2.addEventListener('loadeddata', () => {
+            status2.textContent = 'Background video loaded successfully!';
+            status2.className = 'status success';
+        });
+        
+        video2.addEventListener('error', (e) => {
+            status2.textContent = 'Error loading background video: ' + e.message;
+            status2.className = 'status error';
+        });
+
+        // Debug information
+        const debug = document.getElementById('debug');
+        
+        // Check if video file exists
+        fetch('/12081478_3840_2160_60fps.mp4', { method: 'HEAD' })
+            .then(response => {
+                if (response.ok) {
+                    debug.innerHTML += '<br>✅ Video file exists and is accessible';
+                    debug.innerHTML += '<br>Content-Type: ' + response.headers.get('Content-Type');
+                    debug.innerHTML += '<br>Content-Length: ' + response.headers.get('Content-Length') + ' bytes';
+                    debug.innerHTML += '<br>Status: ' + response.status + ' ' + response.statusText;
+                } else {
+                    debug.innerHTML += '<br>❌ Video file not accessible: ' + response.status + ' ' + response.statusText;
+                }
+            })
+            .catch(error => {
+                debug.innerHTML += '<br>❌ Network error: ' + error.message;
+            });
+
+        // Browser information
+        debug.innerHTML += '<br><br>Browser Information:';
+        debug.innerHTML += '<br>User Agent: ' + navigator.userAgent;
+        debug.innerHTML += '<br>Video Support: ' + (typeof HTMLVideoElement !== 'undefined' ? '✅' : '❌');
+        debug.innerHTML += '<br>Autoplay Support: ' + (video1.autoplay ? '✅' : '❌');
+    </script>
+</body>
+</html>
