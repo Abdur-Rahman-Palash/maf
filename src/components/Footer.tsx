@@ -235,22 +235,14 @@ export default function Footer() {
           onClick={scrollToTop}
           whileHover={{ y: -5 }}
           whileTap={{ scale: 0.9 }}
-          className="fixed right-6 bottom-6 w-12 h-12 bg-gold text-black rounded-full flex items-center justify-center shadow-lg z-50"
+          className="fixed right-6 bottom-6 w-12 h-12 bg-gold text-black rounded-full flex items-center justify-center shadow-lg z-50 animate-float"
           style={{ 
-            boxShadow: '0 10px 30px rgba(212, 175, 55, 0.4)',
-            animation: 'float 3s ease-in-out infinite'
+            boxShadow: '0 10px 30px rgba(212, 175, 55, 0.4)'
           }}
         >
           <FaArrowUp className="text-lg" />
         </motion.button>
       )}
-
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-      `}</style>
     </>
   );
 }

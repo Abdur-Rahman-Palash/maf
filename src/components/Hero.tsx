@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTicketAlt, FaPlay, FaChevronDown, FaMosque, FaTimes, FaMoon, FaSun, FaCloudSun, FaCloudMoon } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
+import { Link } from '@/i18n/routing';
 
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -35,21 +36,15 @@ const Hero = () => {
   const slides = [
     {
       id: 1,
-      image: 'https://images.unsplash.com/photo-1586379972525-4d69b0c3d2a1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-      title: 'Prayer Hall',
-      description: 'Beautiful mosque interior with Islamic architecture'
+      image: '/image1.png',
+      title: 'Grand Mosque',
+      description: 'Magnificent Islamic architecture with golden domes'
     },
     {
       id: 2,
-      image: 'https://images.unsplash.com/photo-1610057099431-d73e0c007d38?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-      title: 'Golden Hour',
-      description: 'Sunlight streaming through mosque windows'
-    },
-    {
-      id: 3,
-      image: 'https://images.unsplash.com/photo-1528722828814-77b9b83aafb2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-      title: 'Dusk View',
-      description: 'Mosque minarets silhouetted against sunset'
+      image: '/image2.jpg',
+      title: 'Prayer Hall',
+      description: 'Serene interior with intricate Islamic patterns'
     }
   ];
 
@@ -227,20 +222,19 @@ const Hero = () => {
             </motion.div>
 
             {/* Secondary CTA */}
-            <motion.div
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.98 }}
+            <Link
+              href="/architecture/overview"
+              className="group relative overflow-hidden bg-transparent border-2 border-white/60 text-white px-8 sm:px-10 lg:px-12 py-4 sm:py-5 lg:py-6 rounded-full font-bold text-lg sm:text-xl lg:text-2xl hover:bg-white hover:text-gray-900 transition-all duration-300 block"
+              onClick={() => {
+                console.log('Architecture link clicked!');
+                alert('Architecture link clicked!');
+              }}
             >
-              <button
-                onClick={() => router.push('/architecture/overview')}
-                className="group relative overflow-hidden bg-transparent border-2 border-white/60 text-white px-8 sm:px-10 lg:px-12 py-4 sm:py-5 lg:py-6 rounded-full font-bold text-lg sm:text-xl lg:text-2xl hover:bg-white hover:text-gray-900 transition-all duration-300"
-              >
-                <span className="relative z-10 flex items-center gap-3">
-                  <FaPlay className="text-xl sm:text-2xl" />
-                  Explore Hidden Stories
-                </span>
-              </button>
-            </motion.div>
+              <span className="relative z-10 flex items-center gap-3">
+                <FaPlay className="text-xl sm:text-2xl" />
+                Explore Hidden Stories
+              </span>
+            </Link>
           </motion.div>
         </motion.div>
       </div>

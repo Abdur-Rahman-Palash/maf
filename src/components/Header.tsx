@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaBars, FaTimes, FaSearch, FaGlobe, FaHeart } from 'react-icons/fa';
 import { useLocale, useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
+import { useRouter } from 'next/navigation';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -13,6 +14,7 @@ const Header = () => {
   const [currentSection, setCurrentSection] = useState('hero');
   const locale = useLocale();
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -160,46 +162,19 @@ const Header = () => {
             </motion.button>
 
             {/* Gorgeous Donate Button */}
-            <motion.div
-              whileHover={{ 
-                scale: 1.08, 
-                y: -3,
-                boxShadow: "0 10px 30px rgba(236, 72, 153, 0.4)"
-              }}
-              whileTap={{ scale: 0.95 }}
-              animate={{
-                boxShadow: [
-                  '0 0 20px rgba(236, 72, 153, 0.3)',
-                  '0 0 40px rgba(236, 72, 153, 0.6)',
-                  '0 0 20px rgba(236, 72, 153, 0.3)'
-                ]
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity
+            <Link
+              href="/donate"
+              className="relative overflow-hidden bg-gradient-to-r from-pink-500 to-rose-600 text-white px-8 py-4 rounded-full font-bold text-base shadow-lg hover:shadow-pink-500/70 transition-all duration-300 flex items-center gap-3 border-2 border-pink-400/30 hover:scale-105 z-50"
+              style={{ pointerEvents: 'auto' }}
+              onClick={(e) => {
+                console.log('Donate link clicked!');
+                alert('Donate link clicked!');
               }}
             >
-              <Link
-                href="/donate"
-                className="relative overflow-hidden bg-gradient-to-r from-pink-500 to-rose-600 text-white px-8 py-4 rounded-full font-bold text-base shadow-lg hover:shadow-pink-500/70 transition-all duration-300 flex items-center gap-3 border-2 border-pink-400/30 block"
-              >
-              <motion.div
-                animate={{
-                  rotate: [0, 10, -10, 0],
-                  scale: [1, 1.1, 1]
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity
-                }}
-              >
-                <FaHeart className="text-base" />
-              </motion.div>
+              <FaHeart className="text-base" />
               <span className="relative z-10 font-bold tracking-wide">Donate</span>
               <div className="absolute inset-0 bg-gradient-to-r from-rose-600 to-pink-700 transform translate-y-full hover:translate-y-0 transition-transform duration-300 rounded-full" />
-              <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-full" />
-              </Link>
-            </motion.div>
+            </Link>
 
             {/* Mobile Menu Button */}
             <motion.button
@@ -261,19 +236,18 @@ const Header = () => {
                 </nav>
 
                 {/* Mobile Donate Button */}
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                <Link
+                  href="/donate"
+                  onClick={() => {
+                    console.log('Mobile donate link clicked!');
+                    alert('Mobile donate link clicked!');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full relative overflow-hidden bg-gradient-to-r from-pink-500 to-rose-600 text-white px-6 py-3 rounded-full font-bold text-sm shadow-lg hover:shadow-pink-500/50 transition-all duration-300 flex items-center justify-center gap-2 mb-6 hover:scale-105"
                 >
-                  <Link
-                    href="/donate"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="w-full relative overflow-hidden bg-gradient-to-r from-pink-500 to-rose-600 text-white px-6 py-3 rounded-full font-bold text-sm shadow-lg hover:shadow-pink-500/50 transition-all duration-300 flex items-center justify-center gap-2 mb-6 block"
-                  >
-                    <FaHeart className="text-sm" />
-                    <span>Donate</span>
-                  </Link>
-                </motion.div>
+                  <FaHeart className="text-sm" />
+                  <span>Donate</span>
+                </Link>
 
                 {/* Mobile Language & Search */}
                 <div className="flex items-center justify-between pt-6 border-t border-white/20">

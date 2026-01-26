@@ -40,6 +40,15 @@ body {
   100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
 }
 
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
 .animate-glow-pulse {
   animation: glow-pulse 2s infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
 }
