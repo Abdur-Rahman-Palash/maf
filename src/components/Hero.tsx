@@ -3,10 +3,12 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTicketAlt, FaPlay, FaChevronDown, FaMosque, FaTimes, FaMoon, FaSun, FaCloudSun, FaCloudMoon } from 'react-icons/fa';
+import { useRouter } from 'next/navigation';
 
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showPrayerTimes, setShowPrayerTimes] = useState(false);
+  const router = useRouter();
 
   // Prayer times for Masjid Salman al Farsi
   const prayerTimes = {
@@ -197,8 +199,7 @@ const Hero = () => {
             transition={{ duration: 1.2, delay: 1.6 }}
           >
             {/* Primary CTA */}
-            <motion.button
-              className="group relative overflow-hidden bg-gradient-to-r from-yellow-500 to-yellow-600 text-white px-8 sm:px-10 lg:px-12 py-4 sm:py-5 lg:py-6 rounded-full font-bold text-lg sm:text-xl lg:text-2xl shadow-2xl hover:shadow-yellow-500/50 transition-all duration-300"
+            <motion.div
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.98 }}
               animate={{
@@ -213,24 +214,33 @@ const Hero = () => {
                 repeat: Infinity
               }}
             >
-              <span className="relative z-10 flex items-center gap-3">
-                <FaTicketAlt className="text-xl sm:text-2xl" />
-                Book Skip-the-Line Tickets
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-600 to-yellow-700 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-            </motion.button>
+              <button
+                onClick={() => router.push('/visitors/book-visit')}
+                className="group relative overflow-hidden bg-gradient-to-r from-yellow-500 to-yellow-600 text-white px-8 sm:px-10 lg:px-12 py-4 sm:py-5 lg:py-6 rounded-full font-bold text-lg sm:text-xl lg:text-2xl shadow-2xl hover:shadow-yellow-500/50 transition-all duration-300"
+              >
+                <span className="relative z-10 flex items-center gap-3">
+                  <FaTicketAlt className="text-xl sm:text-2xl" />
+                  Book Skip-the-Line Tickets
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-600 to-yellow-700 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+              </button>
+            </motion.div>
 
             {/* Secondary CTA */}
-            <motion.button
-              className="group relative overflow-hidden bg-transparent border-2 border-white/60 text-white px-8 sm:px-10 lg:px-12 py-4 sm:py-5 lg:py-6 rounded-full font-bold text-lg sm:text-xl lg:text-2xl hover:bg-white hover:text-gray-900 transition-all duration-300"
+            <motion.div
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.98 }}
             >
-              <span className="relative z-10 flex items-center gap-3">
-                <FaPlay className="text-xl sm:text-2xl" />
-                Explore Hidden Stories
-              </span>
-            </motion.button>
+              <button
+                onClick={() => router.push('/architecture/overview')}
+                className="group relative overflow-hidden bg-transparent border-2 border-white/60 text-white px-8 sm:px-10 lg:px-12 py-4 sm:py-5 lg:py-6 rounded-full font-bold text-lg sm:text-xl lg:text-2xl hover:bg-white hover:text-gray-900 transition-all duration-300"
+              >
+                <span className="relative z-10 flex items-center gap-3">
+                  <FaPlay className="text-xl sm:text-2xl" />
+                  Explore Hidden Stories
+                </span>
+              </button>
+            </motion.div>
           </motion.div>
         </motion.div>
       </div>

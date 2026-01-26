@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { FaInstagram, FaTwitter, FaFacebook, FaYoutube, FaArrowUp } from 'react-icons/fa';
+import { Link } from '@/i18n/routing';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
@@ -66,22 +67,25 @@ export default function Footer() {
               <h4 className="text-gold font-bold text-lg mb-6 uppercase tracking-wider">Quick Links</h4>
               <ul className="space-y-3">
                 {[
-                  { name: 'Services', href: '#services' },
-                  { name: 'News & Media', href: '#news' },
-                  { name: 'Architecture', href: '/en/general-architecture' },
-                  { name: 'Visit Us', href: '#visit' },
-                  { name: 'Contact', href: '#contact' },
-                  { name: 'Prayer Times', href: '#prayer' }
+                  { name: 'Services', href: '/worshippers/services-facilities' },
+                  { name: 'News & Media', href: '/news/multimedia-gallery' },
+                  { name: 'Architecture', href: '/architecture/overview' },
+                  { name: 'Visit Us', href: '/visitors/book-visit' },
+                  { name: 'Contact', href: '/mosques/sheikh-zayed' },
+                  { name: 'Prayer Times', href: '/worshippers/prayer-timings' }
                 ].map((link) => (
                   <li key={link.name}>
-                    <motion.a
-                      href={link.href}
+                    <motion.div
                       whileHover={{ x: 5 }}
-                      className="text-slate-300 hover:text-gold transition-colors duration-300 flex items-center gap-2 text-sm"
                     >
-                      <span className="text-gold/50">›</span>
-                      {link.name}
-                    </motion.a>
+                      <Link
+                        href={link.href}
+                        className="text-slate-300 hover:text-gold transition-colors duration-300 flex items-center gap-2 text-sm"
+                      >
+                        <span className="text-gold/50">›</span>
+                        {link.name}
+                      </Link>
+                    </motion.div>
                   </li>
                 ))}
               </ul>
@@ -212,11 +216,11 @@ export default function Footer() {
             <p>© Masjid Salman al Farsi 2026. All rights reserved.</p>
             <p className="text-xs">Best viewed in modern browsers (Chrome, Firefox, Safari, Edge)</p>
             <div className="flex justify-center gap-4 mt-4">
-              <a href="#" className="hover:text-gold transition-colors">Privacy Policy</a>
+              <Link href="/privacy" className="hover:text-gold transition-colors">Privacy Policy</Link>
               <span className="text-gold/30">•</span>
-              <a href="#" className="hover:text-gold transition-colors">Terms of Use</a>
+              <Link href="/terms" className="hover:text-gold transition-colors">Terms of Use</Link>
               <span className="text-gold/30">•</span>
-              <a href="#" className="hover:text-gold transition-colors">Accessibility</a>
+              <Link href="/accessibility" className="hover:text-gold transition-colors">Accessibility</Link>
             </div>
           </motion.div>
         </div>

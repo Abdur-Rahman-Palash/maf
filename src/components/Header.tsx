@@ -3,12 +3,16 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaBars, FaTimes, FaSearch, FaGlobe, FaHeart } from 'react-icons/fa';
+import { useLocale, useTranslations } from 'next-intl';
+import { Link, usePathname } from '@/i18n/routing';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [currentLang, setCurrentLang] = useState('EN');
   const [currentSection, setCurrentSection] = useState('hero');
+  const locale = useLocale();
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,10 +43,10 @@ const Header = () => {
   };
 
   const navLinks = [
-    { name: 'Home', href: '#hero' },
-    { name: 'About', href: '#banner' },
-    { name: 'Services', href: '#services' },
-    { name: 'Quran', href: '#quran' }
+    { name: 'Home', href: '/' },
+    { name: 'About', href: '/mosques/sheikh-zayed' },
+    { name: 'Services', href: '/worshippers/services-facilities' },
+    { name: 'Architecture', href: '/architecture/overview' }
   ];
 
   // Dynamic background based on current section
@@ -79,52 +83,56 @@ const Header = () => {
       >
         <div className="relative z-10 h-full flex items-center justify-between px-6 lg:px-12">
           {/* Logo - Left */}
-          <motion.a
-            href="#hero"
+          <motion.div
             className="flex items-center space-x-3 group"
             whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.2 }}
           >
-            <div className="relative">
-              <h1 
-                className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600"
-                style={{ 
-                  fontFamily: 'Georgia, "Times New Roman", serif',
-                  letterSpacing: '1px',
-                  textShadow: '0 4px 8px rgba(0,0,0,0.4)'
-                }}
+            <Link href="/" className="flex items-center space-x-3 group">
+              <div className="relative">
+                <h1 
+                  className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600"
+                  style={{ 
+                    fontFamily: 'Georgia, "Times New Roman", serif',
+                    letterSpacing: '1px',
+                    textShadow: '0 4px 8px rgba(0,0,0,0.4)'
+                  }}
+                >
+                  Masjid Salman al
+                </h1>
+                <div className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-yellow-500/70 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
+              </div>
+              <span 
+                className="hidden md:block text-xl md:text-2xl text-yellow-200/90 font-semibold"
+                style={{ fontFamily: 'Georgia, serif' }}
               >
-                Masjid Salman al
-              </h1>
-              <div className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-yellow-500/70 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
-            </div>
-            <span 
-              className="hidden md:block text-xl md:text-2xl text-yellow-200/90 font-semibold"
-              style={{ fontFamily: 'Georgia, serif' }}
-            >
-              Farsi
-            </span>
-          </motion.a>
+                Farsi
+              </span>
+            </Link>
+          </motion.div>
 
           {/* Navigation Links - Center */}
           <nav className="hidden lg:flex items-center justify-center flex-1">
             <div className="flex items-center space-x-8">
               {navLinks.map((link, index) => (
-                <motion.a
+                <motion.div
                   key={link.name}
-                  href={link.href}
-                  className="relative text-white/90 hover:text-yellow-300 transition-colors duration-200 font-medium"
-                  style={{ fontFamily: 'system-ui, sans-serif' }}
+                  whileHover={{ y: -2 }}
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.1 * index }}
-                  whileHover={{ y: -2 }}
                 >
-                  {link.name}
-                  <span 
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-400 transform scale-x-0 hover:scale-x-100 transition-transform duration-300"
-                  />
-                </motion.a>
+                  <Link
+                    href={link.href}
+                    className="relative text-white/90 hover:text-yellow-300 transition-colors duration-200 font-medium block py-2"
+                    style={{ fontFamily: 'system-ui, sans-serif' }}
+                  >
+                    {link.name}
+                    <span 
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-400 transform scale-x-0 hover:scale-x-100 transition-transform duration-300"
+                    />
+                  </Link>
+                </motion.div>
               ))}
             </div>
           </nav>
@@ -152,8 +160,7 @@ const Header = () => {
             </motion.button>
 
             {/* Gorgeous Donate Button */}
-            <motion.button
-              className="relative overflow-hidden bg-gradient-to-r from-pink-500 to-rose-600 text-white px-8 py-4 rounded-full font-bold text-base shadow-lg hover:shadow-pink-500/70 transition-all duration-300 flex items-center gap-3 border-2 border-pink-400/30"
+            <motion.div
               whileHover={{ 
                 scale: 1.08, 
                 y: -3,
@@ -172,6 +179,10 @@ const Header = () => {
                 repeat: Infinity
               }}
             >
+              <Link
+                href="/donate"
+                className="relative overflow-hidden bg-gradient-to-r from-pink-500 to-rose-600 text-white px-8 py-4 rounded-full font-bold text-base shadow-lg hover:shadow-pink-500/70 transition-all duration-300 flex items-center gap-3 border-2 border-pink-400/30 block"
+              >
               <motion.div
                 animate={{
                   rotate: [0, 10, -10, 0],
@@ -187,7 +198,8 @@ const Header = () => {
               <span className="relative z-10 font-bold tracking-wide">Donate</span>
               <div className="absolute inset-0 bg-gradient-to-r from-rose-600 to-pink-700 transform translate-y-full hover:translate-y-0 transition-transform duration-300 rounded-full" />
               <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-full" />
-            </motion.button>
+              </Link>
+            </motion.div>
 
             {/* Mobile Menu Button */}
             <motion.button
@@ -230,30 +242,38 @@ const Header = () => {
                 {/* Mobile Nav Links */}
                 <nav className="space-y-4 mb-6">
                   {navLinks.map((link, index) => (
-                    <motion.a
+                    <motion.div
                       key={link.name}
-                      href={link.href}
-                      className="block text-white/90 hover:text-yellow-300 transition-colors duration-200 font-medium py-3 px-4 rounded-lg hover:bg-white/10"
-                      style={{ fontFamily: 'system-ui, sans-serif' }}
                       initial={{ opacity: 0, x: 50 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.3, delay: 0.1 * index }}
-                      onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      {link.name}
-                    </motion.a>
+                      <Link
+                        href={link.href}
+                        className="block text-white/90 hover:text-yellow-300 transition-colors duration-200 font-medium py-3 px-4 rounded-lg hover:bg-white/10"
+                        style={{ fontFamily: 'system-ui, sans-serif' }}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {link.name}
+                      </Link>
+                    </motion.div>
                   ))}
                 </nav>
 
                 {/* Mobile Donate Button */}
-                <motion.button
-                  className="w-full relative overflow-hidden bg-gradient-to-r from-pink-500 to-rose-600 text-white px-6 py-3 rounded-full font-bold text-sm shadow-lg hover:shadow-pink-500/50 transition-all duration-300 flex items-center justify-center gap-2 mb-6"
+                <motion.div
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <FaHeart className="text-sm" />
-                  <span>Donate</span>
-                </motion.button>
+                  <Link
+                    href="/donate"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-full relative overflow-hidden bg-gradient-to-r from-pink-500 to-rose-600 text-white px-6 py-3 rounded-full font-bold text-sm shadow-lg hover:shadow-pink-500/50 transition-all duration-300 flex items-center justify-center gap-2 mb-6 block"
+                  >
+                    <FaHeart className="text-sm" />
+                    <span>Donate</span>
+                  </Link>
+                </motion.div>
 
                 {/* Mobile Language & Search */}
                 <div className="flex items-center justify-between pt-6 border-t border-white/20">
