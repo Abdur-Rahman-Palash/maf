@@ -4,6 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
+import { Link } from '@/i18n/routing';
 
 const servicesData = [
   { 
@@ -11,42 +12,48 @@ const servicesData = [
     title: 'Guided Tours', 
     image: '/mosque-visitors-bg.svg',
     description: 'Book to join us on weekend mornings for a guided walk through our mosque, or on weekdays if you are part of an organisation such as a school or a local community group.',
-    icon: '🕌'
+    icon: '🕌',
+    href: '/visitors/public-cultural-tours'
   },
   { 
     id: 2, 
     title: 'Shahadas', 
     image: 'https://images.unsplash.com/photo-1541963463532-d68292c34b19?auto=format&fit=crop&q=80&w=800',
     description: 'Whether you are just interested in Islam, have some questions or are ready to convert, we are happy to speak to you and guide you through the Shahada. Learn more and book here.',
-    icon: '🤝'
+    icon: '🤝',
+    href: '/services/shahadas'
   },
   { 
     id: 3, 
     title: 'Nikahs', 
     image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=800',
     description: 'Offering a unique & stunning yet economical & eco-friendly venue, getting married at Cambridge Central Mosque is the experience of a lifetime. Find out more here.',
-    icon: '💒'
+    icon: '💒',
+    href: '/services/nikahs'
   },
   { 
     id: 4, 
     title: 'Madrasa', 
     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800',
     description: 'We have a range of educational programmes being offered for both children and adults. Find out more.',
-    icon: '📖'
+    icon: '📖',
+    href: '/services/madrasa'
   },
   { 
     id: 5, 
     title: 'General Events', 
     image: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&q=80&w=800',
     description: 'To book rooms for other events or Islamic celebrations, from \'aqiqas and private gatherings to conferences, we offer rooms at reasonable rates of hire. Book here.',
-    icon: '🎉'
+    icon: '🎉',
+    href: '/services/general-events'
   },
   { 
     id: 6, 
     title: 'Meet an Imam', 
     image: 'https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&q=80&w=800',
     description: 'Book a meeting up to two weeks in advance with one of our Imams to discuss one of a range of topics. Learn more here.',
-    icon: '👳‍♂️'
+    icon: '👳‍♂️',
+    href: '/services/meet-imam'
   }
 ];
 
@@ -56,31 +63,33 @@ interface Service {
   image: string;
   description: string;
   icon: string;
+  href: string;
 }
 
 function ServiceCard({ service, index }: { service: Service; index: number }) {
   const [isHovered, setIsHovered] = React.useState(false);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ 
-        duration: 0.8, 
-        delay: index * 0.1,
-        type: "spring",
-        stiffness: 100
-      }}
-      whileHover={{ 
-        y: -10,
-        scale: 1.05,
-        transition: { duration: 0.3 }
-      }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className="bg-white rounded-2xl overflow-hidden shadow-xl group cursor-pointer relative"
-    >
+    <Link href={service.href} className="block">
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ 
+          duration: 0.8, 
+          delay: index * 0.1,
+          type: "spring",
+          stiffness: 100
+        }}
+        whileHover={{ 
+          y: -10,
+          scale: 1.05,
+          transition: { duration: 0.3 }
+        }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className="bg-white rounded-2xl overflow-hidden shadow-xl group cursor-pointer relative"
+      >
       {/* Background Image */}
       <div className="relative h-64 sm:h-72 lg:h-80">
         <Image
@@ -137,6 +146,7 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
         </motion.div>
       </div>
     </motion.div>
+    </Link>
   );
 }
 

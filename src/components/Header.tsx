@@ -41,31 +41,37 @@ const Header = () => {
   }, []);
 
   const toggleLanguage = () => {
-    setCurrentLang(currentLang === 'EN' ? 'TR' : 'EN');
+    const newLocale = locale === 'en' ? 'ar' : 'en';
+    router.push(pathname.replace(`/${locale}`, `/${newLocale}`));
+    setCurrentLang(newLocale === 'en' ? 'EN' : 'TR');
+    console.log(`Language switched to: ${newLocale}`);
+    alert(`Language switched to: ${newLocale.toUpperCase()}`);
   };
 
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'About', href: '/mosques/sheikh-zayed' },
+    { name: 'Programs', href: '/programs' },
+    { name: 'E-Services', href: '/e-services' },
     { name: 'Services', href: '/worshippers/services-facilities' },
     { name: 'Architecture', href: '/architecture/overview' }
   ];
 
   // Dynamic background based on current section
   const getBackgroundClass = () => {
-    if (!isScrolled) return 'bg-gradient-to-r from-teal-900/80 via-teal-800/80 to-yellow-700/80 backdrop-blur-sm';
+    if (!isScrolled) return 'bg-transparent backdrop-blur-sm';
     
     switch (currentSection) {
       case 'hero':
-        return 'bg-gradient-to-r from-teal-900/95 via-teal-800/95 to-yellow-700/95 backdrop-blur-md';
+        return 'bg-white/90 backdrop-blur-md shadow-lg';
       case 'banner':
-        return 'bg-gradient-to-r from-amber-900/95 via-amber-800/95 to-yellow-700/95 backdrop-blur-md';
+        return 'bg-white/90 backdrop-blur-md shadow-lg';
       case 'services':
-        return 'bg-gradient-to-r from-blue-900/95 via-blue-800/95 to-indigo-700/95 backdrop-blur-md';
+        return 'bg-white/90 backdrop-blur-md shadow-lg';
       case 'quran':
-        return 'bg-gradient-to-r from-purple-900/95 via-purple-800/95 to-pink-700/95 backdrop-blur-md';
+        return 'bg-white/90 backdrop-blur-md shadow-lg';
       default:
-        return 'bg-gradient-to-r from-teal-900/95 via-teal-800/95 to-yellow-700/95 backdrop-blur-md';
+        return 'bg-white/90 backdrop-blur-md shadow-lg';
     }
   };
 
@@ -93,11 +99,11 @@ const Header = () => {
             <Link href="/" className="flex items-center space-x-3 group">
               <div className="relative">
                 <h1 
-                  className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600"
+                  className={`text-3xl md:text-4xl font-bold ${isScrolled ? 'text-black' : 'text-black'}`}
                   style={{ 
                     fontFamily: 'Georgia, "Times New Roman", serif',
                     letterSpacing: '1px',
-                    textShadow: '0 4px 8px rgba(0,0,0,0.4)'
+                    textShadow: isScrolled ? 'none' : '0 4px 12px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.5)'
                   }}
                 >
                   Masjid Salman al
@@ -105,8 +111,11 @@ const Header = () => {
                 <div className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-yellow-500/70 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
               </div>
               <span 
-                className="hidden md:block text-xl md:text-2xl text-yellow-200/90 font-semibold"
-                style={{ fontFamily: 'Georgia, serif' }}
+                className={`hidden md:block text-xl md:text-2xl ${isScrolled ? 'text-black' : 'text-black'} font-semibold`}
+                style={{ 
+                  fontFamily: 'Georgia, serif',
+                  textShadow: isScrolled ? 'none' : '0 2px 8px rgba(255,255,255,0.8)'
+                }}
               >
                 Farsi
               </span>
@@ -126,8 +135,11 @@ const Header = () => {
                 >
                   <Link
                     href={link.href}
-                    className="relative text-white/90 hover:text-yellow-300 transition-colors duration-200 font-medium block py-2"
-                    style={{ fontFamily: 'system-ui, sans-serif' }}
+                    className={`relative ${isScrolled ? 'text-black hover:text-yellow-600' : 'text-black hover:text-yellow-600'} transition-colors duration-200 font-bold block py-2`}
+                    style={{ 
+                      fontFamily: 'system-ui, sans-serif',
+                      textShadow: isScrolled ? 'none' : '0 2px 6px rgba(255,255,255,0.8)'
+                    }}
                   >
                     {link.name}
                     <span 
@@ -143,7 +155,12 @@ const Header = () => {
           <div className="flex items-center space-x-4">
             {/* Search Icon */}
             <motion.button
-              className="hidden md:flex text-white/80 hover:text-yellow-300 transition-colors duration-200"
+              onClick={() => {
+                console.log('Search clicked!');
+                alert('Search functionality coming soon!');
+              }}
+              className={`hidden md:flex ${isScrolled ? 'text-black hover:text-yellow-600' : 'text-black hover:text-yellow-600'} transition-colors duration-200`}
+              style={{ textShadow: isScrolled ? 'none' : '0 2px 6px rgba(255,255,255,0.8)' }}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             >
@@ -153,7 +170,8 @@ const Header = () => {
             {/* Language Toggle */}
             <motion.button
               onClick={toggleLanguage}
-              className="hidden md:flex items-center space-x-2 text-white/80 hover:text-yellow-300 transition-colors duration-200"
+              className={`hidden md:flex items-center space-x-2 ${isScrolled ? 'text-black hover:text-yellow-600' : 'text-black hover:text-yellow-600'} transition-colors duration-200`}
+              style={{ textShadow: isScrolled ? 'none' : '0 2px 6px rgba(255,255,255,0.8)' }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -166,10 +184,6 @@ const Header = () => {
               href="/donate"
               className="relative overflow-hidden bg-gradient-to-r from-pink-500 to-rose-600 text-white px-8 py-4 rounded-full font-bold text-base shadow-lg hover:shadow-pink-500/70 transition-all duration-300 flex items-center gap-3 border-2 border-pink-400/30 hover:scale-105 z-50"
               style={{ pointerEvents: 'auto' }}
-              onClick={(e) => {
-                console.log('Donate link clicked!');
-                alert('Donate link clicked!');
-              }}
             >
               <FaHeart className="text-base" />
               <span className="relative z-10 font-bold tracking-wide">Donate</span>
@@ -225,8 +239,11 @@ const Header = () => {
                     >
                       <Link
                         href={link.href}
-                        className="block text-white/90 hover:text-yellow-300 transition-colors duration-200 font-medium py-3 px-4 rounded-lg hover:bg-white/10"
-                        style={{ fontFamily: 'system-ui, sans-serif' }}
+                        className="block text-black hover:text-yellow-600 transition-colors duration-200 font-bold py-3 px-4 rounded-lg hover:bg-white/20"
+                        style={{ 
+                          fontFamily: 'system-ui, sans-serif',
+                          textShadow: '0 2px 6px rgba(255,255,255,0.8)'
+                        }}
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         {link.name}
@@ -239,8 +256,6 @@ const Header = () => {
                 <Link
                   href="/donate"
                   onClick={() => {
-                    console.log('Mobile donate link clicked!');
-                    alert('Mobile donate link clicked!');
                     setIsMobileMenuOpen(false);
                   }}
                   className="w-full relative overflow-hidden bg-gradient-to-r from-pink-500 to-rose-600 text-white px-6 py-3 rounded-full font-bold text-sm shadow-lg hover:shadow-pink-500/50 transition-all duration-300 flex items-center justify-center gap-2 mb-6 hover:scale-105"
@@ -253,7 +268,8 @@ const Header = () => {
                 <div className="flex items-center justify-between pt-6 border-t border-white/20">
                   <motion.button
                     onClick={toggleLanguage}
-                    className="flex items-center space-x-2 text-white/80 hover:text-yellow-300 transition-colors duration-200"
+                    className="flex items-center space-x-2 text-black hover:text-yellow-600 transition-colors duration-200"
+                    style={{ textShadow: '0 2px 6px rgba(255,255,255,0.8)' }}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -262,7 +278,12 @@ const Header = () => {
                   </motion.button>
 
                   <motion.button
-                    className="text-white/80 hover:text-yellow-300 transition-colors duration-200"
+                    onClick={() => {
+                      console.log('Mobile search clicked!');
+                      alert('Search functionality coming soon!');
+                    }}
+                    className="text-black hover:text-yellow-600 transition-colors duration-200"
+                    style={{ textShadow: '0 2px 6px rgba(255,255,255,0.8)' }}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                   >

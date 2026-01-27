@@ -160,14 +160,11 @@ const BannerSection = () => {
               onTouchStart={() => setActiveSection('worshippers')}
               onTouchEnd={() => setActiveSection(null)}
             >
-              {/* Animated Background */}
-              <iframe
-                src="/islamic-worshippers-animation.html"
-                className="absolute inset-0 w-full h-full border-0"
-                style={{ 
-                  transform: 'scale(1.1)',
-                  pointerEvents: 'none'
-                }}
+              {/* Background Image */}
+              <img
+                src="/pexels-manpritkalsi-1537086.jpg"
+                alt="Islamic worshippers"
+                className="absolute inset-0 w-full h-full object-cover"
               />
               
               {/* Animated Gradient Overlay */}
@@ -301,14 +298,11 @@ const BannerSection = () => {
               onTouchStart={() => setActiveSection('visitors')}
               onTouchEnd={() => setActiveSection(null)}
             >
-              {/* Animated Background */}
-              <iframe
-                src="/islamic-visitors-animation.html"
-                className="absolute inset-0 w-full h-full border-0"
-                style={{ 
-                  transform: 'scale(1.1)',
-                  pointerEvents: 'none'
-                }}
+              {/* Background Image */}
+              <img
+                src="/pexels-pashal-337901.jpg"
+                alt="Islamic visitors"
+                className="absolute inset-0 w-full h-full object-cover"
               />
               
               {/* Animated Gradient Overlay */}
