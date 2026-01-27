@@ -51,8 +51,6 @@ const Header = () => {
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'About', href: '/mosques/sheikh-zayed' },
-    { name: 'Programs', href: '/programs' },
-    { name: 'E-Services', href: '/e-services' },
     { name: 'Services', href: '/worshippers/services-facilities' },
     { name: 'Architecture', href: '/architecture/overview' }
   ];
