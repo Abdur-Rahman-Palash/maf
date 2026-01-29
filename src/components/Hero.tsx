@@ -56,58 +56,41 @@ const Hero = () => {
   }, [slides.length]);
 
   return (
-    <section className="relative h-screen w-full overflow-hidden">
-      {/* Background Slideshow */}
-      <div className="absolute inset-0 z-0">
-        {slides.map((slide, index) => (
-          <div
-            key={slide.id}
-            className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentSlide ? 'opacity-100' : 'opacity-0'
-            }`}
-          >
-            <img
-              src={slide.image}
-              alt={slide.title}
-              className="w-full h-full object-cover"
-              loading="eager"
-            />
-            {/* Dark gradient overlay for readability */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-transparent" />
-          </div>
-        ))}
-      </div>
+    <section className="relative h-screen w-full overflow-hidden bg-gradient-to-br from-amber-900 via-amber-800 to-orange-900">
+      {/* Remove Background Slideshow - Using gradient background instead */}
 
       {/* Subtle dome silhouette watermark */}
       <div className="absolute inset-0 z-10 opacity-5 pointer-events-none">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xMDAgMjBDMTQ0LjE4IDIwIDE4MCA1NS44MTgyIDE4MCAxMDBDMTgwIDE0NC4xODIgMTQ0LjE4IDE4MCAxMDAgMTgwQzU1LjgxODIgMTgwIDIwIDE0NC4xODIgMjAgMTAwQzIwIDU1LjgxODIgNTUuODE4MiAyMCAxMDAgMjBaIiBmaWxsPSIjRkZEN0AwIi8+Cjwvc3ZnPgo=')] bg-center bg-no-repeat bg-contain" />
       </div>
 
-      {/* Prayer Time Widget - Left Side */}
-      <motion.div
-        className="absolute left-8 top-1/2 transform -translate-y-1/2 z-30"
-        initial={{ x: -100, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.8, delay: 1.5 }}
-      >
-        <AnimatePresence>
-          {showPrayerTimes ? (
+      {/* Prayer Times Modal */}
+      <AnimatePresence>
+        {showPrayerTimes && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowPrayerTimes(false)}
+          >
             <motion.div
-              className="bg-black/95 backdrop-blur-md rounded-2xl p-8 border border-yellow-400/50 shadow-2xl"
-              initial={{ width: 100, height: 100 }}
-              animate={{ width: 450, height: 'auto' }}
-              exit={{ width: 100, height: 100 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="bg-gradient-to-br from-amber-900 to-amber-800 rounded-2xl p-8 border border-yellow-400/50 shadow-2xl max-w-md w-full mx-4"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-between items-start mb-6">
-                <h3 className="text-yellow-400 font-bold text-xl">Prayer Times</h3>
+                <h3 className="text-yellow-400 font-bold text-2xl">Prayer Times</h3>
                 <motion.button
                   onClick={() => setShowPrayerTimes(false)}
                   className="text-white/60 hover:text-white transition-colors"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
-                  <FaTimes className="w-5 h-5" />
+                  <FaTimes className="w-6 h-6" />
                 </motion.button>
               </div>
               
@@ -115,7 +98,7 @@ const Hero = () => {
                 {Object.entries(prayerTimes).map(([prayer, time]) => (
                   <motion.div
                     key={prayer}
-                    className="flex items-center justify-between text-white/90 text-base"
+                    className="flex items-center justify-between text-white/90 text-base bg-black/20 rounded-lg p-3"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.1 }}
@@ -136,18 +119,9 @@ const Hero = () => {
                 </div>
               </div>
             </motion.div>
-          ) : (
-            <motion.button
-              onClick={() => setShowPrayerTimes(true)}
-              className="bg-black/95 backdrop-blur-md rounded-full p-6 border border-yellow-400/50 shadow-2xl hover:bg-black/100 transition-colors"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              <FaMosque className="w-10 h-10 text-yellow-400" />
-            </motion.button>
-          )}
-        </AnimatePresence>
-      </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main Content */}
       <div className="relative z-20 h-full flex items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -168,7 +142,7 @@ const Hero = () => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.5, delay: 0.8 }}
           >
-            Welcome to our
+            Welcome to 
             <br />
             Masjid Salman al Farsi
           </motion.h1>
@@ -238,21 +212,6 @@ const Hero = () => {
           <span className="text-sm font-medium">Journey Begins Here</span>
         </motion.div>
       </motion.div>
-
-      {/* Slide Indicators */}
-      <div className="absolute bottom-8 right-8 z-30 flex gap-2">
-        {slides.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentSlide(index)}
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${
-              index === currentSlide
-                ? 'bg-yellow-500 w-8'
-                : 'bg-white/50 hover:bg-white/70'
-            }`}
-          />
-        ))}
-      </div>
     </section>
   );
 };

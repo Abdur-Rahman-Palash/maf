@@ -1,6 +1,6 @@
 import Header from '@/components/Header';
+import QuranReader from '@/components/QuranReader';
 import Hero from '@/components/Hero';
-import BannerSection from '@/components/BannerSection';
 import ProgramsSection from '@/components/ProgramsSection';
 import EServicesSection from '@/components/EServicesSection';
 import PremiumScrollAnimation from '@/components/PremiumScrollAnimation';
@@ -19,14 +19,12 @@ export default function Home() {
         <div className="relative z-10">
           <div className="relative">
             <Header />
+            <div id="quran-reader">
+              <QuranReader />
+            </div>
             <div id="hero">
               <PremiumScrollAnimation direction="up" delay={0.1} intensity={1.2}>
                 <Hero />
-              </PremiumScrollAnimation>
-            </div>
-            <div id="banner">
-              <PremiumScrollAnimation direction="scale" delay={0.2} intensity={0.8}>
-                <BannerSection />
               </PremiumScrollAnimation>
             </div>
             <div id="programs">

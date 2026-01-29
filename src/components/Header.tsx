@@ -6,6 +6,7 @@ import { FaBars, FaTimes, FaSearch, FaGlobe, FaHeart } from 'react-icons/fa';
 import { useLocale, useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
 import { useRouter } from 'next/navigation';
+import HeaderPrayerTimes from './HeaderPrayerTimes';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -50,9 +51,11 @@ const Header = () => {
 
   const navLinks = [
     { name: 'Home', href: '/' },
-    { name: 'About', href: '/mosques/sheikh-zayed' },
-    { name: 'Services', href: '/worshippers/services-facilities' },
-    { name: 'Architecture', href: '/architecture/overview' }
+    { name: 'About Us', href: '/about' },
+    { name: 'Programs', href: '/programs' },
+    { name: 'Events', href: '/events' },
+    { name: 'Media', href: '/media' },
+    { name: 'Contact Us', href: '/contact' }
   ];
 
   // Dynamic background based on current section
@@ -75,15 +78,19 @@ const Header = () => {
 
   return (
     <>
-      {/* Sticky Header */}
+      {/* Prayer Times Bar - Normal header content */}
+      <div className="bg-white border-b border-gray-200 shadow-sm">
+        <HeaderPrayerTimes />
+      </div>
+
+      {/* Sticky Main Header */}
       <header
-        className={`fixed top-0 left-0 right-0 z-[999999] transition-all duration-500 ${getBackgroundClass()} shadow-2xl backdrop-blur-md`}
+        className={`sticky top-0 left-0 right-0 z-[999999] transition-all duration-500 ${getBackgroundClass()} shadow-2xl backdrop-blur-md`}
         style={{ 
           height: '80px',
-          position: 'fixed',
+          position: 'sticky',
           width: '100vw',
           left: 0,
-          top: 0,
           transform: 'translateZ(0)'
         }}
       >
@@ -96,27 +103,13 @@ const Header = () => {
           >
             <Link href="/" className="flex items-center space-x-3 group">
               <div className="relative">
-                <h1 
-                  className={`text-3xl md:text-4xl font-bold ${isScrolled ? 'text-black' : 'text-black'}`}
-                  style={{ 
-                    fontFamily: 'Georgia, "Times New Roman", serif',
-                    letterSpacing: '1px',
-                    textShadow: isScrolled ? 'none' : '0 4px 12px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.5)'
-                  }}
-                >
-                  Masjid Salman al
-                </h1>
+                <img
+                  src="/cropped-logo.png"
+                  alt="Masjid Salman al Farsi"
+                  className="h-10 md:h-12 lg:h-14 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                />
                 <div className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-yellow-500/70 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
               </div>
-              <span 
-                className={`hidden md:block text-xl md:text-2xl ${isScrolled ? 'text-black' : 'text-black'} font-semibold`}
-                style={{ 
-                  fontFamily: 'Georgia, serif',
-                  textShadow: isScrolled ? 'none' : '0 2px 8px rgba(255,255,255,0.8)'
-                }}
-              >
-                Farsi
-              </span>
             </Link>
           </motion.div>
 
@@ -149,38 +142,12 @@ const Header = () => {
             </div>
           </nav>
 
-          {/* Right Side - Donate Button & Icons */}
+          {/* Right Side - Donate Button Only */}
           <div className="flex items-center space-x-4">
-            {/* Search Icon */}
-            <motion.button
-              onClick={() => {
-                console.log('Search clicked!');
-                alert('Search functionality coming soon!');
-              }}
-              className={`hidden md:flex ${isScrolled ? 'text-black hover:text-yellow-600' : 'text-black hover:text-yellow-600'} transition-colors duration-200`}
-              style={{ textShadow: isScrolled ? 'none' : '0 2px 6px rgba(255,255,255,0.8)' }}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              <FaSearch className="text-lg" />
-            </motion.button>
-
-            {/* Language Toggle */}
-            <motion.button
-              onClick={toggleLanguage}
-              className={`hidden md:flex items-center space-x-2 ${isScrolled ? 'text-black hover:text-yellow-600' : 'text-black hover:text-yellow-600'} transition-colors duration-200`}
-              style={{ textShadow: isScrolled ? 'none' : '0 2px 6px rgba(255,255,255,0.8)' }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <FaGlobe className="text-sm" />
-              <span className="text-sm font-medium">{currentLang}</span>
-            </motion.button>
-
-            {/* Gorgeous Donate Button */}
+            {/* Donate Button */}
             <Link
               href="/donate"
-              className="relative overflow-hidden bg-gradient-to-r from-pink-500 to-rose-600 text-white px-8 py-4 rounded-full font-bold text-base shadow-lg hover:shadow-pink-500/70 transition-all duration-300 flex items-center gap-3 border-2 border-pink-400/30 hover:scale-105 z-50"
+              className="relative overflow-hidden bg-gradient-to-r from-pink-500 to-rose-600 text-white px-8 py-4 rounded-full font-bold text-base shadow-lg hover:shadow-pink-500/70 transition-all duration-300 flex items-center gap-3 border-2 border-pink-400/30 hover:scale-105 hover:bg-transparent hover:border-pink-500 z-50"
               style={{ pointerEvents: 'auto' }}
             >
               <FaHeart className="text-base" />
@@ -190,7 +157,7 @@ const Header = () => {
 
             {/* Mobile Menu Button */}
             <motion.button
-              className="lg:hidden text-white/80 hover:text-yellow-300 transition-colors duration-200"
+              className="lg:hidden text-gray-800 hover:text-yellow-600 transition-colors duration-200"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -237,10 +204,10 @@ const Header = () => {
                     >
                       <Link
                         href={link.href}
-                        className="block text-black hover:text-yellow-600 transition-colors duration-200 font-bold py-3 px-4 rounded-lg hover:bg-white/20"
+                        className="block text-white hover:text-yellow-600 transition-colors duration-200 font-bold py-3 px-4 rounded-lg hover:bg-white/20"
                         style={{ 
                           fontFamily: 'system-ui, sans-serif',
-                          textShadow: '0 2px 6px rgba(255,255,255,0.8)'
+                          textShadow: '0 2px 6px rgba(0,0,0,0.8)'
                         }}
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
@@ -256,46 +223,16 @@ const Header = () => {
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full relative overflow-hidden bg-gradient-to-r from-pink-500 to-rose-600 text-white px-6 py-3 rounded-full font-bold text-sm shadow-lg hover:shadow-pink-500/50 transition-all duration-300 flex items-center justify-center gap-2 mb-6 hover:scale-105"
+                  className="w-full relative overflow-hidden bg-gradient-to-r from-pink-500 to-rose-600 text-white px-6 py-3 rounded-full font-bold text-sm shadow-lg hover:shadow-pink-500/50 transition-all duration-300 flex items-center justify-center gap-2 mb-6 hover:scale-105 hover:bg-transparent hover:border-pink-500 border-2 border-pink-400/30"
                 >
                   <FaHeart className="text-sm" />
                   <span>Donate</span>
                 </Link>
-
-                {/* Mobile Language & Search */}
-                <div className="flex items-center justify-between pt-6 border-t border-white/20">
-                  <motion.button
-                    onClick={toggleLanguage}
-                    className="flex items-center space-x-2 text-black hover:text-yellow-600 transition-colors duration-200"
-                    style={{ textShadow: '0 2px 6px rgba(255,255,255,0.8)' }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <FaGlobe className="text-sm" />
-                    <span className="text-sm font-medium">{currentLang}</span>
-                  </motion.button>
-
-                  <motion.button
-                    onClick={() => {
-                      console.log('Mobile search clicked!');
-                      alert('Search functionality coming soon!');
-                    }}
-                    className="text-black hover:text-yellow-600 transition-colors duration-200"
-                    style={{ textShadow: '0 2px 6px rgba(255,255,255,0.8)' }}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <FaSearch className="text-lg" />
-                  </motion.button>
-                </div>
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Spacer to prevent content overlap */}
-      <div style={{ height: '80px' }} />
     </>
   );
 };
