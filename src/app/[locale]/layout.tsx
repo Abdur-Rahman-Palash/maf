@@ -38,7 +38,10 @@ export default async function LocaleLayout({
  
   return (
     <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-      <body className={`${amiri.variable} font-serif bg-slate-50 text-slate-900 overflow-x-hidden antialiased relative`}>
+      <body 
+        className={`${amiri.variable} font-serif bg-slate-50 text-slate-900 overflow-x-hidden antialiased relative`}
+        suppressHydrationWarning={true}
+      >
         <NextIntlClientProvider messages={messages}>
           {/* <UltraPremiumPageTransitions>
             <UltraPremiumAnimations>
