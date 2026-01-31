@@ -81,7 +81,7 @@ const HeaderPrayerTimes: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <div className="hidden lg:block text-gray-700 font-medium text-sm lg:text-base">
+            <div className="hidden lg:block text-gray-700 font-bold text-base lg:text-lg">
               {currentDate.english} · {currentDate.hijri}
             </div>
             <div className="text-gray-700 text-sm lg:text-base" style={{ textTransform: 'uppercase', fontWeight: 500 }}>
