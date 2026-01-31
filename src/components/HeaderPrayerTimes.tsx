@@ -28,18 +28,18 @@ const HeaderPrayerTimes: React.FC = () => {
 
   const [prayerTimes, setPrayerTimes] = useState<PrayerTimes>({
     jamaat: {
-      fajr: '06:45',
-      zuhr: '13:00',
-      asr: '15:30',
-      maghrib: '16:42',
+      fajr: '06:15',
+      zuhr: '13:30',
+      asr: '16:00',
+      maghrib: '18:15',
       isha: '20:00'
     },
     begins: {
-      fajr: '06:08',
-      zuhr: '12:17',
-      asr: '14:50',
-      maghrib: '16:42',
-      isha: '18:09'
+      fajr: '05:45',
+      zuhr: '13:00',
+      asr: '15:30',
+      maghrib: '18:15',
+      isha: '19:30'
     }
   });
 

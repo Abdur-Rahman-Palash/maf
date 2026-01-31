@@ -11,6 +11,7 @@
   --color-gold: var(--gold);
   --color-gold-light: var(--gold-light);
   --font-amiri: var(--font-amiri);
+  --font-philosopher: var(--font-philosopher);
 }
 
 body {

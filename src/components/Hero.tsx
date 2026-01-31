@@ -13,12 +13,12 @@ const Hero = () => {
 
   // Prayer times for Masjid Salman al Farsi
   const prayerTimes = {
-    Fajr: '5:15 AM',
+    Fajr: '5:45 AM',
     Sunrise: '6:30 AM', 
-    Dhuhr: '12:30 PM',
-    Asr: '3:45 PM',
-    Maghrib: '6:00 PM',
-    Isha: '7:15 PM'
+    Dhuhr: '1:00 PM',
+    Asr: '3:30 PM',
+    Maghrib: '6:15 PM',
+    Isha: '7:30 PM'
   };
 
   const [nextPrayer, setNextPrayer] = useState({ name: 'DHUHR', time: '12:30 PM' });
@@ -133,18 +133,17 @@ const Hero = () => {
         >
           {/* Main Heading */}
           <motion.h1
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 mb-6 leading-tight"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 mb-6 leading-snug sm:leading-tight"
             style={{
-              fontFamily: 'Georgia, serif',
+              fontFamily: 'var(--font-philosopher), serif',
               textShadow: '0 0 30px rgba(255, 215, 0, 0.5)'
             }}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.5, delay: 0.8 }}
           >
-            Welcome to 
-            <br />
-            Masjid Salman al Farsi
+            <span className="block">Welcome to</span>
+            <span className="block">Masjid Salman al Farsi</span>
           </motion.h1>
 
           {/* Subtitle */}

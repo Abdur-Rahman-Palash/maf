@@ -3,6 +3,7 @@ import {getMessages} from 'next-intl/server';
 import {notFound} from 'next/navigation';
 import {routing} from '@/i18n/routing';
 import { Amiri } from 'next/font/google';
+import { Philosopher } from 'next/font/google';
 import "../globals.css";
 import SmoothScroll from '@/components/SmoothScroll';
 import UltraPremiumAnimations from '@/components/UltraPremiumAnimations';
@@ -13,6 +14,13 @@ const amiri = Amiri({
   subsets: ['arabic', 'latin'],
   weight: ['400', '700'],
   variable: '--font-amiri',
+  display: 'swap',
+});
+
+const philosopher = Philosopher({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  variable: '--font-philosopher',
   display: 'swap',
 });
 
@@ -39,7 +47,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       <body 
-        className={`${amiri.variable} font-serif bg-slate-50 text-slate-900 overflow-x-hidden antialiased relative`}
+        className={`${amiri.variable} ${philosopher.variable} font-serif bg-slate-50 text-slate-900 overflow-x-hidden antialiased relative`}
         suppressHydrationWarning={true}
       >
         <NextIntlClientProvider messages={messages}>

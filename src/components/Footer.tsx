@@ -214,7 +214,17 @@ export default function Footer() {
             className="text-center text-sm text-slate-400 space-y-2"
           >
             <p>© Masjid Salman al Farsi 2026. All rights reserved.</p>
-            <p className="text-xs">Best viewed in modern browsers (Chrome, Firefox, Safari, Edge)</p>
+            <p className="text-lg font-bold">
+              Powered by-{' '}
+              <a 
+                href="https://neubyte.tech/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gold hover:text-yellow-400 transition-colors duration-300"
+              >
+                neubyte.tech
+              </a>
+            </p>
             <div className="flex justify-center gap-4 mt-4">
               <Link href="/privacy" className="hover:text-gold transition-colors">Privacy Policy</Link>
               <span className="text-gold/30">•</span>
