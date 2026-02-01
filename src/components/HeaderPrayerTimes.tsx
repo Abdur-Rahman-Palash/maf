@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useLocale } from 'next-intl';
 
 interface PrayerTimes {
   jamaat: {
@@ -21,6 +22,7 @@ interface PrayerTimes {
 }
 
 const HeaderPrayerTimes: React.FC = () => {
+  const locale = useLocale();
   const [currentDate, setCurrentDate] = useState({
     english: '',
     hijri: ''
@@ -42,6 +44,55 @@ const HeaderPrayerTimes: React.FC = () => {
       isha: '19:30'
     }
   });
+
+  // Prayer names in different languages
+  const prayerNames = {
+    en: {
+      fajr: 'FAJR',
+      zuhr: 'ZUHR', 
+      asr: 'ASR',
+      maghrib: 'MAGHRIB',
+      isha: 'ISHA',
+      jamaat: "JAMA'AT",
+      begins: 'BEGINS',
+      juma: "JUM'A",
+      prayerTimes: 'PRAYER TIMES'
+    },
+    ar: {
+      fajr: 'الفجر',
+      zuhr: 'الظهر',
+      asr: 'العصر', 
+      maghrib: 'المغرب',
+      isha: 'العشاء',
+      jamaat: 'الجماعة',
+      begins: 'البداية',
+      juma: 'الجمعة',
+      prayerTimes: 'مواقيت الصلاة'
+    }
+  };
+
+  // Convert 24-hour time to 12-hour format with AM/PM
+  const convertTo12Hour = (time: string) => {
+    const [hours, minutes] = time.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minutes} ${ampm}`;
+  };
+
+  // Convert 24-hour time to Arabic format
+  const convertToArabicTime = (time: string) => {
+    const [hours, minutes] = time.split(':');
+    const hour = parseInt(hours);
+    
+    // Arabic numerals
+    const arabicNumerals = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+    const toArabicNumeral = (num: number) => {
+      return num.toString().split('').map(digit => arabicNumerals[parseInt(digit)] || digit).join('');
+    };
+    
+    return `${toArabicNumeral(hour)}:${toArabicNumeral(parseInt(minutes))}`;
+  };
 
   useEffect(() => {
     // Set current date
@@ -70,6 +121,8 @@ const HeaderPrayerTimes: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
+  const names = prayerNames[locale as keyof typeof prayerNames] || prayerNames.en;
+
   return (
     <div className="w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -81,16 +134,16 @@ const HeaderPrayerTimes: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <div className="hidden lg:block text-gray-700 font-bold text-base lg:text-lg">
+            <div className="hidden lg:block text-gray-700 font-bold text-base lg:text-lg" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
               {currentDate.english} · {currentDate.hijri}
             </div>
-            <div className="text-gray-700 text-sm lg:text-base" style={{ textTransform: 'uppercase', fontWeight: 500 }}>
+            <div className="text-gray-700 text-sm lg:text-base" style={{ textTransform: locale === 'ar' ? 'none' : 'uppercase', fontWeight: 500 }}>
               <motion.a 
                 href="/worshippers/prayer-timings" 
                 className="hover:text-amber-600 transition-colors duration-200 mr-2 inline-block"
                 whileHover={{ y: -1 }}
               >
-                JUM'A 12:30 & 13:15
+                {locale === 'ar' ? 'الجمعة ١٢:٣٠ & ١٣:١٥' : `${names.juma} 12:30 & 13:15`}
               </motion.a>
               <span className="text-gray-400">·</span>
               <motion.a 
@@ -100,7 +153,7 @@ const HeaderPrayerTimes: React.FC = () => {
                 className="hover:text-amber-600 transition-colors duration-200 ml-2 inline-block"
                 whileHover={{ y: -1 }}
               >
-                PRAYER TIMES
+                {names.prayerTimes}
               </motion.a>
             </div>
           </motion.div>
@@ -116,26 +169,26 @@ const HeaderPrayerTimes: React.FC = () => {
             <div className="grid grid-cols-6 gap-1 mb-2 lg:mb-3" style={{ lineHeight: '20px', margin: '7px 0 5px 0' }}>
               <div className="col-span-1"></div>
               <div className="col-span-1 text-center">
-                <span className="text-xs lg:text-sm font-semibold text-gray-700">FAJR</span>
+                <span className="text-xs lg:text-sm font-semibold text-gray-700">{names.fajr}</span>
               </div>
               <div className="col-span-1 text-center">
-                <span className="text-xs lg:text-sm font-semibold text-gray-700">ZUHR</span>
+                <span className="text-xs lg:text-sm font-semibold text-gray-700">{names.zuhr}</span>
               </div>
               <div className="col-span-1 text-center">
-                <span className="text-xs lg:text-sm font-semibold text-gray-700">ASR</span>
+                <span className="text-xs lg:text-sm font-semibold text-gray-700">{names.asr}</span>
               </div>
               <div className="col-span-1 text-center">
-                <span className="text-xs lg:text-sm font-semibold text-gray-700">MAGHRIB</span>
+                <span className="text-xs lg:text-sm font-semibold text-gray-700">{names.maghrib}</span>
               </div>
               <div className="col-span-1 text-center">
-                <span className="text-xs lg:text-sm font-semibold text-gray-700">ISHA</span>
+                <span className="text-xs lg:text-sm font-semibold text-gray-700">{names.isha}</span>
               </div>
             </div>
 
             {/* Jama'at Times */}
             <div className="grid grid-cols-6 gap-1 mb-1 lg:mb-2" style={{ lineHeight: '20px' }}>
               <div className="col-span-1">
-                <span className="text-xs lg:text-sm font-bold text-gray-700">JAMA'AT</span>
+                <span className="text-xs lg:text-sm font-bold text-gray-700">{names.jamaat}</span>
               </div>
               {Object.entries(prayerTimes.jamaat).map(([prayer, time], index) => (
                 <motion.div 
@@ -146,7 +199,7 @@ const HeaderPrayerTimes: React.FC = () => {
                   transition={{ delay: 0.3 + index * 0.05 }}
                 >
                   <span className="text-xs lg:text-sm font-medium text-gray-800 hover:text-amber-600 transition-colors cursor-pointer">
-                    {time}
+                    {locale === 'ar' ? convertToArabicTime(time) : convertTo12Hour(time)}
                   </span>
                 </motion.div>
               ))}
@@ -155,7 +208,7 @@ const HeaderPrayerTimes: React.FC = () => {
             {/* Begin Times */}
             <div className="grid grid-cols-6 gap-1" style={{ margin: '4px 0 2px', paddingBottom: 0, lineHeight: '20px' }}>
               <div className="col-span-1">
-                <span className="text-xs lg:text-sm font-bold text-gray-700">BEGINS</span>
+                <span className="text-xs lg:text-sm font-bold text-gray-700">{names.begins}</span>
               </div>
               {Object.entries(prayerTimes.begins).map(([prayer, time], index) => (
                 <motion.div 
@@ -166,7 +219,7 @@ const HeaderPrayerTimes: React.FC = () => {
                   transition={{ delay: 0.4 + index * 0.05 }}
                 >
                   <span className="text-xs lg:text-sm font-medium text-gray-800 hover:text-amber-600 transition-colors cursor-pointer">
-                    {time}
+                    {locale === 'ar' ? convertToArabicTime(time) : convertTo12Hour(time)}
                   </span>
                 </motion.div>
               ))}
