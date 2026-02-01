@@ -106,7 +106,7 @@ const Header = () => {
                 <img
                   src="/cropped-logo.png"
                   alt="Masjid Salman al Farsi"
-                  className="h-10 md:h-12 lg:h-14 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                  className="h-14 md:h-16 lg:h-20 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
                 />
                 <div className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-yellow-500/70 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
               </div>

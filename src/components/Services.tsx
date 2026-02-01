@@ -8,14 +8,6 @@ import { Link } from '@/i18n/routing';
 
 const servicesData = [
   { 
-    id: 1, 
-    title: 'Guided Tours', 
-    image: '/mosque-visitors-bg.svg',
-    description: 'Book to join us on weekend mornings for a guided walk through our mosque, or on weekdays if you are part of an organisation such as a school or a local community group.',
-    icon: '🕌',
-    href: '/visitors/public-cultural-tours'
-  },
-  { 
     id: 2, 
     title: 'Shahadas', 
     image: 'https://images.unsplash.com/photo-1541963463532-d68292c34b19?auto=format&fit=crop&q=80&w=800',
@@ -32,14 +24,6 @@ const servicesData = [
     href: '/services/nikahs'
   },
   { 
-    id: 4, 
-    title: 'Madrasa', 
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800',
-    description: 'We have a range of educational programmes being offered for both children and adults. Find out more.',
-    icon: '📖',
-    href: '/services/madrasa'
-  },
-  { 
     id: 5, 
     title: 'General Events', 
     image: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&q=80&w=800',
@@ -49,8 +33,8 @@ const servicesData = [
   },
   { 
     id: 6, 
-    title: 'Meet an Imam', 
-    image: 'https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&q=80&w=800',
+    title: 'Meet our Imam', 
+    image: '',
     description: 'Book a meeting up to two weeks in advance with one of our Imams to discuss one of a range of topics. Learn more here.',
     icon: '👳‍♂️',
     href: '/services/meet-imam'

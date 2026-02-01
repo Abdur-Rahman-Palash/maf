@@ -5,10 +5,16 @@ import {routing} from '@/i18n/routing';
 import { Amiri } from 'next/font/google';
 import { Philosopher } from 'next/font/google';
 import "../globals.css";
-import SmoothScroll from '@/components/SmoothScroll';
-import UltraPremiumAnimations from '@/components/UltraPremiumAnimations';
-import UltraPremiumPageTransitions from '@/components/UltraPremiumPageTransitions';
-import UltraPremiumInteractions from '@/components/UltraPremiumInteractions';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+// import SmoothScroll from '@/components/SmoothScroll';
+// import UltraPremiumAnimations from '@/components/UltraPremiumAnimations';
+// import UltraPremiumPageTransitions from '@/components/UltraPremiumPageTransitions';
+// import UltraPremiumInteractions from '@/components/UltraPremiumInteractions';
+
+export async function generateStaticParams() {
+  return routing.locales.map((locale) => ({locale}));
+}
  
 const amiri = Amiri({ 
   subsets: ['arabic', 'latin'],
@@ -42,7 +48,7 @@ export default async function LocaleLayout({
     notFound();
   }
  
-  const messages = await getMessages();
+  const messages = await getMessages({locale});
  
   return (
     <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
@@ -51,15 +57,13 @@ export default async function LocaleLayout({
         suppressHydrationWarning={true}
       >
         <NextIntlClientProvider messages={messages}>
-          {/* <UltraPremiumPageTransitions>
-            <UltraPremiumAnimations>
-              <UltraPremiumInteractions> */}
-                <SmoothScroll>
-                  {children}
-                </SmoothScroll>
-              {/* </UltraPremiumInteractions>
-            </UltraPremiumAnimations>
-          </UltraPremiumPageTransitions> */}
+          <div className="flex flex-col min-h-screen">
+            <Header />
+            <main className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </div>
         </NextIntlClientProvider>
       </body>
     </html>

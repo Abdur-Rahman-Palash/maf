@@ -133,10 +133,9 @@ const Hero = () => {
         >
           {/* Main Heading */}
           <motion.h1
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 mb-6 leading-snug sm:leading-tight"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold text-white mb-6 leading-snug sm:leading-tight"
             style={{
-              fontFamily: 'var(--font-philosopher), serif',
-              textShadow: '0 0 30px rgba(255, 215, 0, 0.5)'
+              fontFamily: 'var(--font-philosopher), serif'
             }}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -148,7 +147,7 @@ const Hero = () => {
 
           {/* Subtitle */}
           <motion.p
-            className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-white/90 mb-12 max-w-4xl mx-auto leading-relaxed"
+            className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed"
             style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -159,39 +158,6 @@ const Hero = () => {
             Experience the Beauty of Islamic Worship
           </motion.p>
 
-          {/* CTA Buttons */}
-          <motion.div
-            className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, delay: 1.6 }}
-          >
-            {/* Primary CTA */}
-            <Link
-              href="/visitors/book-visit"
-              className="group relative overflow-hidden bg-gradient-to-r from-yellow-500 to-yellow-600 text-white px-8 sm:px-10 lg:px-12 py-4 sm:py-5 lg:py-6 rounded-full font-bold text-lg sm:text-xl lg:text-2xl shadow-2xl hover:shadow-yellow-500/50 transition-all duration-300 block"
-              onClick={() => {
-                console.log('Book visit link clicked!');
-              }}
-            >
-              <span className="relative z-10 flex items-center gap-3">
-                <FaTicketAlt className="text-xl sm:text-2xl" />
-                Book Skip-the-Line Tickets
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-600 to-yellow-700 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-            </Link>
-
-            {/* Secondary CTA */}
-            <Link
-              href="/architecture/overview"
-              className="group relative overflow-hidden bg-transparent border-2 border-white/60 text-white px-8 sm:px-10 lg:px-12 py-4 sm:py-5 lg:py-6 rounded-full font-bold text-lg sm:text-xl lg:text-2xl hover:bg-white hover:text-gray-900 transition-all duration-300 block"
-            >
-              <span className="relative z-10 flex items-center gap-3">
-                <FaPlay className="text-xl sm:text-2xl" />
-                Explore Hidden Stories
-              </span>
-            </Link>
-          </motion.div>
         </motion.div>
       </div>
 

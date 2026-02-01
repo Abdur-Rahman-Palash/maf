@@ -6,7 +6,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
+  output: 'export',
+  trailingSlash: true,
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -14,6 +17,8 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Skip build-time locale generation for static export
+  skipTrailingSlashRedirect: true,
 };
 
 export default withNextIntl(nextConfig);
