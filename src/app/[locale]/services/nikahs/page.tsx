@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import {FaHeart, FaCalendarAlt, FaRing, FaMosque} from 'react-icons/fa';
+import { FaHeart, FaCalendarAlt, FaRing, FaMosque } from 'react-icons/fa';
 
 export default function Nikahs() {
   return (
@@ -32,13 +32,13 @@ export default function Nikahs() {
               <h2 className="text-2xl font-bold text-gray-900">Islamic Marriage</h2>
             </div>
             <p className="text-gray-600 mb-4">
-              Nikah is the Islamic marriage contract that joins a couple together in accordance with Islamic law. 
+              Nikah is the Islamic marriage contract that joins a couple together in accordance with Islamic law.
               Our mosque provides a beautiful and sacred environment for this blessed occasion.
             </p>
             <div className="bg-red-50 rounded-lg p-4">
               <p className="text-red-800 font-medium text-center">
-                "And among His signs is that He created for you spouses from among yourselves, 
-                that you may find tranquility in them, and He has put between you affection and mercy."
+                &quot;And among His signs is that He created for you spouses from among yourselves,
+                that you may find tranquility in them, and He has put between you affection and mercy.&quot;
                 <span className="text-sm block mt-2">- Quran 30:21</span>
               </p>
             </div>

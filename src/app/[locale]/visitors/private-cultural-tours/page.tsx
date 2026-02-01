@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import {FaUsers, FaStar, FaCalendarAlt, FaPhone} from 'react-icons/fa';
+import { FaUsers, FaStar, FaCalendarAlt, FaPhone } from 'react-icons/fa';
 
 export default function PrivateCulturalTours() {
   return (
@@ -16,7 +16,7 @@ export default function PrivateCulturalTours() {
             Private Cultural Tours
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Exclusive guided tours tailored to your group's interests
+            Exclusive guided tours tailored to your group&apos;s interests
           </p>
         </motion.div>
 

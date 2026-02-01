@@ -30,8 +30,8 @@ export default function MainPrayerHallPage() {
             <div className="space-y-4">
               <h3 className="text-xl font-semibold text-slate-700">A Spiritual Sanctuary</h3>
               <p className="text-slate-600">
-                The main prayer hall spans an impressive 3,000 square meters, accommodating up to 2,000 worshippers. 
-                Designed with profound spiritual significance, every element serves to enhance the prayer experience 
+                The main prayer hall spans an impressive 3,000 square meters, accommodating up to 2,000 worshippers.
+                Designed with profound spiritual significance, every element serves to enhance the prayer experience
                 and create an atmosphere of tranquility and devotion.
               </p>
               <div className="bg-blue-50 p-4 rounded-lg">
@@ -66,7 +66,7 @@ export default function MainPrayerHallPage() {
                 <li>• Quranic calligraphy</li>
               </ul>
             </div>
-            
+
             <div className="bg-gradient-to-b from-blue-50 to-white p-6 rounded-lg">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-blue-600">🏛️</span>
@@ -81,7 +81,7 @@ export default function MainPrayerHallPage() {
                 <li>• Geometric patterns</li>
               </ul>
             </div>
-            
+
             <div className="bg-gradient-to-b from-green-50 to-white p-6 rounded-lg">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-green-600">🎨</span>
@@ -111,7 +111,7 @@ export default function MainPrayerHallPage() {
             <div className="space-y-4">
               <h3 className="text-xl font-semibold text-slate-700">Direction of Prayer</h3>
               <p className="text-slate-600">
-                The mihrab is a semi-circular niche in the wall that indicates the qibla, the direction of the Kaaba in Mecca. 
+                The mihrab is a semi-circular niche in the wall that indicates the qibla, the direction of the Kaaba in Mecca.
                 Our mihrab is a masterpiece of Islamic art, crafted from rare marble and adorned with gold leaf calligraphy.
               </p>
               <div className="bg-amber-50 p-4 rounded-lg">
@@ -119,9 +119,9 @@ export default function MainPrayerHallPage() {
                 <ul className="space-y-1 text-sm text-slate-600">
                   <li>• Carved from single marble block</li>
                   <li>• Gold leaf calligraphy</li>
-                  <li>• Quranic verse: "Face the direction of the Sacred Mosque"</li>
+                  <li>• Quranic verse: &quot;Face the direction of the Sacred Mosque&quot;</li>
                   <li>• Illuminated from within</li>
-                  <li>• Acoustic enhancement for Imam's voice</li>
+                  <li>• Acoustic enhancement for Imam&apos;s voice</li>
                 </ul>
               </div>
             </div>
@@ -135,8 +135,8 @@ export default function MainPrayerHallPage() {
             <div className="space-y-4">
               <h3 className="text-xl font-semibold text-slate-700">Platform of Knowledge</h3>
               <p className="text-slate-600">
-                The minbar stands to the right of the mihrab, serving as the platform from which the Imam delivers 
-                the Friday sermon (khutbah) and other religious lectures. Our minbar is a work of art, featuring 
+                The minbar stands to the right of the mihrab, serving as the platform from which the Imam delivers
+                the Friday sermon (khutbah) and other religious lectures. Our minbar is a work of art, featuring
                 intricate woodwork and Islamic geometric patterns.
               </p>
               <div className="bg-green-50 p-4 rounded-lg">
@@ -149,7 +149,7 @@ export default function MainPrayerHallPage() {
                 </ul>
               </div>
             </div>
-            
+
             <div className="space-y-4">
               <div className="aspect-square bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center">
                 <span className="text-6xl text-green-600">📢</span>
@@ -169,7 +169,7 @@ export default function MainPrayerHallPage() {
               <h4 className="font-semibold text-slate-700 text-sm">Prayer Mats</h4>
               <p className="text-xs text-slate-600 mt-1">High-quality Turkish prayer mats</p>
             </div>
-            
+
             <div className="text-center p-6 bg-gradient-to-b from-green-50 to-white rounded-lg">
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <span className="text-xl font-bold text-green-600">📖</span>
@@ -177,7 +177,7 @@ export default function MainPrayerHallPage() {
               <h4 className="font-semibold text-slate-700 text-sm">Quran Stands</h4>
               <p className="text-xs text-slate-600 mt-1">Wooden rihal for Quran reading</p>
             </div>
-            
+
             <div className="text-center p-6 bg-gradient-to-b from-purple-50 to-white rounded-lg">
               <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <span className="text-xl font-bold text-purple-600">🎤</span>
@@ -185,7 +185,7 @@ export default function MainPrayerHallPage() {
               <h4 className="font-semibold text-slate-700 text-sm">Sound System</h4>
               <p className="text-xs text-slate-600 mt-1">Crystal clear audio throughout</p>
             </div>
-            
+
             <div className="text-center p-6 bg-gradient-to-b from-amber-50 to-white rounded-lg">
               <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <span className="text-xl font-bold text-amber-600">💡</span>
@@ -203,8 +203,8 @@ export default function MainPrayerHallPage() {
             <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg">
               <h3 className="text-lg font-semibold text-slate-700 mb-4">Acoustic Design</h3>
               <p className="text-slate-600 mb-3">
-                The prayer hall is engineered for perfect acoustics, ensuring the Imam's voice reaches 
-                every corner without distortion. The dome and walls are designed to minimize echo 
+                The prayer hall is engineered for perfect acoustics, ensuring the Imam&apos;s voice reaches
+                every corner without distortion. The dome and walls are designed to minimize echo
                 while enhancing vocal clarity.
               </p>
               <ul className="space-y-1 text-sm text-slate-600">
@@ -213,12 +213,12 @@ export default function MainPrayerHallPage() {
                 <li>• Natural echo control</li>
               </ul>
             </div>
-            
+
             <div className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg">
               <h3 className="text-lg font-semibold text-slate-700 mb-4">Climate Control</h3>
               <p className="text-slate-600 mb-3">
-                Advanced climate systems maintain comfortable temperatures year-round, with 
-                specialized ventilation that respects Islamic prayer requirements while ensuring 
+                Advanced climate systems maintain comfortable temperatures year-round, with
+                specialized ventilation that respects Islamic prayer requirements while ensuring
                 optimal air quality.
               </p>
               <ul className="space-y-1 text-sm text-slate-600">
@@ -255,7 +255,7 @@ export default function MainPrayerHallPage() {
                 </li>
               </ul>
             </div>
-            
+
             <div>
               <h3 className="font-semibold text-slate-700 mb-3">Best Times to Visit</h3>
               <div className="space-y-2 text-slate-600 text-sm">
@@ -274,10 +274,10 @@ export default function MainPrayerHallPage() {
               </div>
             </div>
           </div>
-          
+
           <div className="mt-6 p-4 bg-white rounded-lg">
             <p className="text-center text-sm text-slate-600">
-              <strong>Guided Tours:</strong> Available daily. Experience the spiritual atmosphere and learn about 
+              <strong>Guided Tours:</strong> Available daily. Experience the spiritual atmosphere and learn about
               the architectural significance. Advance booking recommended for groups.
             </p>
           </div>

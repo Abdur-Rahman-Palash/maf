@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { useTranslations } from 'next-intl';
+
 
 export const metadata: Metadata = {
   title: 'Privacy Policy | Masjid Salman al Farsi',
@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 };
 
 export default function PrivacyPage() {
-  const t = useTranslations('privacy');
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-6">
@@ -16,12 +16,12 @@ export default function PrivacyPage() {
           <h1 className="text-4xl font-bold text-gray-900 mb-8 text-center">
             Privacy Policy
           </h1>
-          
+
           <div className="prose prose-lg max-w-none">
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">Information We Collect</h2>
               <p className="text-gray-600 leading-relaxed">
-                We collect information you provide directly to us, such as when you contact us, 
+                We collect information you provide directly to us, such as when you contact us,
                 make donations, or subscribe to our newsletter.
               </p>
             </section>
@@ -29,7 +29,7 @@ export default function PrivacyPage() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">How We Use Your Information</h2>
               <p className="text-gray-600 leading-relaxed">
-                We use the information we collect to provide, maintain, and improve our services, 
+                We use the information we collect to provide, maintain, and improve our services,
                 process donations, and communicate with you about our activities.
               </p>
             </section>
@@ -37,7 +37,7 @@ export default function PrivacyPage() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">Information Sharing</h2>
               <p className="text-gray-600 leading-relaxed">
-                We do not sell, trade, or otherwise transfer your personal information to third parties 
+                We do not sell, trade, or otherwise transfer your personal information to third parties
                 without your consent, except as described in this privacy policy.
               </p>
             </section>
@@ -45,7 +45,7 @@ export default function PrivacyPage() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">Data Security</h2>
               <p className="text-gray-600 leading-relaxed">
-                We implement appropriate security measures to protect your personal information 
+                We implement appropriate security measures to protect your personal information
                 against unauthorized access, alteration, disclosure, or destruction.
               </p>
             </section>

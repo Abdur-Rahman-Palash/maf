@@ -12,7 +12,7 @@ export default function UltraPremiumPageTransitions({ children }: UltraPremiumPa
   const [scrollProgress, setScrollProgress] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
-  
+
   // Smooth loading animation
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -174,6 +174,7 @@ export default function UltraPremiumPageTransitions({ children }: UltraPremiumPa
   );
 
   // Page transition effects based on scroll
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const pageTransform = useTransform(scrollYProgress, [0, 0.1, 0.9, 1], [0, 5, -5, 0]);
   const pageOpacity = useTransform(scrollYProgress, [0, 0.05, 0.95, 1], [1, 0.95, 0.95, 1]);
   const pageScale = useTransform(scrollYProgress, [0, 0.1, 0.9, 1], [1, 0.98, 0.98, 1]);

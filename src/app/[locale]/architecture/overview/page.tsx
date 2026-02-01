@@ -1,6 +1,7 @@
 'use client';
 
-import { Metadata } from 'next';
+import Link from 'next/link';
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaMosque, FaEye, FaRulerCombined, FaPaintBrush } from 'react-icons/fa';
 
@@ -8,9 +9,9 @@ import { FaMosque, FaEye, FaRulerCombined, FaPaintBrush } from 'react-icons/fa';
 // We'll use document title instead
 export default function ArchitectureOverview() {
   // Set document title
-  if (typeof window !== 'undefined') {
+  useEffect(() => {
     document.title = 'Architecture Overview | Masjid Salman al Farsi';
-  }
+  }, []);
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Hero Section */}
@@ -45,8 +46,8 @@ export default function ArchitectureOverview() {
             A Testament to Islamic Artistry
           </h2>
           <p className="text-lg text-gray-600 text-center max-w-4xl mx-auto leading-relaxed">
-            Masjid Salman al Farsi stands as a magnificent example of contemporary Islamic architecture, 
-            blending traditional design elements with modern construction techniques. Every aspect of the mosque 
+            Masjid Salman al Farsi stands as a magnificent example of contemporary Islamic architecture,
+            blending traditional design elements with modern construction techniques. Every aspect of the mosque
             has been carefully crafted to create a space of spiritual reflection and community gathering.
           </p>
         </motion.div>
@@ -92,12 +93,12 @@ export default function ArchitectureOverview() {
                 {feature.title}
               </h3>
               <p className="text-gray-600 mb-4">{feature.description}</p>
-              <a
+              <Link
                 href={feature.link}
                 className="text-teal-600 font-medium hover:text-teal-700 transition-colors"
               >
                 Explore →
-              </a>
+              </Link>
             </motion.div>
           ))}
         </div>
@@ -112,7 +113,7 @@ export default function ArchitectureOverview() {
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Key Architectural Elements
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               "Domes and Minarets",
@@ -143,12 +144,12 @@ export default function ArchitectureOverview() {
           <p className="text-gray-600 mb-8">
             Visit us to witness the architectural splendor firsthand
           </p>
-          <a
+          <Link
             href="/visitors/book-visit"
             className="inline-block bg-teal-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-teal-700 transition-colors"
           >
             Schedule a Visit
-          </a>
+          </Link>
         </motion.div>
       </div>
     </div>

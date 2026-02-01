@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import {FaUserTie, FaCalendarAlt, FaPhone, FaBook, FaEnvelope, FaClock} from 'react-icons/fa';
+import { FaUserTie, FaCalendarAlt, FaPhone, FaBook, FaEnvelope, FaClock } from 'react-icons/fa';
 import { useState } from 'react';
 
 export default function MeetImam() {
@@ -53,13 +53,13 @@ export default function MeetImam() {
             <h2 className="text-2xl font-bold text-gray-900">Spiritual Guidance</h2>
           </div>
           <p className="text-gray-600 mb-6">
-            Our Imams are available to provide spiritual guidance, counseling, and support 
+            Our Imams are available to provide spiritual guidance, counseling, and support
             for various aspects of Islamic life and personal development.
           </p>
           <div className="bg-green-50 rounded-lg p-6">
             <p className="text-green-800 font-medium text-center text-lg">
-              "And consult them in the affairs. Then when you have taken a decision, 
-              put your trust in Allah."
+              &quot;And consult them in the affairs. Then when you have taken a decision,
+              put your trust in Allah.&quot;
               <span className="text-sm block mt-2">- Quran 3:159</span>
             </p>
           </div>
@@ -101,7 +101,7 @@ export default function MeetImam() {
               <FaUserTie className="text-3xl text-green-600 mr-4" />
               <h2 className="text-2xl font-bold text-gray-900">Book Appointment</h2>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">

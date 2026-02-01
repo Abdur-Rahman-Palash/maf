@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaClock } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaPhone, FaEnvelope } from 'react-icons/fa';
 
 export default function ContactPage() {
   return (
@@ -143,7 +143,7 @@ export default function ContactPage() {
                   <span className="text-gray-600">10:00 AM - 2:00 PM</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="font-medium text-gray-700">Jumu'ah (Friday)</span>
+                  <span className="font-medium text-gray-700">Jumu&apos;ah (Friday)</span>
                   <span className="text-emerald-600 font-semibold">1:00 PM - 3:00 PM</span>
                 </div>
               </div>

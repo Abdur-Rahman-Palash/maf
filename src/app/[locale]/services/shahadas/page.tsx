@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import {FaHandHoldingHeart, FaBook, FaCalendarAlt, FaPhone} from 'react-icons/fa';
+import { FaHandHoldingHeart, FaBook, FaCalendarAlt, FaPhone } from 'react-icons/fa';
 
 export default function Shahadas() {
   return (
@@ -32,12 +32,12 @@ export default function Shahadas() {
               <h2 className="text-2xl font-bold text-gray-900">What is Shahada?</h2>
             </div>
             <p className="text-gray-600 mb-4">
-              The Shahada is the declaration of faith in Islam. It is the first and most important pillar of Islam, 
+              The Shahada is the declaration of faith in Islam. It is the first and most important pillar of Islam,
               declaring belief in the oneness of Allah and that Muhammad is His messenger.
             </p>
             <div className="bg-green-50 rounded-lg p-4">
               <p className="text-green-800 font-medium text-center">
-                "Ash-hadu an la ilaha illallah, wa ash-hadu anna Muhammadan rasulullah"<br />
+                &quot;Ash-hadu an la ilaha illallah, wa ash-hadu anna Muhammadan rasulullah&quot;<br />
                 <span className="text-sm">I bear witness that there is no god but Allah, and I bear witness that Muhammad is His messenger</span>
               </p>
             </div>

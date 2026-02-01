@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import {FaCalendarAlt, FaUsers, FaHome, FaPhone} from 'react-icons/fa';
+import { FaCalendarAlt, FaUsers, FaHome, FaPhone } from 'react-icons/fa';
 
 export default function GeneralEvents() {
   return (
@@ -16,7 +16,7 @@ export default function GeneralEvents() {
             General Events
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            To book rooms for other events or Islamic celebrations, from 'aqiqas and private gatherings to conferences, we offer rooms at reasonable rates of hire
+            To book rooms for other events or Islamic celebrations, from &apos;aqiqas and private gatherings to conferences, we offer rooms at reasonable rates of hire
           </p>
         </motion.div>
 
@@ -32,7 +32,7 @@ export default function GeneralEvents() {
               <h2 className="text-2xl font-bold text-gray-900">Event Facilities</h2>
             </div>
             <p className="text-gray-600 mb-4">
-              Our mosque offers versatile spaces for various Islamic events and celebrations. 
+              Our mosque offers versatile spaces for various Islamic events and celebrations.
               We provide well-maintained facilities suitable for both small gatherings and larger events.
             </p>
             <ul className="text-gray-600 space-y-2">

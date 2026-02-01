@@ -12,7 +12,7 @@ export default function DonatePage() {
       <section className="relative h-[60vh] overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-amber-900/80 to-slate-900/80" />
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=2070')] bg-cover bg-center" />
-        
+
         <div className="relative z-10 flex items-center justify-center h-full">
           <div className="text-center text-white px-4">
             <h1 className="text-4xl md:text-6xl font-bold mb-6" style={{ fontFamily: 'var(--font-amiri)' }}>
@@ -70,7 +70,7 @@ export default function DonatePage() {
                       </button>
                     ))}
                   </div>
-                  
+
                   {/* Custom Amount */}
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -167,7 +167,7 @@ export default function DonatePage() {
                           <span>{campaign.progress}%</span>
                         </div>
                         <div className="w-full bg-slate-200 rounded-full h-2">
-                          <div 
+                          <div
                             className="bg-amber-500 h-2 rounded-full transition-all duration-500"
                             style={{ width: `${campaign.progress}%` }}
                           />
@@ -183,7 +183,7 @@ export default function DonatePage() {
               <div className="bg-slate-50 rounded-2xl p-8">
                 <h3 className="text-xl font-bold text-slate-800 mb-3">Tax Information</h3>
                 <p className="text-slate-600 mb-3">
-                  Masjid Salman al Farsi is a registered 501(c)(3) non-profit organization. 
+                  Masjid Salman al Farsi is a registered 501(c)(3) non-profit organization.
                   Your donation is tax-deductible to the extent allowed by law.
                 </p>
                 <p className="text-sm text-slate-500">
@@ -229,7 +229,7 @@ export default function DonatePage() {
                     <p className="text-sm text-amber-600">{testimonial.amount}</p>
                   </div>
                 </div>
-                <p className="text-slate-600 italic">"{testimonial.text}"</p>
+                <p className="text-slate-600 italic">&quot;{testimonial.text}&quot;</p>
               </div>
             ))}
           </div>
@@ -240,7 +240,7 @@ export default function DonatePage() {
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-center text-slate-800 mb-12" style={{ fontFamily: 'var(--font-amiri)' }}>
-              Frequently Asked Questions
+            Frequently Asked Questions
           </h2>
           <div className="space-y-4">
             {[

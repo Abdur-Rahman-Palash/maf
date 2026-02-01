@@ -196,7 +196,7 @@ export default function LostFound() {
                   <FaPhone className="text-purple-600 mt-1" />
                   <div>
                     <h4 className="font-semibold text-gray-800">Contact</h4>
-                    <p className="text-gray-600 text-sm">We'll contact you within 24 hours</p>
+                    <p className="text-gray-600 text-sm">We&apos;ll contact you within 24 hours</p>
                   </div>
                 </div>
               </div>

@@ -30,8 +30,8 @@ export default function DomesPage() {
             <div className="space-y-4">
               <h3 className="text-xl font-semibold text-slate-700">Architectural Marvel</h3>
               <p className="text-slate-600">
-                The central dome of Masjid Salman al Farsi stands as a testament to Islamic architectural excellence, 
-                soaring 45 meters above the main prayer hall with a diameter of 25 meters. Its golden exterior catches 
+                The central dome of Masjid Salman al Farsi stands as a testament to Islamic architectural excellence,
+                soaring 45 meters above the main prayer hall with a diameter of 25 meters. Its golden exterior catches
                 the sunlight, creating a beacon that can be seen from miles around.
               </p>
               <div className="bg-amber-50 p-4 rounded-lg">
@@ -66,7 +66,7 @@ export default function DomesPage() {
                 <li>• Ventilation design</li>
               </ul>
             </div>
-            
+
             <div className="bg-gradient-to-b from-green-50 to-white p-6 rounded-lg">
               <div className="aspect-square bg-gradient-to-br from-green-100 to-green-200 rounded-lg mb-4 flex items-center justify-center">
                 <span className="text-4xl text-green-600">⭐</span>
@@ -81,7 +81,7 @@ export default function DomesPage() {
                 <li>• Blue mosaic tiles</li>
               </ul>
             </div>
-            
+
             <div className="bg-gradient-to-b from-purple-50 to-white p-6 rounded-lg">
               <div className="aspect-square bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg mb-4 flex items-center justify-center">
                 <span className="text-4xl text-purple-600">💎</span>
@@ -106,8 +106,8 @@ export default function DomesPage() {
             <div className="space-y-4">
               <h3 className="text-xl font-semibold text-slate-700">Islamic Geometry</h3>
               <p className="text-slate-600">
-                The domes feature intricate geometric patterns based on sacred Islamic mathematics. 
-                The designs incorporate the golden ratio and complex star patterns that have been used 
+                The domes feature intricate geometric patterns based on sacred Islamic mathematics.
+                The designs incorporate the golden ratio and complex star patterns that have been used
                 in Islamic architecture for centuries.
               </p>
               <div className="bg-blue-50 p-4 rounded-lg">
@@ -120,11 +120,11 @@ export default function DomesPage() {
                 </ul>
               </div>
             </div>
-            
+
             <div className="space-y-4">
               <h3 className="text-xl font-semibold text-slate-700">Calligraphy & Inscriptions</h3>
               <p className="text-slate-600">
-                Quranic verses and Islamic calligraphy adorn the dome interiors and exteriors, 
+                Quranic verses and Islamic calligraphy adorn the dome interiors and exteriors,
                 created by master calligraphers using traditional techniques passed down through generations.
               </p>
               <div className="bg-green-50 p-4 rounded-lg">
@@ -133,7 +133,7 @@ export default function DomesPage() {
                   <li>• Ayat al-Kursi (Throne Verse)</li>
                   <li>• 99 Names of Allah</li>
                   <li>• Surah Al-Ikhlas</li>
-                  <li>• Prophet's traditions</li>
+                  <li>• Prophet&apos;s traditions</li>
                 </ul>
               </div>
             </div>
@@ -153,7 +153,7 @@ export default function DomesPage() {
                 Combining traditional Islamic architecture with modern seismic engineering and climate control systems.
               </p>
             </div>
-            
+
             <div className="text-center p-6 bg-gradient-to-b from-blue-50 to-white rounded-lg">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-blue-600">🌡️</span>
@@ -163,7 +163,7 @@ export default function DomesPage() {
                 Advanced ventilation and cooling systems maintain comfortable temperatures year-round.
               </p>
             </div>
-            
+
             <div className="text-center p-6 bg-gradient-to-b from-green-50 to-white rounded-lg">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-green-600">💡</span>
@@ -194,7 +194,7 @@ export default function DomesPage() {
                 Explore the domes in stunning 360° detail from the comfort of your home
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="aspect-video bg-black rounded-lg mb-4 flex items-center justify-center">
                 <div className="text-center">
@@ -233,7 +233,7 @@ export default function DomesPage() {
                 </div>
               </div>
             </div>
-            
+
             <div>
               <h3 className="text-lg font-semibold text-slate-700 mb-3">Photography Guidelines</h3>
               <div className="space-y-2 text-slate-600 text-sm">
@@ -244,10 +244,10 @@ export default function DomesPage() {
               </div>
             </div>
           </div>
-          
+
           <div className="mt-6 p-4 bg-amber-50 rounded-lg">
             <p className="text-center text-sm text-slate-600">
-              <strong>Guided Architecture Tours:</strong> Available daily at 10:00 AM, 2:00 PM, and 4:00 PM. 
+              <strong>Guided Architecture Tours:</strong> Available daily at 10:00 AM, 2:00 PM, and 4:00 PM.
               Book in advance for group visits.
             </p>
           </div>

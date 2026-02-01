@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import {FaBook, FaGraduationCap, FaUsers, FaCalendarAlt} from 'react-icons/fa';
+import { FaBook, FaGraduationCap, FaUsers, FaCalendarAlt } from 'react-icons/fa';
 
 export default function Madrasa() {
   return (
@@ -32,12 +32,12 @@ export default function Madrasa() {
               <h2 className="text-2xl font-bold text-gray-900">Islamic Education</h2>
             </div>
             <p className="text-gray-600 mb-4">
-              Our Madrasa provides comprehensive Islamic education following traditional methods 
+              Our Madrasa provides comprehensive Islamic education following traditional methods
               while adapting to modern educational needs. We focus on Quran, Hadith, Fiqh, and Arabic language.
             </p>
             <div className="bg-blue-50 rounded-lg p-4">
               <p className="text-blue-800 font-medium text-center">
-                "Read! In the name of your Lord who has created"<br />
+                &quot;Read! In the name of your Lord who has created&quot;<br />
                 <span className="text-sm block mt-2">- Quran 96:1</span>
               </p>
             </div>
@@ -57,7 +57,7 @@ export default function Madrasa() {
               We offer structured programs for different age groups:
             </p>
             <ul className="text-gray-600 space-y-2">
-              <li>• Children's Islamic Studies (Ages 5-12)</li>
+              <li>• Children&apos;s Islamic Studies (Ages 5-12)</li>
               <li>• Youth Programs (Ages 13-18)</li>
               <li>• Adult Education Classes</li>
               <li>• Quran Memorization (Hifz)</li>
@@ -75,7 +75,7 @@ export default function Madrasa() {
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Course Schedule</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <h3 className="font-semibold text-gray-800 mb-3">Children's Classes</h3>
+              <h3 className="font-semibold text-gray-800 mb-3">Children&apos;s Classes</h3>
               <div className="space-y-2">
                 <div className="flex items-center text-gray-600">
                   <FaCalendarAlt className="mr-2 text-blue-600" />

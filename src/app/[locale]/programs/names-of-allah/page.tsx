@@ -66,7 +66,7 @@ export default function NamesOfAllah() {
           transition={{ delay: 0.6 }}
           className="bg-gradient-to-r from-red-50 to-pink-50 rounded-xl p-8 mb-8"
         >
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Benefits of Knowing Allah's Names</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Benefits of Knowing Allah&apos;s Names</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <h3 className="font-semibold text-gray-800 mb-3">Spiritual Benefits</h3>

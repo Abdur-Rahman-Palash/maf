@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import {FaUsers, FaClock, FaCalendarAlt, FaTicketAlt} from 'react-icons/fa';
+import { FaUsers, FaClock, FaCalendarAlt, FaTicketAlt } from 'react-icons/fa';
 
 export default function PublicCulturalTours() {
   return (
@@ -126,7 +126,7 @@ export default function PublicCulturalTours() {
           transition={{ delay: 0.5 }}
           className="bg-gradient-to-r from-blue-50 to-green-50 rounded-xl p-8"
         >
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">What You'll See</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">What You&apos;ll See</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <h3 className="font-semibold text-gray-800 mb-2">Architecture Highlights</h3>

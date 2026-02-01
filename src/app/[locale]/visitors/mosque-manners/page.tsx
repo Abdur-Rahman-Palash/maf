@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import {FaHands, FaShoePrints, FaUserTie, FaVolumeMute} from 'react-icons/fa';
+import { FaHands, FaShoePrints, FaUserTie, FaVolumeMute } from 'react-icons/fa';
 
 export default function MosqueManners() {
   return (
@@ -115,7 +115,7 @@ export default function MosqueManners() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Important Reminders</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <h3 className="font-semibold text-gray-800 mb-2">Do's</h3>
+              <h3 className="font-semibold text-gray-800 mb-2">Do&apos;s</h3>
               <ul className="text-gray-600 space-y-1">
                 <li>✓ Dress modestly</li>
                 <li>✓ Remove shoes at entrance</li>
@@ -125,7 +125,7 @@ export default function MosqueManners() {
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-800 mb-2">Don'ts</h3>
+              <h3 className="font-semibold text-gray-800 mb-2">Don&apos;ts</h3>
               <ul className="text-gray-600 space-y-1">
                 <li>✗ Enter during prayer calls</li>
                 <li>✗ Take photos without permission</li>

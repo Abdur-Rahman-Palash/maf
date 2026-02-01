@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import {FaTabletAlt, FaHeadphones, FaVideo, FaCamera} from 'react-icons/fa';
+import { FaTabletAlt, FaHeadphones, FaVideo, FaCamera } from 'react-icons/fa';
 
 export default function MultimediaGuide() {
   return (
@@ -110,7 +110,7 @@ export default function MultimediaGuide() {
               <h3 className="text-xl font-semibold">AR Experience</h3>
             </div>
             <p className="text-gray-600 mb-4">
-              Augmented reality features bring the mosque's history to life.
+              Augmented reality features bring the mosque&apos;s history to life.
             </p>
             <div className="space-y-2">
               <div className="text-sm text-gray-500">
