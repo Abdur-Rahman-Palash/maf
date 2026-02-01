@@ -7,14 +7,6 @@ import EServicesSection from '@/components/EServicesSection';
 // import PremiumFloatingElements from '@/components/PremiumFloatingElements';
 import Services from '@/components/Services';
 import QuranSection from '@/components/QuranSection';
-import {routing} from '@/i18n/routing';
-
-export async function generateStaticParams() {
-  return [
-    { locale: 'en' },
-    { locale: 'ar' }
-  ];
-}
 
 export default function Home() {
   return (

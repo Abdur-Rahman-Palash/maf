@@ -11,10 +11,6 @@ import Footer from '@/components/Footer';
 // import UltraPremiumAnimations from '@/components/UltraPremiumAnimations';
 // import UltraPremiumPageTransitions from '@/components/UltraPremiumPageTransitions';
 // import UltraPremiumInteractions from '@/components/UltraPremiumInteractions';
-
-export async function generateStaticParams() {
-  return routing.locales.map((locale) => ({locale}));
-}
  
 const amiri = Amiri({ 
   subsets: ['arabic', 'latin'],

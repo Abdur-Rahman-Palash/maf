@@ -1,7 +1,10 @@
 import {getRequestConfig} from 'next-intl/server';
  
-export default getRequestConfig(async ({locale}) => {
-  // For static export, we'll use the locale from the URL params
+export default getRequestConfig(async ({requestLocale}) => {
+  // This typically corresponds to the `[locale]` segment
+  let locale = await requestLocale;
+
+  // Ensure that a valid locale is used
   if (!locale || !['en', 'ar'].includes(locale)) {
     locale = 'en';
   }
