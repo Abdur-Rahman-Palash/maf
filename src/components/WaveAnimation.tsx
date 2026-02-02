@@ -63,7 +63,10 @@ const WaveAnimation: React.FC<WaveAnimationProps> = ({
   }, [speed]);
 
   return (
-    <div className={`absolute inset-x-0 bottom-0 overflow-hidden ${className}`}>
+    <div 
+      className={`absolute inset-x-0 bottom-0 overflow-hidden pointer-events-none ${className}`}
+      style={{ zIndex: 1 }}
+    >
       <svg
         ref={waveRef}
         className="relative block w-full h-full"
