@@ -28,9 +28,12 @@ const HeaderPrayerTimes: React.FC = () => {
     hijri: ''
   });
 
-  const [prayerTimes, setPrayerTimes] = useState<PrayerTimes>({
+  const [nextPrayer, setNextPrayer] = useState({ name: 'DHUHR', time: '12:30 PM' });
+
+  // Real Islamic prayer times for Georgia (Atlanta)
+  const [prayerTimes, setPrayerTimes] = useState({
     jamaat: {
-      fajr: '06:15',
+      fajr: '06:00',
       zuhr: '13:30',
       asr: '16:00',
       maghrib: '18:15',
@@ -95,30 +98,71 @@ const HeaderPrayerTimes: React.FC = () => {
   };
 
   useEffect(() => {
-    // Set current date
-    const updateDate = () => {
-      const now = new Date();
-      const day = now.getDate();
-      const month = now.toLocaleDateString('en-US', { month: 'long' });
-      const year = now.getFullYear();
-      
-      // Add ordinal suffix to day
-      const getOrdinalSuffix = (day: number) => {
-        const suffixes = ['th', 'st', 'nd', 'rd'];
-        const v = day % 100;
-        return suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0];
-      };
-      
-      setCurrentDate({
-        english: `${day}${getOrdinalSuffix(day)} ${month} ${year}`,
-        hijri: '9 Shabaan 1447' // This would normally be calculated
-      });
+    const fetchPrayerTimes = async () => {
+      try {
+        // Using Islamic prayer times API for Georgia, USA
+        const response = await fetch('https://api.aladhan.com/v1/timingsByCity?city=Atlanta&country=US&method=2');
+        const data = await response.json();
+        
+        if (data.code === 200 && data.data) {
+          const timings = data.data.timings;
+          const hijriDate = data.data.date.hijri;
+          
+          setPrayerTimes({
+            jamaat: {
+              fajr: timings.Fajr,
+              zuhr: timings.Dhuhr,
+              asr: timings.Asr,
+              maghrib: timings.Maghrib,
+              isha: timings.Isha
+            },
+            begins: {
+              fajr: timings.Fajr,
+              zuhr: timings.Dhuhr,
+              asr: timings.Asr,
+              maghrib: timings.Maghrib,
+              isha: timings.Isha
+            }
+          });
+
+          // Update Hijri date
+          setCurrentDate({
+            english: new Date().toLocaleDateString('en-US', { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            }),
+            hijri: `${hijriDate.day} ${hijriDate.month.en} ${hijriDate.year}`
+          });
+        }
+      } catch (error) {
+        console.log('Using fallback prayer times');
+        // Keep using fallback times if API fails
+        const now = new Date();
+        const day = now.getDate();
+        const month = now.toLocaleDateString('en-US', { month: 'long' });
+        const year = now.getFullYear();
+        
+        // Add ordinal suffix to day
+        const getOrdinalSuffix = (day: number) => {
+          const suffixes = ['th', 'st', 'nd', 'rd'];
+          const v = day % 100;
+          return suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0];
+        };
+        
+        setCurrentDate({
+          english: `${day}${getOrdinalSuffix(day)} ${month} ${year}`,
+          hijri: '9 Shabaan 1447' // This would normally be calculated
+        });
+      }
     };
 
-    updateDate();
-    const timer = setInterval(updateDate, 60000); // Update every minute
-
-    return () => clearInterval(timer);
+    fetchPrayerTimes();
+    
+    // Update every hour
+    const interval = setInterval(fetchPrayerTimes, 60 * 60 * 1000);
+    return () => clearInterval(interval);
   }, []);
 
   const names = prayerNames[locale as keyof typeof prayerNames] || prayerNames.en;
@@ -147,9 +191,7 @@ const HeaderPrayerTimes: React.FC = () => {
               </motion.a>
               <span className="text-gray-400">·</span>
               <motion.a 
-                href="https://cambridgecentralmosque.org/prayer-times/" 
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/worshippers/prayer-timings" 
                 className="hover:text-amber-600 transition-colors duration-200 ml-2 inline-block"
                 whileHover={{ y: -1 }}
               >
