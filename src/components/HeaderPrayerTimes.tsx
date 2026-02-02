@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useLocale } from 'next-intl';
+import { Link } from '@/i18n/routing';
 
 interface PrayerTimes {
   jamaat: {
@@ -190,13 +191,14 @@ const HeaderPrayerTimes: React.FC = () => {
                 {locale === 'ar' ? 'الجمعة ١٢:٣٠ & ١٣:١٥' : `${names.juma} 12:30 & 13:15`}
               </motion.a>
               <span className="text-gray-400">·</span>
-              <motion.a 
-                href="/worshippers/prayer-timings" 
-                className="hover:text-amber-600 transition-colors duration-200 ml-2 inline-block"
-                whileHover={{ y: -1 }}
-              >
-                {names.prayerTimes}
-              </motion.a>
+              <motion.div whileHover={{ y: -1 }} className="inline-block">
+                <Link
+                  href="/worshippers/prayer-timings" 
+                  className="hover:text-amber-600 transition-colors duration-200 ml-2 inline-block"
+                >
+                  {names.prayerTimes}
+                </Link>
+              </motion.div>
             </div>
           </motion.div>
 

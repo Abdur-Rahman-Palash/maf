@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
 import { useRouter } from 'next/navigation';
 import HeaderPrayerTimes from './HeaderPrayerTimes';
+import DonateButton from './DonateButton';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -145,15 +146,9 @@ const Header = () => {
           {/* Right Side - Donate Button Only */}
           <div className="flex items-center space-x-4">
             {/* Donate Button */}
-            <Link
-              href="/donate"
-              className="relative overflow-hidden bg-gradient-to-r from-pink-500 to-rose-600 text-white px-8 py-4 rounded-full font-bold text-base shadow-lg hover:shadow-pink-500/70 transition-all duration-300 flex items-center gap-3 border-2 border-pink-400/30 hover:scale-105 hover:bg-transparent hover:border-pink-500 z-50"
-              style={{ pointerEvents: 'auto' }}
-            >
-              <FaHeart className="text-base" />
-              <span className="relative z-10 font-bold tracking-wide">Donate</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-rose-600 to-pink-700 transform translate-y-full hover:translate-y-0 transition-transform duration-300 rounded-full" />
-            </Link>
+            <DonateButton href="/donate" className="my-0">
+              Donate
+            </DonateButton>
 
             {/* Mobile Menu Button */}
             <motion.button
@@ -218,16 +213,15 @@ const Header = () => {
                 </nav>
 
                 {/* Mobile Donate Button */}
-                <Link
+                <DonateButton 
                   href="/donate"
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full relative overflow-hidden bg-gradient-to-r from-pink-500 to-rose-600 text-white px-6 py-3 rounded-full font-bold text-sm shadow-lg hover:shadow-pink-500/50 transition-all duration-300 flex items-center justify-center gap-2 mb-6 hover:scale-105 hover:bg-transparent hover:border-pink-500 border-2 border-pink-400/30"
+                  className="w-full text-center my-4"
                 >
-                  <FaHeart className="text-sm" />
-                  <span>Donate</span>
-                </Link>
+                  Donate
+                </DonateButton>
               </div>
             </motion.div>
           </motion.div>

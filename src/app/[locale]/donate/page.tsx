@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import DonateButton from '@/components/DonateButton';
 
 export const metadata: Metadata = {
   title: 'Donate - Masjid Salman al Farsi',
@@ -111,9 +112,14 @@ export default function DonatePage() {
                 </div>
 
                 {/* Donate Button */}
-                <button className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-amber-600 hover:to-amber-700 transition-all shadow-lg">
-                  Proceed to Donate
-                </button>
+                <div className="mt-8">
+                  <DonateButton 
+                    href="#payment"
+                    className="w-full text-center"
+                  >
+                    Proceed to Donate
+                  </DonateButton>
+                </div>
               </div>
             </div>
 
