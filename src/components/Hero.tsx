@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaTicketAlt, FaPlay, FaChevronDown, FaMosque, FaTimes, FaMoon, FaSun, FaCloudSun, FaCloudMoon } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { Link } from '@/i18n/routing';
+import WaveAnimation from '@/components/WaveAnimation';
 
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -177,6 +178,14 @@ const Hero = () => {
           <span className="text-sm font-medium">Journey Begins Here</span>
         </motion.div>
       </motion.div>
+      
+      {/* Wave Animation */}
+      <WaveAnimation 
+        color="#10b981" 
+        opacity={0.1} 
+        speed={0.02} 
+        height={80}
+      />
     </section>
   );
 };

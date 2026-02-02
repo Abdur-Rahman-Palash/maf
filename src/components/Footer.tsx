@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { FaInstagram, FaTwitter, FaFacebook, FaYoutube, FaArrowUp } from 'react-icons/fa';
 import { Link } from '@/i18n/routing';
+import WaveAnimation from '@/components/WaveAnimation';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
@@ -31,6 +32,14 @@ export default function Footer() {
 
   return (
     <>
+      {/* Wave Animation */}
+      <WaveAnimation 
+        color="#d4af37" 
+        opacity={0.05} 
+        speed={0.01} 
+        height={50}
+      />
+      
       <footer className="bg-black/90 text-white py-16 px-6">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">

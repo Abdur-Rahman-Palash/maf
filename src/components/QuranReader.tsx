@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { FaBook, FaMosque } from 'react-icons/fa';
+import WaveAnimation from '@/components/WaveAnimation';
 
 const QuranReader: React.FC = () => {
   return (
@@ -48,6 +49,14 @@ const QuranReader: React.FC = () => {
 
       {/* Decorative Bottom Border */}
       <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-600 via-amber-500 to-emerald-600" />
+      
+      {/* Wave Animation */}
+      <WaveAnimation 
+        color="#059669" 
+        opacity={0.08} 
+        speed={0.015} 
+        height={60}
+      />
     </section>
   );
 };

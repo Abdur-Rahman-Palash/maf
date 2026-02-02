@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { Link } from '@/i18n/routing';
+import WaveAnimation from '@/components/WaveAnimation';
 
 const servicesData = [
   { 
@@ -245,6 +246,14 @@ export default function Services() {
           );
         })}
       </div>
+      
+      {/* Wave Animation */}
+      <WaveAnimation 
+        color="#3b82f6" 
+        opacity={0.06} 
+        speed={0.025} 
+        height={70}
+      />
     </motion.section>
   );
 }
