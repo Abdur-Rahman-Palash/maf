@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { Link } from '@/i18n/routing';
 
 interface DonateButtonProps {
   children?: React.ReactNode;
@@ -23,8 +24,10 @@ const DonateButton: React.FC<DonateButtonProps> = ({
 
   const content = (
     <>
-      {children}
-      <span className="btn-icon pe-7s-right-arrow ml-2 transition-transform duration-300 group-hover:translate-x-1">
+      <span className="relative z-10 transition-colors duration-300 group-hover:text-black">
+        {children}
+      </span>
+      <span className="btn-icon pe-7s-right-arrow ml-2 transition-transform duration-300 group-hover:translate-x-1 relative z-10 group-hover:text-black">
         →
       </span>
       {/* Hover effect overlay - fills from left to right */}
@@ -34,15 +37,18 @@ const DonateButton: React.FC<DonateButtonProps> = ({
 
   if (href) {
     return (
-      <motion.a
-        href={href}
-        className={combinedClasses}
+      <motion.div
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         transition={{ duration: 0.2 }}
       >
-        {content}
-      </motion.a>
+        <Link
+          href={href}
+          className={combinedClasses}
+        >
+          {content}
+        </Link>
+      </motion.div>
     );
   }
 
