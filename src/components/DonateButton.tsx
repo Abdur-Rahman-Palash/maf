@@ -16,7 +16,7 @@ const DonateButton: React.FC<DonateButtonProps> = ({
   onClick,
   href 
 }) => {
-  const baseClasses = "btn btn-primary icon-right relative inline-flex items-center justify-center px-4 py-2 md:px-6 md:py-3 lg:px-8 lg:py-4 border-4 border-[#8C7C4E] bg-[#8C7C4E] text-white font-bold text-base md:text-lg lg:text-xl rounded-lg transition-all duration-300 ease-in-out group overflow-hidden my-2";
+  const baseClasses = "btn btn-primary icon-right relative inline-flex items-center justify-center px-2 py-1 md:px-3 md:py-1.5 lg:px-4 lg:py-2 border-4 border-[#8C7C4E] bg-[#8C7C4E] text-white font-bold text-xs md:text-sm lg:text-base rounded-lg transition-all duration-300 ease-in-out group overflow-hidden my-2";
 
   const hoverClasses = "hover:bg-transparent hover:text-black";
   

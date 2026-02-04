@@ -143,12 +143,14 @@ const Header = () => {
             </div>
           </nav>
 
-          {/* Right Side - Donate Button Only */}
+          {/* Right Side - Donate Button (Desktop) + Mobile Menu Button */}
           <div className="flex items-center space-x-4">
-            {/* Donate Button */}
-            <DonateButton href="/donate" className="my-0">
-              Donate
-            </DonateButton>
+            {/* Donate Button - Desktop Only */}
+            <div className="hidden lg:block">
+              <DonateButton href="/donate" className="my-0">
+                Donate
+              </DonateButton>
+            </div>
 
             {/* Mobile Menu Button */}
             <motion.button
@@ -175,13 +177,13 @@ const Header = () => {
           >
             {/* Backdrop */}
             <div
-              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/50 "
               onClick={() => setIsMobileMenuOpen(false)}
             />
 
             {/* Mobile Menu Panel */}
             <motion.div
-              className="absolute top-20 right-0 w-80 max-w-full bg-gradient-to-b from-teal-900/95 to-teal-800/95 backdrop-blur-md shadow-2xl rounded-l-2xl"
+              className="absolute top-20 right-0 w-80 max-w-full bg-gradient-to-b from-teal-900/95 to-teal-800/95 shadow-2xl rounded-l-2xl"
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
@@ -202,7 +204,7 @@ const Header = () => {
                         className="block text-white hover:text-yellow-600 transition-colors duration-200 font-bold py-3 px-4 rounded-lg hover:bg-white/20"
                         style={{ 
                           fontFamily: 'system-ui, sans-serif',
-                          textShadow: '0 2px 6px rgba(0,0,0,0.8)'
+                          textShadow: 'none'
                         }}
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
@@ -218,7 +220,7 @@ const Header = () => {
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full text-center my-4"
+                  className="w-full text-center my-4 px-2 py-1 text-xs"
                 >
                   Donate
                 </DonateButton>
