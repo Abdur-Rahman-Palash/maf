@@ -1,10 +1,35 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaCalendarAlt, FaMoon, FaHands, FaHeart } from 'react-icons/fa';
+import { FaCalendarAlt, FaMoon, FaHands, FaHeart, FaClock, FaMapMarkerAlt, FaUsers, FaPlay, FaUser, FaArrowRight, FaChevronLeft, FaChevronRight, FaBook, FaHandsHelping } from 'react-icons/fa';
 import { Link } from '@/i18n/routing';
+import EventStorage from '@/lib/eventStorage';
 
 const ProgramsSection = () => {
+  const [events, setEvents] = useState(EventStorage.getEvents());
+  const [currentEventPage, setCurrentEventPage] = useState(0);
+  const [currentProgramPage, setCurrentProgramPage] = useState(0);
+  const [registrationMessage, setRegistrationMessage] = useState('');
+  const eventsPerPage = 3;
+  const programsPerPage = 4;
+
+  // Load events from storage on mount and set up interval for updates
+  useEffect(() => {
+    const loadEvents = () => {
+      const storedEvents = EventStorage.getEvents();
+      setEvents(storedEvents);
+    };
+
+    // Initial load
+    loadEvents();
+
+    // Set up interval to check for new events every 2 seconds
+    const interval = setInterval(loadEvents, 2000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const programs = [
     {
       title: 'Hijri Calendar',
@@ -33,8 +58,66 @@ const ProgramsSection = () => {
       description: 'Learn and reflect on the 99 beautiful names of Allah',
       href: '/programs/names-of-allah',
       color: 'from-red-500 to-red-600'
+    },
+    {
+      title: 'Islamic Education',
+      icon: FaBook,
+      description: 'Comprehensive Islamic education for all ages',
+      href: '/programs/education',
+      color: 'from-indigo-500 to-indigo-600'
+    },
+    {
+      title: 'Community Services',
+      icon: FaHandsHelping,
+      description: 'Volunteer and community service opportunities',
+      href: '/programs/community',
+      color: 'from-pink-500 to-pink-600'
+    },
+    {
+      title: 'Youth Programs',
+      icon: FaUser,
+      description: 'Special programs for youth and young adults',
+      href: '/programs/youth',
+      color: 'from-yellow-500 to-yellow-600'
+    },
+    {
+      title: 'Family Counseling',
+      icon: FaHeart,
+      description: 'Family and marriage counseling services',
+      href: '/programs/counseling',
+      color: 'from-teal-500 to-teal-600'
     }
   ];
+
+  // Pagination for events
+  const totalEventPages = Math.ceil(events.length / eventsPerPage);
+  const currentEvents = events.slice(
+    currentEventPage * eventsPerPage,
+    (currentEventPage + 1) * eventsPerPage
+  );
+
+  // Pagination for programs
+  const totalProgramPages = Math.ceil(programs.length / programsPerPage);
+  const currentPrograms = programs.slice(
+    currentProgramPage * programsPerPage,
+    (currentProgramPage + 1) * programsPerPage
+  );
+
+  const handleEventPageChange = (direction: 'prev' | 'next') => {
+    if (direction === 'prev' && currentEventPage > 0) {
+      setCurrentEventPage(currentEventPage - 1);
+    } else if (direction === 'next' && currentEventPage < totalEventPages - 1) {
+      setCurrentEventPage(currentEventPage + 1);
+    }
+  };
+
+  const handleProgramPageChange = (direction: 'prev' | 'next') => {
+    if (direction === 'prev' && currentProgramPage > 0) {
+      setCurrentProgramPage(currentProgramPage - 1);
+    } else if (direction === 'next' && currentProgramPage < totalProgramPages - 1) {
+      setCurrentProgramPage(currentProgramPage + 1);
+    }
+  };
 
   return (
     <section className="py-16 px-6 bg-gradient-to-b from-gray-50 to-white">
@@ -45,67 +128,322 @@ const ProgramsSection = () => {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'var(--font-philosopher), serif' }}>
-            Programs
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'var(--font-philosopher), sans-serif' }}>
+            Programs & Events
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Discover our spiritual and educational programs designed to enrich your Islamic journey
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            Explore our Islamic programs and upcoming events
           </p>
+          
+          {/* Registration Success Message */}
+          {registrationMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-4 inline-block bg-green-100 text-green-700 px-6 py-3 rounded-lg font-medium"
+            >
+              {registrationMessage}
+            </motion.div>
+          )}
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {programs.map((program, index) => (
-            <motion.div
-              key={program.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="group"
-            >
-              <Link
-                href={program.href}
-                className="block h-full"
+        {/* Events Section */}
+        <div className="mb-12">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-2xl font-bold text-gray-800">Upcoming Events</h3>
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <span>Page {currentEventPage + 1} of {totalEventPages}</span>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => handleEventPageChange('prev')}
+                  disabled={currentEventPage === 0}
+                  className="p-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <FaChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => handleEventPageChange('next')}
+                  disabled={currentEventPage === totalEventPages - 1}
+                  className="p-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <FaChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {currentEvents.map((event, index) => (
+              <motion.div
+                key={event.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ 
+                  duration: 0.8, 
+                  delay: index * 0.1,
+                  type: "spring",
+                  stiffness: 100
+                }}
+                whileHover={{ 
+                  y: -5,
+                  scale: 1.05,
+                  transition: { duration: 0.3 }
+                }}
+                className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer border border-gray-100"
               >
-                <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 h-full group-hover:scale-105">
-                  <div className={`w-16 h-16 bg-gradient-to-r ${program.color} rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                    <program.icon className="text-white text-2xl" />
+                {/* Event Image */}
+                <div className="h-48 bg-gradient-to-br from-emerald-400 to-blue-500 relative">
+                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
+                      <FaCalendarAlt className="text-emerald-600 text-xl" />
+                    </div>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">
-                    {program.title}
-                  </h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    {program.description}
-                  </p>
-                  <div className="mt-4 flex items-center text-blue-600 font-medium text-sm group-hover:text-blue-700">
-                    Learn more
-                    <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                  <div className="absolute top-4 right-4">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      event.status === 'Completed' ? 'bg-green-100 text-green-600' :
+                      event.status === 'Cancelled' ? 'bg-red-100 text-red-600' :
+                      'bg-yellow-100 text-yellow-600'
+                    }`}>
+                      {event.status}
+                    </span>
+                  </div>
+                  <div className="absolute bottom-4 left-4 bg-black/60 text-white px-2 py-1 rounded text-xs">
+                    {event.time}
                   </div>
                 </div>
-              </Link>
-            </motion.div>
-          ))}
+                
+                {/* Event Details */}
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      event.category === 'Prayer' ? 'bg-emerald-100 text-emerald-600' :
+                      event.category === 'Education' ? 'bg-blue-100 text-blue-600' :
+                      event.category === 'Community' ? 'bg-purple-100 text-purple-600' :
+                      event.category === 'Celebration' ? 'bg-pink-100 text-pink-600' :
+                      event.category === 'Charity' ? 'bg-orange-100 text-orange-600' :
+                      'bg-gray-100 text-gray-600'
+                    }`}>
+                      {event.category}
+                    </span>
+                    <div className="flex gap-2">
+                      <span className="text-xs text-gray-500">
+                        <FaUsers className="text-gray-400 mr-1" />
+                        {event.currentAttendees}/{event.maxAttendees}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        <FaClock className="text-gray-400 mr-1" />
+                        {event.time}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <h4 className="font-bold text-gray-800 mb-2 line-clamp-2">{event.title}</h4>
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-3">{event.description}</p>
+                  
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-2">
+                        <FaMapMarkerAlt className="text-gray-400" />
+                        {event.location}
+                      </span>
+                      <span className="flex items-center gap-2">
+                        <FaUser className="text-gray-400" />
+                        {event.organizer}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-2">
+                        <FaCalendarAlt className="text-gray-400" />
+                        {event.date}
+                      </span>
+                      <span className="flex items-center gap-2">
+                        <FaPlay className="text-gray-400" />
+                        <Link 
+                          href={`/events/${event.id}`}
+                          className="text-blue-500 hover:text-blue-700 text-sm font-medium"
+                        >
+                          View Details
+                        </Link>
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-500">
+                        {event.maxAttendees - event.currentAttendees} spots left
+                      </span>
+                      <button 
+                        onClick={() => {
+                          EventStorage.incrementAttendees(event.id);
+                          // Update local state to reflect the change
+                          setEvents(EventStorage.getEvents());
+                          // Show success message
+                          setRegistrationMessage(`Successfully registered for ${event.title}!`);
+                          // Clear message after 3 seconds
+                          setTimeout(() => setRegistrationMessage(''), 3000);
+                        }}
+                        className={`px-3 py-1 rounded-lg text-sm font-medium ${
+                          event.currentAttendees >= event.maxAttendees 
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                            : 'bg-emerald-500 text-white hover:bg-emerald-600'
+                        }`}
+                        disabled={event.currentAttendees >= event.maxAttendees}
+                      >
+                        {event.currentAttendees >= event.maxAttendees ? 'Full' : 'Register'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Event Pagination */}
+          {totalEventPages > 1 && (
+            <div className="flex justify-center mt-6 gap-2">
+              {Array.from({ length: totalEventPages }, (_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentEventPage(i)}
+                  className={`w-8 h-8 rounded-full text-sm font-medium ${
+                    currentEventPage === i
+                      ? 'bg-emerald-500 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.4 }}
-          className="text-center mt-12"
-        >
-          <Link
-            href="/programs"
-            className="inline-flex items-center bg-blue-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-blue-700 transition-colors duration-300"
+        {/* Programs Section */}
+        <div className="mb-12">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-2xl font-bold text-gray-800">Our Programs</h3>
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <span>Page {currentProgramPage + 1} of {totalProgramPages}</span>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => handleProgramPageChange('prev')}
+                  disabled={currentProgramPage === 0}
+                  className="p-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <FaChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => handleProgramPageChange('next')}
+                  disabled={currentProgramPage === totalProgramPages - 1}
+                  className="p-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <FaChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {currentPrograms.map((program, index) => (
+              <motion.div
+                key={program.title}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ 
+                  duration: 0.8, 
+                  delay: index * 0.1,
+                  type: "spring",
+                  stiffness: 100
+                }}
+                whileHover={{ 
+                  y: -10,
+                  scale: 1.05,
+                  transition: { duration: 0.3 }
+                }}
+                className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer border border-gray-100"
+              >
+                {/* Program Icon */}
+                <div className={`h-32 ${program.color} relative`}>
+                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
+                      <program.icon className="text-white text-2xl" />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Program Content */}
+                <div className="p-6">
+                  <h3 className="text-lg font-bold text-gray-800 mb-2">{program.title}</h3>
+                  <p className="text-gray-600 text-sm">{program.description}</p>
+                  <div className="mt-4">
+                    <Link 
+                      href={program.href}
+                      className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 font-medium"
+                    >
+                      Learn More
+                      <FaArrowRight className="text-sm" />
+                    </Link>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Program Pagination */}
+          {totalProgramPages > 1 && (
+            <div className="flex justify-center mt-6 gap-2">
+              {Array.from({ length: totalProgramPages }, (_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentProgramPage(i)}
+                  className={`w-8 h-8 rounded-full text-sm font-medium ${
+                    currentProgramPage === i
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* View All Links */}
+        <div className="flex justify-center gap-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
           >
-            View All Programs
-            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </Link>
-        </motion.div>
+            <Link
+              href="/programs"
+              className="inline-flex items-center bg-blue-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-blue-700 transition-colors duration-300"
+            >
+              View All Programs
+              <FaArrowRight className="w-5 h-5 ml-2" />
+            </Link>
+          </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.5 }}
+          >
+            <Link
+              href="/events"
+              className="inline-flex items-center bg-emerald-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-emerald-700 transition-colors duration-300"
+            >
+              View All Events
+              <FaArrowRight className="w-5 h-5 ml-2" />
+            </Link>
+          </motion.div>
+        </div>
       </div>
     </section>
   );

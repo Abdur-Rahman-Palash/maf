@@ -143,7 +143,7 @@ export default function QuranSection() {
             >
                 <motion.h2 
                   className="text-5xl font-bold text-slate-800 mb-6"
-                  style={{ fontFamily: 'var(--font-philosopher), serif' }}
+                  style={{ fontFamily: 'var(--font-philosopher), sans-serif' }}
                 >
                   Quran Recitations
                   <motion.span

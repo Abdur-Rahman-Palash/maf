@@ -1,0 +1,15 @@
+# Sermon Files Directory
+
+This directory stores sermon video and audio files uploaded through the Admin Dashboard.
+
+## File Structure:
+- /sermons/videos/ - Video files (.mp4, .avi, .mov, etc.)
+- /sermons/audio/ - Audio files (.mp3, .wav, etc.)
+- /sermons/thumbnails/ - Thumbnail images (.jpg, .png, etc.)
+
+## Default Files:
+- default.jpg - Default thumbnail for uploaded sermons
+- prayer.jpg - Thumbnail for prayer-related sermons
+- ramadan-prep.jpg - Thumbnail for Ramadan sermons
+- family-values.jpg - Thumbnail for family-related sermons
+- quran-guide.jpg - Thumbnail for Quran-related sermons

@@ -10,19 +10,16 @@ import WaveAnimation from '@/components/WaveAnimation';
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showPrayerTimes, setShowPrayerTimes] = useState(false);
-  const router = useRouter();
-
-  // Prayer times for Masjid Salman al Farsi
-  const prayerTimes = {
+  const [prayerTimes, setPrayerTimes] = useState({
     Fajr: '5:45 AM',
     Sunrise: '6:30 AM', 
     Dhuhr: '1:00 PM',
     Asr: '3:30 PM',
     Maghrib: '6:15 PM',
     Isha: '7:30 PM'
-  };
-
+  });
   const [nextPrayer, setNextPrayer] = useState({ name: 'DHUHR', time: '12:30 PM' });
+  const router = useRouter();
 
   // Prayer icons mapping
   const prayerIcons = {
@@ -33,6 +30,47 @@ const Hero = () => {
     Maghrib: <FaCloudMoon className="text-purple-200" />,
     Isha: <FaMoon className="text-indigo-200" />
   };
+
+  // Convert 24-hour time to 12-hour format
+  const convertTo12Hour = (time: string) => {
+    const [hours, minutes] = time.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minutes} ${ampm}`;
+  };
+
+  useEffect(() => {
+    const fetchPrayerTimes = async () => {
+      try {
+        // Using Islamic Finder API for Atlanta, Georgia, USA
+        const response = await fetch('https://api.aladhan.com/v1/timingsByCity?city=Atlanta&country=US&method=2');
+        const data = await response.json();
+        
+        if (data.code === 200 && data.data) {
+          const timings = data.data.timings;
+          
+          setPrayerTimes({
+            Fajr: convertTo12Hour(timings.Fajr),
+            Sunrise: convertTo12Hour(timings.Sunrise),
+            Dhuhr: convertTo12Hour(timings.Dhuhr),
+            Asr: convertTo12Hour(timings.Asr),
+            Maghrib: convertTo12Hour(timings.Maghrib),
+            Isha: convertTo12Hour(timings.Isha)
+          });
+        }
+      } catch (error) {
+        console.log('Using fallback prayer times in Hero');
+        // Keep using fallback times if API fails
+      }
+    };
+
+    fetchPrayerTimes();
+    
+    // Update every hour
+    const interval = setInterval(fetchPrayerTimes, 60 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const slides = [
     {
@@ -57,8 +95,17 @@ const Hero = () => {
   }, [slides.length]);
 
   return (
-    <section className="relative h-screen w-full overflow-hidden bg-gradient-to-br from-amber-900 via-amber-800 to-orange-900">
-      {/* Remove Background Slideshow - Using gradient background instead */}
+    <section className="relative h-screen w-full overflow-hidden">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src="/image1.png" 
+          alt="Masjid Salman al Farsi"
+          className="w-full h-full object-cover"
+        />
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60"></div>
+      </div>
 
       {/* Subtle dome silhouette watermark */}
       <div className="absolute inset-0 z-10 opacity-5 pointer-events-none">
@@ -136,7 +183,7 @@ const Hero = () => {
           <motion.h1
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold text-white mb-6 leading-snug sm:leading-tight"
             style={{
-              fontFamily: 'var(--font-philosopher), serif'
+              fontFamily: 'var(--font-philosopher), sans-serif'
             }}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -149,7 +196,7 @@ const Hero = () => {
           {/* Subtitle */}
           <motion.p
             className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed"
-            style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+            style={{ fontFamily: 'var(--font-philosopher), sans-serif' }}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 1.2 }}
@@ -169,14 +216,7 @@ const Hero = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, delay: 2 }}
       >
-        <motion.div
-          className="flex flex-col items-center gap-2 text-white/70"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          <FaChevronDown className="text-2xl" />
-          <span className="text-sm font-medium">Journey Begins Here</span>
-        </motion.div>
+      
       </motion.div>
       
       {/* Wave Animation */}

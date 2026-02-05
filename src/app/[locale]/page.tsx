@@ -7,6 +7,7 @@ import EServicesSection from '@/components/EServicesSection';
 // import PremiumFloatingElements from '@/components/PremiumFloatingElements';
 import Services from '@/components/Services';
 import QuranSection from '@/components/QuranSection';
+import SermonStreaming from '@/components/SermonStreaming';
 
 export default function Home() {
   return (
@@ -19,6 +20,9 @@ export default function Home() {
             </div>
             <div id="hero">
               <Hero />
+            </div>
+            <div id="sermons">
+              <SermonStreaming />
             </div>
             <div id="programs">
               <ProgramsSection />

@@ -49,6 +49,7 @@ export default function Footer() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
+              className="lg:col-span-1"
             >
               <div className="mb-6">
                 <h3 className="text-2xl font-bold text-gold mb-4">
@@ -72,6 +73,7 @@ export default function Footer() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
+              className="lg:col-span-1"
             >
               <h4 className="text-gold font-bold text-lg mb-6 uppercase tracking-wider">Quick Links</h4>
               <ul className="space-y-3">
@@ -106,6 +108,7 @@ export default function Footer() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
+              className="lg:col-span-1"
             >
               <h4 className="text-gold font-bold text-lg mb-6 uppercase tracking-wider">Contact</h4>
               <div className="space-y-4 text-slate-300 text-sm">
@@ -137,6 +140,7 @@ export default function Footer() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.4 }}
+              className="lg:col-span-1"
             >
               <h4 className="text-gold font-bold text-lg mb-6 uppercase tracking-wider">Stay Connected</h4>
               
@@ -185,22 +189,22 @@ export default function Footer() {
               </div>
 
               {/* Newsletter */}
-              <form onSubmit={handleNewsletterSubmit} className="space-y-3">
-                <p className="text-slate-300 text-sm mb-3">Subscribe to our newsletter for updates</p>
-                <div className="flex gap-2">
+              <form onSubmit={handleNewsletterSubmit} className="space-y-4">
+                <p className="text-slate-300 text-sm">Subscribe to our newsletter for updates</p>
+                <div className="flex flex-col gap-3">
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Your email"
-                    className="flex-1 px-4 py-2 bg-white/10 border border-gold/30 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-gold transition-colors"
+                    className="w-full px-4 py-2 bg-white/10 border border-gold/30 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-gold transition-colors"
                     required
                   />
                   <motion.button
                     type="submit"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-4 py-2 bg-gold text-black font-semibold rounded-lg hover:bg-gold/90 transition-colors"
+                    className="w-full px-4 py-2 bg-gold text-black font-semibold rounded-lg hover:bg-gold/90 transition-colors"
                   >
                     Subscribe
                   </motion.button>

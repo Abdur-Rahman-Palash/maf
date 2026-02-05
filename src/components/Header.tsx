@@ -53,6 +53,7 @@ const Header = () => {
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'About Us', href: '/about' },
+    { name: 'Meet Our Imam', href: '/meet-our-imam' },
     { name: 'Programs', href: '/programs' },
     { name: 'Events', href: '/events' },
     { name: 'Media', href: '/media' },
@@ -129,7 +130,8 @@ const Header = () => {
                     href={link.href}
                     className={`relative ${isScrolled ? 'text-black hover:text-yellow-600' : 'text-black hover:text-yellow-600'} transition-colors duration-200 font-bold block py-2`}
                     style={{ 
-                      fontFamily: 'system-ui, sans-serif',
+                      fontFamily: 'var(--font-philosopher), sans-serif',
+                      fontWeight: '600',
                       textShadow: isScrolled ? 'none' : '0 2px 6px rgba(255,255,255,0.8)'
                     }}
                   >
@@ -203,7 +205,8 @@ const Header = () => {
                         href={link.href}
                         className="block text-white hover:text-yellow-600 transition-colors duration-200 font-bold py-3 px-4 rounded-lg hover:bg-white/20"
                         style={{ 
-                          fontFamily: 'system-ui, sans-serif',
+                          fontFamily: 'var(--font-philosopher), sans-serif',
+                          fontWeight: '600',
                           textShadow: 'none'
                         }}
                         onClick={() => setIsMobileMenuOpen(false)}

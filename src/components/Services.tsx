@@ -35,7 +35,7 @@ const servicesData = [
   { 
     id: 6, 
     title: 'Meet our Imam', 
-    image: '',
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800',
     description: 'Book a meeting up to two weeks in advance with one of our Imams to discuss one of a range of topics. Learn more here.',
     icon: '👳‍♂️',
     href: '/services/meet-imam'
@@ -77,13 +77,26 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
       >
       {/* Background Image */}
       <div className="relative h-64 sm:h-72 lg:h-80">
-        <Image
-          src={service.image}
-          alt={service.title}
-          fill
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
+        {service.image ? (
+          <Image
+            src={service.image}
+            alt={service.title}
+            fill
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            onError={(e) => {
+              // Fallback to a default image if the image fails to load
+              const target = e.target as HTMLImageElement;
+              target.src = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800';
+            }}
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-emerald-400 to-blue-500 flex items-center justify-center">
+            <div className="text-white text-6xl">
+              {service.icon}
+            </div>
+          </div>
+        )}
         
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
@@ -156,7 +169,7 @@ export default function Services() {
       >
         <motion.h2 
           className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-800 mb-6"
-          style={{ fontFamily: 'var(--font-amiri)' }}
+          style={{ fontFamily: 'var(--font-philosopher), sans-serif' }}
         >
           {t('title')}
           <motion.span

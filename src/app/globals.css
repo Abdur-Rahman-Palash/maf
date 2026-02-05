@@ -17,7 +17,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-amiri), serif;
+  font-family: var(--font-philosopher), sans-serif;
 }
 
 /* Custom Scrollbar */
