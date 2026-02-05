@@ -51,18 +51,120 @@ const EServicesSection = () => {
   ];
 
   return (
-    <section className="py-16 px-6 bg-gradient-to-b from-white to-gray-50">
-      <div className="max-w-7xl mx-auto">
+    <section className="relative min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Floating Particles */}
+        <div className="absolute top-0 left-0 w-full h-full">
+          {[...Array(22)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-gradient-to-r from-orange-400/25 to-amber-400/30 rounded-full"
+              animate={{
+                x: [0, 100, 50, 0],
+                y: [Math.random() * 100, Math.random() * 100, Math.random() * 100, Math.random() * 100],
+              }}
+              transition={{
+                duration: 8 + Math.random() * 16,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+            />
+          ))}
+        </div>
+        
+        {/* Gradient Wave Animation */}
+        <motion.div
+          className="absolute bottom-0 left-0 w-full h-28 bg-gradient-to-t from-transparent via-orange-200/20 to-transparent"
+          animate={{
+            x: ["-100%", "0%", "100%"],
+            opacity: [0.2, 0.4, 0.2],
+          }}
+          transition={{
+            duration: 7.5,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        
+        {/* Pulsing Circles */}
+        <div className="absolute top-1/4 left-1/4 w-40 h-40">
+          <motion.div
+            className="w-full h-full rounded-full bg-gradient-to-r from-orange-500/12 to-amber-500/12"
+            animate={{
+              scale: [1, 1.25, 1],
+              opacity: [0.3, 0.1, 0.3],
+            }}
+            transition={{
+              duration: 4.2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+        
+        <div className="absolute top-1/3 right-1/4 w-32 h-32">
+          <motion.div
+            className="w-full h-full rounded-full bg-gradient-to-r from-amber-500/12 to-yellow-500/12"
+            animate={{
+              scale: [1.15, 1, 1.15],
+              opacity: [0.25, 0.1, 0.25],
+            }}
+            transition={{
+              duration: 3.6,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+
+        {/* Additional Floating Elements */}
+        <div className="absolute top-2/3 left-1/6 w-24 h-24">
+          <motion.div
+            className="w-full h-full rounded-full bg-gradient-to-br from-yellow-400/15 to-orange-400/15"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.2, 0.08, 0.2],
+            }}
+            transition={{
+              duration: 4.8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+
+        <div className="absolute bottom-1/4 right-1/6 w-20 h-20">
+          <motion.div
+            className="w-full h-full rounded-full bg-gradient-to-r from-amber-400/10 to-yellow-400/10"
+            animate={{
+              scale: [1.1, 1, 1.1],
+              opacity: [0.15, 0.06, 0.15],
+            }}
+            transition={{
+              duration: 5.5,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 relative z-10 py-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'var(--font-philosopher), serif' }}>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'var(--font-philosopher), serif' }}>
             E-Services
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-4xl mx-auto">
             Access our comprehensive digital services for booking, registration, and support
           </p>
         </motion.div>

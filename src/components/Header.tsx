@@ -128,7 +128,7 @@ const Header = () => {
                 >
                   <Link
                     href={link.href}
-                    className={`relative ${isScrolled ? 'text-black hover:text-yellow-600' : 'text-black hover:text-yellow-600'} transition-colors duration-200 font-bold block py-2`}
+                    className={`relative ${isScrolled ? 'text-black hover:text-yellow-600' : 'text-black hover:text-yellow-600'} transition-colors duration-200 font-bold text-lg lg:text-xl block py-2`}
                     style={{ 
                       fontFamily: 'var(--font-philosopher), sans-serif',
                       fontWeight: '600',

@@ -83,7 +83,7 @@ export default function DonateModal({ isOpen, onClose }: DonateModalProps) {
               <div className="bg-gradient-to-r from-amber-500 to-amber-600 p-6 text-white">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h2 className="text-2xl md:text-3xl font-bold mb-2" style={{ fontFamily: 'var(--font-amiri)' }}>
+                    <h2 className="text-2xl md:text-3xl font-bold mb-2" style={{ fontFamily: 'var(--font-philosopher)' }}>
                       Support Masjid Salman al Farsi
                     </h2>
                     <p className="text-amber-100">

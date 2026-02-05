@@ -120,18 +120,120 @@ const ProgramsSection = () => {
   };
 
   return (
-    <section className="py-16 px-6 bg-gradient-to-b from-gray-50 to-white">
-      <div className="max-w-7xl mx-auto">
+    <section className="relative min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Floating Particles */}
+        <div className="absolute top-0 left-0 w-full h-full">
+          {[...Array(25)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-gradient-to-r from-blue-400/25 to-indigo-400/30 rounded-full"
+              animate={{
+                x: [0, 100, 50, 0],
+                y: [Math.random() * 100, Math.random() * 100, Math.random() * 100, Math.random() * 100],
+              }}
+              transition={{
+                duration: 9 + Math.random() * 18,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+            />
+          ))}
+        </div>
+        
+        {/* Gradient Wave Animation */}
+        <motion.div
+          className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-transparent via-blue-200/20 to-transparent"
+          animate={{
+            x: ["-100%", "0%", "100%"],
+            opacity: [0.2, 0.5, 0.2],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        
+        {/* Pulsing Circles */}
+        <div className="absolute top-1/4 left-1/4 w-44 h-44">
+          <motion.div
+            className="w-full h-full rounded-full bg-gradient-to-r from-blue-500/15 to-indigo-500/15"
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.3, 0.1, 0.3],
+            }}
+            transition={{
+              duration: 4.5,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+        
+        <div className="absolute top-1/3 right-1/4 w-36 h-36">
+          <motion.div
+            className="w-full h-full rounded-full bg-gradient-to-r from-indigo-500/15 to-purple-500/15"
+            animate={{
+              scale: [1.2, 1, 1.2],
+              opacity: [0.25, 0.1, 0.25],
+            }}
+            transition={{
+              duration: 3.8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+
+        {/* Additional Floating Elements */}
+        <div className="absolute top-2/3 left-1/6 w-28 h-28">
+          <motion.div
+            className="w-full h-full rounded-full bg-gradient-to-br from-purple-400/20 to-blue-400/20"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.2, 0.08, 0.2],
+            }}
+            transition={{
+              duration: 5.2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+
+        <div className="absolute bottom-1/4 right-1/6 w-24 h-24">
+          <motion.div
+            className="w-full h-full rounded-full bg-gradient-to-r from-indigo-400/12 to-purple-400/12"
+            animate={{
+              scale: [1.1, 1, 1.1],
+              opacity: [0.15, 0.06, 0.15],
+            }}
+            transition={{
+              duration: 6.5,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 relative z-10 py-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'var(--font-philosopher), sans-serif' }}>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'var(--font-philosopher), sans-serif' }}>
             Programs & Events
           </h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-4xl mx-auto">
             Explore our Islamic programs and upcoming events
           </p>
           

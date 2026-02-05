@@ -327,14 +327,118 @@ const SermonStreaming: React.FC = () => {
   );
 
   return (
-    <section className="py-16 bg-gradient-to-br from-emerald-50 via-white to-purple-50">
-      <div className="container mx-auto px-4">
+    <section className="relative min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Floating Particles */}
+        <div className="absolute top-0 left-0 w-full h-full">
+          {[...Array(30)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-gradient-to-r from-indigo-400/20 to-purple-400/30 rounded-full"
+              animate={{
+                x: [0, 100, 50, 0],
+                y: [Math.random() * 100, Math.random() * 100, Math.random() * 100, Math.random() * 100],
+              }}
+              transition={{
+                duration: 10 + Math.random() * 20,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+            />
+          ))}
+        </div>
+        
+        {/* Gradient Wave Animation */}
+        <motion.div
+          className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-transparent via-indigo-200/20 to-transparent"
+          animate={{
+            x: ["-100%", "0%", "100%"],
+            opacity: [0.2, 0.5, 0.2],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        
+        {/* Pulsing Circles */}
+        <div className="absolute top-1/4 left-1/4 w-48 h-48">
+          <motion.div
+            className="w-full h-full rounded-full bg-gradient-to-r from-purple-500/15 to-indigo-500/15"
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.3, 0.1, 0.3],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+        
+        <div className="absolute top-1/3 right-1/4 w-36 h-36">
+          <motion.div
+            className="w-full h-full rounded-full bg-gradient-to-br from-pink-500/15 to-purple-500/15"
+            animate={{
+              scale: [1.2, 1, 1.2],
+              opacity: [0.2, 0.08, 0.2],
+            }}
+            transition={{
+              duration: 3.5,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+
+        {/* Additional Floating Elements */}
+        <div className="absolute top-2/3 left-1/6 w-24 h-24">
+          <motion.div
+            className="w-full h-full rounded-full bg-gradient-to-br from-indigo-400/20 to-purple-400/20"
+            animate={{
+              scale: [1, 1.1, 1],
+              opacity: [0.15, 0.05, 0.15],
+            }}
+            transition={{
+              duration: 5,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+
+        <div className="absolute bottom-1/4 right-1/6 w-20 h-20">
+          <motion.div
+            className="w-full h-full rounded-full bg-gradient-to-r from-pink-400/10 to-indigo-400/10"
+            animate={{
+              scale: [1.1, 1, 1.1],
+              opacity: [0.1, 0.03, 0.1],
+            }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10 mt-32">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <h2 className="text-4xl font-bold text-gray-800 mb-4">Sermon Library</h2>
+          <h2 className="text-4xl lg:text-5xl font-bold text-gray-800 mb-4" style={{ fontFamily: 'var(--font-philosopher), sans-serif' }}>
+            Sermon Library
+          </h2>
           <p className="text-xl text-gray-600 mb-8">Watch and listen to inspiring Islamic content</p>
         </motion.div>
 

@@ -137,24 +137,51 @@ const QuranReader: React.FC = () => {
     <section className="relative min-h-[20vh] bg-gradient-to-br from-emerald-50 via-white to-amber-50 overflow-hidden">
       {/* Subtle Islamic Pattern Background */}
       <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIgZmlsbD0iIzA0NzY1MSIvPgo8Y2lyY2xlIGN4PSIxMCIgY3k9IjEwIiByPSIxIiBmaWxsPSIjMDQ3NjUxIi8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMTAiIHI9IjEiIGZpbGw9IiMwNDc2NTEiLz4KPGNpcmNsZSBjeD0iMTAiIGN5PSI1MCIgcj0iMSIgZmlsbD0iIzA0NzY1MSIvPgo8Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSIxIiBmaWxsPSIjMDQ3NjUxIi8+CjwvZGlnPgo=')] bg-repeat" />
+
+        {/* Additional Floating Orbs */}
+        <div className="absolute top-2/3 left-1/6 w-20 h-20">
+          <motion.div
+            className="w-full h-full rounded-full bg-gradient-to-br from-cyan-400/15 to-emerald-400/15"
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.2, 0.08, 0.2],
+            }}
+            transition={{
+              duration: 4.5,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+
+        <div className="absolute bottom-1/4 right-1/6 w-16 h-16">
+          <motion.div
+            className="w-full h-full rounded-full bg-gradient-to-br from-teal-400/10 to-cyan-400/10"
+            animate={{
+              scale: [1.1, 1, 1.1],
+              opacity: [0.15, 0.06, 0.15],
+            }}
+            transition={{
+              duration: 3.8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
       </div>
 
-      {/* Decorative Top Border */}
-      <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-600 via-amber-500 to-emerald-600" />
-
-      <div className="relative z-10 container mx-auto px-4 py-8 lg:py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-16">
         {/* Header */}
         <motion.div
-          className="text-center mb-8"
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
+          className="text-center mb-12"
         >
           <div className="flex items-center justify-center gap-3 mb-4">
             <FaBook className="text-emerald-600 text-2xl" />
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-800" style={{ fontFamily: 'var(--font-philosopher), sans-serif' }}>
-              Daily Quran Verse
+            <h2 className="text-4xl lg:text-5xl font-bold text-gray-800" style={{ fontFamily: 'var(--font-philosopher), sans-serif' }}>
+              Quran Reader
             </h2>
             <FaMosque className="text-emerald-600 text-2xl" />
           </div>

@@ -31,14 +31,6 @@ const servicesData = [
     description: 'To book rooms for other events or Islamic celebrations, from \'aqiqas and private gatherings to conferences, we offer rooms at reasonable rates of hire. Book here.',
     icon: '🎉',
     href: '/services/general-events'
-  },
-  { 
-    id: 6, 
-    title: 'Meet our Imam', 
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800',
-    description: 'Book a meeting up to two weeks in advance with one of our Imams to discuss one of a range of topics. Learn more here.',
-    icon: '👳‍♂️',
-    href: '/services/meet-imam'
   }
 ];
 
@@ -153,74 +145,179 @@ export default function Services() {
 
   return (
     <motion.section 
-      className="py-16 sm:py-20 lg:py-24 px-4 container mx-auto relative overflow-hidden"
+      className="relative min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50 overflow-hidden"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
       viewport={{ once: true }}
     >
-      {/* Section Header */}
-      <motion.div 
-        className="text-center mb-12 sm:mb-16"
-        initial={{ opacity: 0, y: -30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8 }}
-      >
-        <motion.h2 
-          className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-800 mb-6"
-          style={{ fontFamily: 'var(--font-philosopher), sans-serif' }}
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Floating Particles */}
+        <div className="absolute top-0 left-0 w-full h-full">
+          {[...Array(18)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-gradient-to-r from-rose-400/25 to-pink-400/30 rounded-full"
+              animate={{
+                x: [0, 100, 50, 0],
+                y: [Math.random() * 100, Math.random() * 100, Math.random() * 100, Math.random() * 100],
+              }}
+              transition={{
+                duration: 7 + Math.random() * 14,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+            />
+          ))}
+        </div>
+        
+        {/* Gradient Wave Animation */}
+        <motion.div
+          className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-transparent via-rose-200/20 to-transparent"
+          animate={{
+            x: ["-100%", "0%", "100%"],
+            opacity: [0.15, 0.35, 0.15],
+          }}
+          transition={{
+            duration: 6.5,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        
+        {/* Pulsing Circles */}
+        <div className="absolute top-1/4 left-1/4 w-36 h-36">
+          <motion.div
+            className="w-full h-full rounded-full bg-gradient-to-r from-rose-500/12 to-pink-500/12"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.25, 0.08, 0.25],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 0
+            }}
+          />
+        </div>
+        
+        <div className="absolute top-1/3 right-1/4 w-28 h-28">
+          <motion.div
+            className="w-full h-full rounded-full bg-gradient-to-r from-pink-500/12 to-amber-500/12"
+            animate={{
+              scale: [1.1, 1, 1.1],
+              opacity: [0.2, 0.08, 0.2],
+            }}
+            transition={{
+              duration: 3.5,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+
+        {/* Additional Floating Elements */}
+        <div className="absolute top-2/3 left-1/6 w-20 h-20">
+          <motion.div
+            className="w-full h-full rounded-full bg-gradient-to-br from-amber-400/15 to-rose-400/15"
+            animate={{
+              scale: [1, 1.15, 1],
+              opacity: [0.18, 0.07, 0.18],
+            }}
+            transition={{
+              duration: 5.5,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+
+        <div className="absolute bottom-1/4 right-1/6 w-16 h-16">
+          <motion.div
+            className="w-full h-full rounded-full bg-gradient-to-r from-pink-400/10 to-amber-400/10"
+            animate={{
+              scale: [1.05, 1, 1.05],
+              opacity: [0.12, 0.05, 0.12],
+            }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-20">
+        {/* Section Header */}
+        <motion.div 
+          className="text-center mb-12 sm:mb-16"
+          initial={{ opacity: 0, y: -30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
         >
-          {t('title')}
+          <motion.h2 
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6"
+            style={{ fontFamily: 'var(--font-philosopher), sans-serif' }}
+          >
+            {t('title')}
+          </motion.h2>
+          <motion.div 
+            className="w-24 sm:w-32 h-1 bg-gradient-to-r from-amber-400 to-amber-600 mx-auto rounded-full"
+            initial={{ width: 0 }}
+            whileInView={{ width: 96 }}
+            transition={{ duration: 1, delay: 0.3 }}
+          />
           <motion.span
             className="inline-block ml-3 text-amber-500"
-            animate={{ 
+            animate={{
               scale: [1, 1.2, 1],
               rotate: [0, 10, -10, 0]
             }}
-            transition={{ 
-              duration: 2, 
-              repeat: 2 
+            transition={{
+              duration: 2,
+              repeat: 2,
+              ease: "easeInOut"
             }}
           >
             📖
           </motion.span>
-        </motion.h2>
+        </motion.div>
         
-        <motion.div 
-          className="w-24 sm:w-32 h-1 bg-gradient-to-r from-amber-400 to-amber-600 mx-auto rounded-full"
-          initial={{ width: 0 }}
-          whileInView={{ width: 96 }}
-          transition={{ duration: 1, delay: 0.3 }}
-        />
-      </motion.div>
-
-      {/* Services Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-        {servicesData.map((service, index) => (
-          <motion.div
-            key={service.id}
-            initial={{ opacity: 0, y: 100, rotateX: -15 }}
-            whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ 
-              duration: 0.8, 
-              delay: index * 0.15,
-              type: "spring",
-              stiffness: 100,
-              damping: 20
-            }}
-            whileHover={{ 
-              y: -15,
-              scale: 1.05,
-              rotateZ: index % 2 === 0 ? 2 : -2,
-              transition: { duration: 0.4, type: "spring" }
-            }}
-            className="group"
-          >
-            <ServiceCard service={service} index={index} />
-          </motion.div>
-        ))}
+        {/* Services Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-4xl mx-auto">
+          {servicesData.map((service, index) => (
+            <motion.div
+              key={service.id}
+              initial={{ opacity: 0, y: 100, rotateX: -15 }}
+              whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ 
+                duration: 0.8, 
+                delay: index * 0.15,
+                type: "spring",
+                stiffness: 100,
+                damping: 20
+              }}
+              whileHover={{ 
+                y: -15,
+                scale: 1.05,
+                rotateZ: index % 2 === 0 ? 2 : -2,
+                transition: { duration: 0.4, type: "spring" }
+              }}
+              className="group"
+            >
+              <ServiceCard service={service} index={index} />
+            </motion.div>
+          ))}
+        </div>
       </div>
 
       {/* Floating decorative elements */}
@@ -241,32 +338,12 @@ export default function Services() {
               className="absolute w-2 h-2 bg-amber-400 rounded-full opacity-20"
               style={{
                 left: `${left}%`,
-                top: `${top}%`,
-              }}
-              animate={{
-                x: [0, xMove, 0],
-                y: [0, yMove, 0],
-                scale: [1, scale, 1],
-                opacity: [0.2, 0.5, 0.2],
-              }}
-              transition={{
-                duration,
-                repeat: 2,
-                delay,
-                ease: "easeInOut"
+                top: `${top}%`
               }}
             />
           );
         })}
       </div>
-      
-      {/* Wave Animation */}
-      <WaveAnimation 
-        color="#3b82f6" 
-        opacity={0.06} 
-        speed={0.025} 
-        height={70}
-      />
     </motion.section>
   );
 }

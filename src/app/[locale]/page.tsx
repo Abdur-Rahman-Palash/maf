@@ -6,6 +6,7 @@ import EServicesSection from '@/components/EServicesSection';
 // import PremiumAnimatedBackground from '@/components/PremiumAnimatedBackground';
 // import PremiumFloatingElements from '@/components/PremiumFloatingElements';
 import Services from '@/components/Services';
+import MosqueMap from '@/components/MosqueMap';
 import QuranSection from '@/components/QuranSection';
 import SermonStreaming from '@/components/SermonStreaming';
 
@@ -32,6 +33,9 @@ export default function Home() {
             </div>
             <div id="services">
               <Services />
+            </div>
+            <div id="mosque-map">
+              <MosqueMap />
             </div>
             <div id="quran">
               <QuranSection />
