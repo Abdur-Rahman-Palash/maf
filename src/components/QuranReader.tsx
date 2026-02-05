@@ -93,7 +93,7 @@ const QuranReader: React.FC = () => {
 
   const fetchVerse = async (surah: number, ayah: number) => {
       const response = await fetch(
-        `http://api.alquran.cloud/v1/ayah/${surah}:${ayah}/editions/quran-uthmani,en.sahih`
+        `/api/quran?surah=${surah}&ayah=${ayah}`
       );
       
       if (!response.ok) {

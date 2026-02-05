@@ -43,8 +43,8 @@ const Hero = () => {
   useEffect(() => {
     const fetchPrayerTimes = async () => {
       try {
-        // Using Islamic Finder API for Atlanta, Georgia, USA
-        const response = await fetch('https://api.aladhan.com/v1/timingsByCity?city=Atlanta&country=US&method=2');
+        // Using local API route for prayer times
+        const response = await fetch('/api/prayer-times');
         const data = await response.json();
         
         if (data.code === 200 && data.data) {
