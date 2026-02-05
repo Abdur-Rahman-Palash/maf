@@ -178,7 +178,7 @@ const HeaderPrayerTimes: React.FC = () => {
           transition={{ duration: 1, delay: 0.5 }}
           className="text-center"
         >
-          <div className="bg-white/90 backdrop-blur-md px-8 py-2 rounded-2xl shadow-2xl border border-purple-400">
+          <div className="bg-white/90 backdrop-blur-md px-8 py-1 rounded-2xl shadow-2xl border border-purple-400">
             {/* English Greeting */}
             <motion.p 
               className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-purple-700 to-pink-600 bg-clip-text text-transparent mb-2"
@@ -339,7 +339,7 @@ const HeaderPrayerTimes: React.FC = () => {
                 whileTap={{ scale: 0.95 }}
               >
                 <span className="group-hover:text-purple-700 group-hover:drop-shadow-2xl transition-all duration-300 text-lg lg:text-xl font-bold">
-                  {locale === 'ar' ? 'الجمعة ١٢:٣٠ & ١٣:١٥' : `${names.juma} 12:30 & 13:15`}
+                  {locale === 'ar' ? 'الجمعة ١٣:٣٠' : 'JUMU\'AH  - 13:30'}
                 </span>
               </motion.a>
               <span className="text-gray-600 mx-3 text-lg">·</span>
@@ -356,28 +356,55 @@ const HeaderPrayerTimes: React.FC = () => {
 
           {/* Right Column - Prayer Times Table */}
           <motion.div 
-            className="bg-gradient-to-br from-white via-purple-50/60 to-pink-50/60 lg:border-l border-l lg:border-purple-300 lg:pl-6 rounded-xl lg:rounded-l-none shadow-2xl backdrop-blur-md"
+            className="bg-gradient-to-br from-white via-purple-50/60 to-pink-50/60 border border-purple-300 lg:border-l lg:border-r lg:pl-6 lg:pr-6 rounded-xl lg:rounded-l-none lg:rounded-r-none shadow-2xl backdrop-blur-md"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
-            {/* Prayer Names Header */}
-            <div className="grid grid-cols-6 gap-1 mb-4 lg:mb-6" style={{ lineHeight: '24px', margin: '10px 0 8px 0' }}>
-              <div className="col-span-1"></div>
-              {(['fajr', 'zuhr', 'asr', 'maghrib', 'isha'] as const).map((prayer) => (
-                <div key={prayer} className="col-span-1 text-center">
+            {/* Mobile Prayer Times */}
+            <div className="lg:hidden">
+              {(['fajr', 'Dhuhr', 'asr', 'maghrib', 'isha'] as const).map((prayer, index) => {
+                const prayerNameKey = prayer === 'Dhuhr' ? 'zuhr' : prayer.toLowerCase();
+                return (
+                <div key={prayer} className="flex justify-between items-center py-2 border-b border-purple-200">
                   <motion.span 
-                    className="text-sm lg:text-base font-bold text-gray-900 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent px-3 py-2 rounded-lg shadow-lg"
+                    className="text-sm font-bold text-gray-900 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent px-3 py-2 rounded-lg shadow-lg"
                     whileHover={{ scale: 1.15 }}
                     transition={{ duration: 0.2 }}
-                    dangerouslySetInnerHTML={{ __html: names[prayer] }}></motion.span>
+                    dangerouslySetInnerHTML={{ __html: names[prayerNameKey as keyof typeof names] }}></motion.span>
+                  <div className="text-right">
+                    <motion.span 
+                      className="text-sm font-semibold text-gray-900 hover:text-purple-600 transition-all duration-300 cursor-pointer bg-white/80 hover:bg-purple-100 px-3 py-2 rounded-lg border-2 border-gray-200 hover:border-purple-300 shadow-lg hover:shadow-xl"
+                      whileHover={{ y: -3, scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      {locale === 'ar' ? convertToArabicTime(prayerTimes.jamaat[prayer]) : convertTo12Hour(prayerTimes.jamaat[prayer])}
+                    </motion.span>
+                  </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
 
+            {/* Desktop Prayer Times Table */}
+            <div className="hidden lg:block">
+              {/* Prayer Names Header */}
+              <div className="grid grid-cols-6 gap-1 mb-4 lg:mb-6" style={{ lineHeight: '24px', margin: '10px 0 8px 0' }}>
+                <div className="col-span-1"></div>
+                {(['fajr', 'zuhr', 'asr', 'maghrib', 'isha'] as const).map((prayer) => (
+                  <div key={prayer} className="col-span-1 text-center">
+                    <motion.span 
+                      className="text-sm lg:text-base font-bold text-gray-900 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent px-3 py-2 rounded-lg shadow-lg"
+                      whileHover={{ scale: 1.15 }}
+                      transition={{ duration: 0.2 }}
+                      dangerouslySetInnerHTML={{ __html: names[prayer] }}></motion.span>
+                  </div>
+                ))}
+              </div>
+
             {/* Jama'at Times */}
-            <div className="grid grid-cols-6 gap-1 mb-3 lg:mb-4" style={{ lineHeight: '24px' }}>
-              <div className="col-span-1">
+            <div className="grid grid-cols-1 lg:grid-cols-6 gap-1 mb-3 lg:mb-4" style={{ lineHeight: '24px' }}>
+              <div className="hidden lg:block">
                 <motion.span 
                   className="text-sm lg:text-base font-bold text-purple-700 bg-purple-100 px-3 py-2 rounded-lg border-2 border-purple-400 shadow-lg"
                   whileHover={{ scale: 1.1 }}
@@ -385,9 +412,7 @@ const HeaderPrayerTimes: React.FC = () => {
                   dangerouslySetInnerHTML={{ __html: names.jamaat }}></motion.span>
               </div>
               {Object.entries(prayerTimes.jamaat).map(([prayer, time], index) => (
-                <motion.div 
-                  key={prayer}
-                  className="col-span-1 text-center"
+                <motion.div key={prayer} className="text-center lg:col-span-1"
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.3 + index * 0.05 }}
@@ -404,8 +429,8 @@ const HeaderPrayerTimes: React.FC = () => {
             </div>
 
             {/* Begin Times */}
-            <div className="grid grid-cols-6 gap-1" style={{ margin: '6px 0 4px', paddingBottom: 0, lineHeight: '24px' }}>
-              <div className="col-span-1">
+            <div className="grid grid-cols-1 lg:grid-cols-6 gap-1" style={{ margin: '6px 0 4px', paddingBottom: 0, lineHeight: '24px' }}>
+              <div className="hidden lg:block">
                 <motion.span 
                   className="text-sm lg:text-base font-bold text-pink-700 bg-pink-100 px-3 py-2 rounded-lg border-2 border-pink-400 shadow-lg"
                   whileHover={{ scale: 1.1 }}
@@ -413,9 +438,7 @@ const HeaderPrayerTimes: React.FC = () => {
                   dangerouslySetInnerHTML={{ __html: names.begins }}></motion.span>
               </div>
               {Object.entries(prayerTimes.begins).map(([prayer, time], index) => (
-                <motion.div 
-                  key={prayer}
-                  className="col-span-1 text-center"
+                <motion.div key={prayer} className="text-center lg:col-span-1"
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.4 + index * 0.05 }}
@@ -429,6 +452,7 @@ const HeaderPrayerTimes: React.FC = () => {
                   </motion.span>
                 </motion.div>
               ))}
+            </div>
             </div>
           </motion.div>
         </div>

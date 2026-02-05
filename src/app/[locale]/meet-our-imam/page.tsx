@@ -84,8 +84,8 @@ export default function MeetOurImamPage() {
               <div className="w-48 h-48 mx-auto mb-6 bg-gradient-to-br from-emerald-100 to-amber-100 rounded-full flex items-center justify-center">
                 <FaUserGraduate className="text-6xl text-emerald-600" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Imam [Name]</h2>
-              <p className="text-emerald-600 font-semibold mb-4">Resident Imam</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Sheikh Dr. Md Ataur Rahman Sarkar</h2>
+              <p className="text-emerald-600 font-semibold mb-4"> Imam and Khatib</p>
               <div className="space-y-3 text-sm">
                 <div className="flex items-center justify-center gap-2 text-gray-600">
                   <FaEnvelope className="text-emerald-600" />
@@ -113,14 +113,12 @@ export default function MeetOurImamPage() {
                 <h2 className="text-2xl font-bold text-gray-900">Biography</h2>
               </div>
               <p className="text-gray-600 leading-relaxed mb-4">
-                Our Imam brings years of Islamic scholarship and community leadership experience to Masjid Salman Al Farsi. 
-                With a deep understanding of Islamic jurisprudence and a passion for community service, our Imam serves 
-                as both a spiritual guide and educational leader for our growing community.
+                Mawlana Dr. Ataur Sarkar has a PhD in Electrical Engineering and works at Intel Corporation, Oregon, as a Senior Product Development Engineer. He has more than three decades of formal and informal teaching experience at various levels and areas. He was an Assistant Professor in the Department of Electrical and Electronic Engineering in Bangladesh University of Engineering and Technology and taught in Canada and USA during his graduate studies. He is licensed Professional Engineer (PE) in Electronics, Controls, and Communications and a certified Notary Public of the State of Oregon.
               </p>
               <p className="text-gray-600 leading-relaxed">
-                Trained in traditional Islamic sciences and modern theological studies, our Imam bridges the gap between 
-                classical Islamic teachings and contemporary challenges faced by Muslims in the West. Their approachable 
-                nature and compassionate guidance make them accessible to community members of all ages and backgrounds.
+               He is highly enthusiastic about learning, practicing, and preaching the teachings of Quran and Sunnah, and call people to the beautiful way life, Islam. Allah SWT has blessed him with the tawfiq to memorize the Noble Quran and complete Dars-e-Nizami Dawrah Hadith Alimiyyah degree equivalent to a master’s in Islamic studies in August 2024. He has multiple Ijazaat in Quran recitation, Books of Hadith, Arabic language, and Islamic laws of inheritance. He has completed formal courses on the Rules and Regulations of Reciting Quran Properly (Tajweed), Quranic Exegesis and its Principles (Tafsir), Islamic Creed and its Principles (Aqidah), Islamic Jurisprudence and its Principles (Fiqh), and is still studying in all these areas. Mawlana Sarkar is currently pursuing an Ifta degree in pursuit of becoming a Mufti. He has conducted several courses on Arabic language and Tajweed for the community in the past years. He conducted Tajweed4All sessions open to local and international participants and is currently leading the Tajweed session hosted by PDX Quran Study Circle. He has been delivering Friday sermons in the local Masjids and Vancouver Islands in Canada for last several years.
+
+He is the founding President of Jamiatul Ikhlas where he is offering voluntary service as the Director and Lead Instructor of Quran and Adab (QnA) program.
               </p>
             </div>
 
@@ -139,10 +137,7 @@ export default function MeetOurImamPage() {
                   <span className="text-emerald-600 mr-2 mt-1">•</span>
                   <span>Ijazah (certification) in Quranic recitation and memorization</span>
                 </li>
-                <li className="flex items-start">
-                  <span className="text-emerald-600 mr-2 mt-1">•</span>
-                  <span>Specialized training in Islamic family counseling and mediation</span>
-                </li>
+                
                 <li className="flex items-start">
                   <span className="text-emerald-600 mr-2 mt-1">•</span>
                   <span>Fluent in Arabic, English, and other community languages</span>
@@ -215,7 +210,7 @@ export default function MeetOurImamPage() {
       <AnimatePresence>
         {showAppointmentModal && (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 flex items-end justify-center p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -229,18 +224,18 @@ export default function MeetOurImamPage() {
 
             {/* Modal Content */}
             <motion.div
-              className="relative bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col"
+              initial={{ y: 100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 100, opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
               {/* Header */}
-              <div className="bg-gradient-to-r from-emerald-600 to-amber-600 text-white p-6 rounded-t-xl">
+              <div className="bg-gradient-to-r from-emerald-600 to-amber-600 p-6 rounded-t-xl">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <FaCalendarAlt className="text-2xl" />
-                    <h2 className="text-2xl font-bold">Schedule Appointment</h2>
+                    <FaCalendarAlt className="text-2xl text-white" />
+                    <h2 className="text-2xl font-bold text-white">Schedule Appointment</h2>
                   </div>
                   <button
                     onClick={() => setShowAppointmentModal(false)}
@@ -252,7 +247,7 @@ export default function MeetOurImamPage() {
               </div>
 
               {/* Form */}
-              <form onSubmit={handleSubmit} className="p-6 space-y-6">
+              <form onSubmit={handleSubmit} className="p-6 space-y-6 flex-1 overflow-y-auto">
                 {/* Date Selection */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -275,17 +270,28 @@ export default function MeetOurImamPage() {
                     <FaClock className="inline mr-2 text-emerald-600" />
                     Preferred Time
                   </label>
-                  <select
-                    required
-                    value={formData.time}
-                    onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  >
-                    <option value="">Select a time</option>
-                    {timeSlots.map((slot) => (
-                      <option key={slot} value={slot}>{slot}</option>
-                    ))}
-                  </select>
+                  <div className="space-y-2">
+                    <select
+                      value={formData.time}
+                      onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    >
+                      <option value="">Select a time or enter manually</option>
+                      {timeSlots.map((slot) => (
+                        <option key={slot} value={slot}>{slot}</option>
+                      ))}
+                      <option value="manual">Enter time manually</option>
+                    </select>
+                    {formData.time === 'manual' && (
+                      <input
+                        type="text"
+                        placeholder="Enter preferred time (e.g., 2:30 PM)"
+                        value={formData.time === 'manual' ? '' : formData.time}
+                        onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      />
+                    )}
+                  </div>
                 </div>
 
                 {/* Counseling Topic */}
@@ -294,35 +300,29 @@ export default function MeetOurImamPage() {
                     <FaHandsHelping className="inline mr-2 text-emerald-600" />
                     Counseling Topic
                   </label>
-                  <select
-                    required
-                    value={formData.topic}
-                    onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  >
-                    <option value="">Select a topic</option>
-                    {counselingTopics.map((topic) => (
-                      <option key={topic} value={topic}>{topic}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Custom Topic (if "Other" is selected) */}
-                {formData.topic === 'Other (please specify)' && (
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Please specify your topic
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.customTopic}
-                      onChange={(e) => setFormData({ ...formData, customTopic: e.target.value })}
+                  <div className="space-y-2">
+                    <select
+                      value={formData.topic}
+                      onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      placeholder="Enter your custom topic"
-                    />
+                    >
+                      <option value="">Select a topic or enter manually</option>
+                      {counselingTopics.map((topic) => (
+                        <option key={topic} value={topic}>{topic}</option>
+                      ))}
+                      <option value="manual">Enter topic manually</option>
+                    </select>
+                    {(formData.topic === 'Other (please specify)' || formData.topic === 'manual') && (
+                      <input
+                        type="text"
+                        placeholder="Please specify your topic"
+                        value={formData.customTopic}
+                        onChange={(e) => setFormData({ ...formData, customTopic: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      />
+                    )}
                   </div>
-                )}
+                </div>
 
                 {/* Name */}
                 <div>
