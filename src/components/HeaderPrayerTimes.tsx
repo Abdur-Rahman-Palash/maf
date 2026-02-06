@@ -30,8 +30,9 @@ const HeaderPrayerTimes: React.FC = () => {
   });
 
   const [nextPrayer, setNextPrayer] = useState({ name: 'DHUHR', time: '12:30 PM' });
+  const [loading, setLoading] = useState(false);
 
-  // Real Islamic prayer times for Georgia (Atlanta)
+  // Islamic prayer times from API with caching
   const [prayerTimes, setPrayerTimes] = useState({
     jamaat: {
       fajr: '06:00',
@@ -48,6 +49,162 @@ const HeaderPrayerTimes: React.FC = () => {
       isha: '19:30'
     }
   });
+
+  // Cache prayer times in localStorage to avoid repeated API calls
+  const getCachedPrayerTimes = () => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('prayerTimes');
+        const cachedTime = localStorage.getItem('prayerTimesTime');
+        const now = new Date().getTime();
+        
+        // Use cache if less than 2 hours old
+        if (cached && cachedTime && (now - parseInt(cachedTime)) < 2 * 60 * 60 * 1000) {
+          return JSON.parse(cached);
+        }
+      } catch (error) {
+        console.error('Error reading cache:', error);
+        localStorage.removeItem('prayerTimes');
+        localStorage.removeItem('prayerTimesTime');
+      }
+    }
+    return null;
+  };
+
+  const cachePrayerTimes = (times: any) => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('prayerTimes', JSON.stringify(times));
+        localStorage.setItem('prayerTimesTime', new Date().getTime().toString());
+      } catch (error) {
+        console.error('Error writing cache:', error);
+      }
+    }
+  };
+
+  // Fetch prayer times from IslamicFinder API with caching
+  useEffect(() => {
+    const fetchPrayerTimes = async () => {
+      try {
+        // Check cache first
+        const cachedTimes = getCachedPrayerTimes();
+        if (cachedTimes) {
+          setPrayerTimes(cachedTimes);
+          setLoading(false);
+          return;
+        }
+
+        setLoading(true);
+        // Add timeout to prevent long loading
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+        const response = await fetch('https://www.islamicfinder.us/index.php/api/prayer_times?country=US&zipcode=30084&format=json', {
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // Debug: Log API response
+        console.log('API Response:', data);
+        
+        // Handle different possible response formats
+        if (data && (data.prayer_times || data.data || data.results)) {
+          const times = data.prayer_times || data.data || data.results;
+          
+          // Debug: Log available time fields
+          console.log('Available fields:', Object.keys(times));
+          console.log('Namaz begin fields:', {
+            fajr_begin: times.fajr_begin,
+            dhuhr_begin: times.dhuhr_begin,
+            asr_begin: times.asr_begin,
+            maghrib_begin: times.maghrib_begin,
+            isha_begin: times.isha_begin,
+            fajr_start: times.fajr_start,
+            dhuhr_start: times.dhuhr_start,
+            asr_start: times.asr_start,
+            maghrib_start: times.maghrib_start,
+            isha_start: times.isha_start
+          });
+          
+          const newPrayerTimes = {
+            jamaat: {
+              fajr: times.fajr || times.Fajr || times.fajr_jamaat || times.Fajr_jamaat || times.jamaat_fajr || '06:00',
+              Dhuhr: times.dhuhr || times.Dhuhr || times.dhuhr_jamaat || times.Dhuhr_jamaat || times.jamaat_dhuhr || times.Zuhr || '13:30',
+              asr: times.asr || times.Asr || times.asr_jamaat || times.Asr_jamaat || times.jamaat_asr || '16:00',
+              maghrib: times.maghrib || times.Maghrib || times.maghrib_jamaat || times.Maghrib_jamaat || times.jamaat_maghrib || '18:15',
+              isha: times.isha || times.Isha || times.isha_jamaat || times.Isha_jamaat || times.jamaat_isha || '20:00'
+            },
+            begins: {
+              // Fetch actual Namaz begin times from API
+              fajr: times.fajr_begin || times.fajr_start || times.Fajr || times.fajr || '05:45',
+              Dhuhr: times.dhuhr_begin || times.dhuhr_start || times.Dhuhr || times.dhuhr || times.Zuhr || '13:00',
+              asr: times.asr_begin || times.asr_start || times.Asr || times.asr || '15:30',
+              maghrib: times.maghrib_begin || times.maghrib_start || times.Maghrib || times.maghrib || '18:15',
+              isha: times.isha_begin || times.isha_start || times.Isha || times.isha || '19:30'
+            }
+          };
+          
+          // Debug: Log final prayer times
+          console.log('Final prayer times:', newPrayerTimes);
+          
+          setPrayerTimes(newPrayerTimes);
+          cachePrayerTimes(newPrayerTimes);
+        } else {
+          console.warn('Unexpected API response format:', data);
+        }
+      } catch (error: any) {
+        if (error.name === 'AbortError') {
+          console.log('Request timed out, using fallback');
+        } else {
+          console.error('Error fetching prayer times:', error);
+        }
+        // Keep default values if API fails
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const updateDates = () => {
+      fetchPrayerTimes();
+      
+      // Update dates regardless of API success
+      const now = new Date();
+      const day = now.getDate();
+      const month = now.toLocaleDateString('en-US', { month: 'long' });
+      const year = now.getFullYear();
+      
+      // Simple Hijri date calculation (approximate)
+      const hijriYear = Math.floor((year - 622) + (year - 622) / 32);
+      const hijriMonths = ['Muharram', 'Safar', 'Rabi al-Awwal', 'Rabi al-Thani', 'Jumada al-Awwal', 'Jumada al-Thani', 'Rajab', 'Shaʿbān', 'Ramadan', 'Shawwal', 'Dhu al-Qidah', 'Dhu al-Hijjah'];
+      const hijriMonth = hijriMonths[new Date().getMonth()] || 'Shaʿbān';
+      const hijriDay = day;
+      
+      const getOrdinalSuffix = (day: number) => {
+        const suffixes = ['th', 'st', 'nd', 'rd'];
+        const v = day % 100;
+        return suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0];
+      };
+      
+      setCurrentDate({
+        english: `${day}${getOrdinalSuffix(day)} ${month} ${year}`,
+        hijri: `${hijriDay} ${hijriMonth} ${hijriYear}`
+      });
+    };
+
+    // Initial load
+    updateDates();
+    
+    // Refresh every 2 hours (less frequent to reduce API calls)
+    const interval = setInterval(updateDates, 2 * 60 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Prayer names in different languages
   const prayerNames = {
@@ -361,98 +518,102 @@ const HeaderPrayerTimes: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
-            {/* Mobile Prayer Times */}
+            {/* Mobile Prayer Times - Adhan Only */}
             <div className="lg:hidden">
-              {(['fajr', 'Dhuhr', 'asr', 'maghrib', 'isha'] as const).map((prayer, index) => {
-                const prayerNameKey = prayer === 'Dhuhr' ? 'zuhr' : prayer.toLowerCase();
-                return (
-                <div key={prayer} className="flex justify-between items-center py-2 border-b border-purple-200">
-                  <motion.span 
-                    className="text-sm font-bold text-gray-900 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent px-3 py-2 rounded-lg shadow-lg"
-                    whileHover={{ scale: 1.15 }}
-                    transition={{ duration: 0.2 }}
-                    dangerouslySetInnerHTML={{ __html: names[prayerNameKey as keyof typeof names] }}></motion.span>
-                  <div className="text-right">
-                    <motion.span 
-                      className="text-sm font-semibold text-gray-900 hover:text-purple-600 transition-all duration-300 cursor-pointer bg-white/80 hover:bg-purple-100 px-3 py-2 rounded-lg border-2 border-gray-200 hover:border-purple-300 shadow-lg hover:shadow-xl"
-                      whileHover={{ y: -3, scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      {locale === 'ar' ? convertToArabicTime(prayerTimes.jamaat[prayer]) : convertTo12Hour(prayerTimes.jamaat[prayer])}
-                    </motion.span>
-                  </div>
+              {loading ? (
+                <div className="flex justify-center items-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+                  <span className="ml-3 text-gray-600">Loading prayer times...</span>
                 </div>
-                );
-              })}
+              ) : (
+                <div className="space-y-2">
+                  {(['fajr', 'Dhuhr', 'asr', 'maghrib', 'isha'] as const).map((prayer, index) => (
+                    <motion.div 
+                      key={prayer} 
+                      className="flex justify-between items-center bg-white rounded-lg shadow-md border border-purple-200 p-3 hover:shadow-lg transition-all duration-300"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <motion.span 
+                          className="text-xs font-semibold text-pink-700 bg-pink-100 px-2 py-1 rounded-md"
+                          whileHover={{ scale: 1.05 }}
+                          transition={{ duration: 0.2 }}
+                          dangerouslySetInnerHTML={{ __html: names.begins }}
+                        ></motion.span>
+                        <motion.span 
+                          className="text-sm font-bold text-gray-900 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"
+                          whileHover={{ scale: 1.05 }}
+                          transition={{ duration: 0.2 }}
+                          dangerouslySetInnerHTML={{ 
+                            __html: prayer === 'Dhuhr' ? names.zuhr : (names as any)[prayer.toLowerCase()] 
+                          }}
+                        ></motion.span>
+                      </div>
+                      <motion.span 
+                        className="text-base font-bold text-gray-900 hover:text-pink-600 transition-all duration-300 cursor-pointer"
+                        whileHover={{ y: -2, scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        {locale === 'ar' ? convertToArabicTime(prayerTimes.begins[prayer]) : convertTo12Hour(prayerTimes.begins[prayer])}
+                      </motion.span>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Desktop Prayer Times Table */}
+            {/* Desktop Prayer Times - Individual Boxes */}
             <div className="hidden lg:block">
-              {/* Prayer Names Header */}
-              <div className="grid grid-cols-6 gap-1 mb-4 lg:mb-6" style={{ lineHeight: '24px', margin: '10px 0 8px 0' }}>
-                <div className="col-span-1"></div>
-                {(['fajr', 'zuhr', 'asr', 'maghrib', 'isha'] as const).map((prayer) => (
-                  <div key={prayer} className="col-span-1 text-center">
-                    <motion.span 
-                      className="text-sm lg:text-base font-bold text-gray-900 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent px-3 py-2 rounded-lg shadow-lg"
-                      whileHover={{ scale: 1.15 }}
-                      transition={{ duration: 0.2 }}
-                      dangerouslySetInnerHTML={{ __html: names[prayer] }}></motion.span>
-                  </div>
-                ))}
-              </div>
-
-            {/* Jama'at Times */}
-            <div className="grid grid-cols-1 lg:grid-cols-6 gap-1 mb-3 lg:mb-4" style={{ lineHeight: '24px' }}>
-              <div className="hidden lg:block">
-                <motion.span 
-                  className="text-sm lg:text-base font-bold text-purple-700 bg-purple-100 px-3 py-2 rounded-lg border-2 border-purple-400 shadow-lg"
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ duration: 0.2 }}
-                  dangerouslySetInnerHTML={{ __html: names.jamaat }}></motion.span>
-              </div>
-              {Object.entries(prayerTimes.jamaat).map(([prayer, time], index) => (
-                <motion.div key={prayer} className="text-center lg:col-span-1"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.3 + index * 0.05 }}
-                >
-                  <motion.span 
-                    className="text-sm lg:text-base font-semibold text-gray-900 hover:text-purple-600 transition-all duration-300 cursor-pointer bg-white/80 hover:bg-purple-100 px-3 py-2 rounded-lg border-2 border-gray-200 hover:border-purple-300 shadow-lg hover:shadow-xl"
-                    whileHover={{ y: -3, scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    {locale === 'ar' ? convertToArabicTime(time) : convertTo12Hour(time)}
-                  </motion.span>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Begin Times */}
-            <div className="grid grid-cols-1 lg:grid-cols-6 gap-1" style={{ margin: '6px 0 4px', paddingBottom: 0, lineHeight: '24px' }}>
-              <div className="hidden lg:block">
-                <motion.span 
-                  className="text-sm lg:text-base font-bold text-pink-700 bg-pink-100 px-3 py-2 rounded-lg border-2 border-pink-400 shadow-lg"
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ duration: 0.2 }}
-                  dangerouslySetInnerHTML={{ __html: names.begins }}></motion.span>
-              </div>
-              {Object.entries(prayerTimes.begins).map(([prayer, time], index) => (
-                <motion.div key={prayer} className="text-center lg:col-span-1"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.4 + index * 0.05 }}
-                >
-                  <motion.span 
-                    className="text-sm lg:text-base font-medium text-gray-900 hover:text-pink-600 transition-all duration-300 cursor-pointer bg-white/80 hover:bg-pink-100 px-3 py-2 rounded-lg border-2 border-gray-200 hover:border-pink-300 shadow-lg hover:shadow-xl"
-                    whileHover={{ y: -3, scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    {locale === 'ar' ? convertToArabicTime(time) : convertTo12Hour(time)}
-                  </motion.span>
-                </motion.div>
-              ))}
-            </div>
+              {loading ? (
+                <div className="flex justify-center items-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+                  <span className="ml-3 text-gray-600">Loading prayer times...</span>
+                </div>
+              ) : (
+                <div className="grid grid-cols-5 gap-4">
+                  {(['fajr', 'Dhuhr', 'asr', 'maghrib', 'isha'] as const).map((prayer, index) => (
+                    <div key={prayer} className="bg-white rounded-xl shadow-lg border border-purple-200 p-4 hover:shadow-xl transition-all duration-300">
+                      {/* Prayer Name */}
+                      <div className="text-center mb-4">
+                        <motion.span 
+                          className="text-sm font-bold text-gray-900 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent px-3 py-2 rounded-lg shadow-md"
+                          whileHover={{ scale: 1.05 }}
+                          transition={{ duration: 0.2 }}
+                          dangerouslySetInnerHTML={{ 
+                            __html: prayer === 'Dhuhr' ? names.zuhr : (names as any)[prayer.toLowerCase()] 
+                          }}
+                        ></motion.span>
+                      </div>
+                      
+                      {/* Adhan Time Only */}
+                      <div className="text-center">
+                        <motion.span 
+                          className="text-xs font-semibold text-pink-700 bg-pink-100 px-2 py-1 rounded-md"
+                          whileHover={{ scale: 1.05 }}
+                          transition={{ duration: 0.2 }}
+                          dangerouslySetInnerHTML={{ __html: names.begins }}
+                        ></motion.span>
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.2 + index * 0.1 }}
+                          className="mt-2"
+                        >
+                          <motion.span 
+                            className="text-2xl font-bold text-gray-900 hover:text-pink-600 transition-all duration-300 cursor-pointer"
+                            whileHover={{ y: -2, scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            {locale === 'ar' ? convertToArabicTime(prayerTimes.begins[prayer]) : convertTo12Hour(prayerTimes.begins[prayer])}
+                          </motion.span>
+                        </motion.div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </motion.div>
         </div>
