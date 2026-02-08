@@ -5,7 +5,7 @@ const withNextIntl = createNextIntlPlugin();
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  reactCompiler: true,
+  // reactCompiler: false, // Temporarily disable to fix Vercel deployment
   images: {
     remotePatterns: [
       {
