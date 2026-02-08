@@ -1,7 +1,14 @@
 'use client';
 import { useState } from 'react';
-
-    { locale: 'ar' }
+import { motion } from 'framer-motion';
+import { 
+  FaUserTie, 
+  FaBook, 
+  FaPhone, 
+  FaCalendarAlt, 
+  FaClock, 
+  FaEnvelope 
+} from 'react-icons/fa';
 
 export default function MeetImam() {
   const [formData, setFormData] = useState({
@@ -221,3 +228,4 @@ export default function MeetImam() {
       </div>
     </div>
   );
+}

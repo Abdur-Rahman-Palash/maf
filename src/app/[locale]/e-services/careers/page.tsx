@@ -1,7 +1,6 @@
 'use client';
+import { motion } from 'framer-motion';
 import { FaBriefcase, FaUsers, FaGraduationCap, FaHeart } from 'react-icons/fa';
-
-    { locale: 'ar' }
 
 export default function Careers() {
   const currentOpenings = [
@@ -28,6 +27,8 @@ export default function Careers() {
       department: 'Community',
       type: 'Full-time',
       description: 'Organize community events and programs'
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-6">
@@ -143,3 +144,4 @@ export default function Careers() {
       </div>
     </div>
   );
+}

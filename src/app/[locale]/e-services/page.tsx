@@ -1,7 +1,14 @@
 'use client';
+import { motion } from 'framer-motion';
 import { Link } from '@/i18n/routing';
-
-    { locale: 'ar' }
+import { 
+  FaSearch, 
+  FaUserTie,
+  FaBriefcase,
+  FaUsers,
+  FaClipboard,
+  FaCalendarCheck
+} from 'react-icons/fa';
 
 const eServices = [
   {
@@ -27,7 +34,7 @@ const eServices = [
   },
   {
     title: 'TOUR OPERATOR REGISTRATION',
-    icon: FaClipboardList,
+    icon: FaClipboard,
     description: 'Register your tour company for organized visits to the mosque',
     href: '/e-services/tour-operator-registration',
     color: 'from-green-500 to-green-600'
@@ -45,6 +52,8 @@ const eServices = [
     description: 'Exclusive private tours with personalized experiences',
     href: '/visitors/private-cultural-tours',
     color: 'from-red-500 to-red-600'
+  }
+];
 
 export default function EServices() {
   return (
@@ -130,3 +139,4 @@ export default function EServices() {
       </div>
     </div>
   );
+}
