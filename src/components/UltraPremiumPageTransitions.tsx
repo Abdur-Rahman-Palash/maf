@@ -7,21 +7,8 @@ interface UltraPremiumPageTransitionsProps {
   children: React.ReactNode;
 }
 
-export default function UltraPremiumPageTransitions({ children }: UltraPremiumPageTransitionsProps) {
-  const [isLoading, setIsLoading] = useState(true);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll();
-
-  // Smooth loading animation
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Ultra-premium loading screen
-  const LoadingScreen = () => (
+// LoadingScreen component moved outside to avoid static component issue
+const LoadingScreen = () => (
     <motion.div
       className="fixed inset-0 z-[9999] bg-gradient-to-br from-slate-900 via-amber-900 to-slate-800 flex items-center justify-center"
       exit={{
@@ -166,6 +153,19 @@ export default function UltraPremiumPageTransitions({ children }: UltraPremiumPa
     </motion.div>
   );
 
+export default function UltraPremiumPageTransitions({ children }: UltraPremiumPageTransitionsProps) {
+  const [isLoading, setIsLoading] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll();
+
+  // Smooth loading animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <AnimatePresence mode="wait">
       {isLoading ? (
@@ -196,3 +196,4 @@ export default function UltraPremiumPageTransitions({ children }: UltraPremiumPa
     </AnimatePresence>
   );
 }
+
