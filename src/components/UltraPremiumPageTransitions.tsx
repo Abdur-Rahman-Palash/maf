@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
+import { motion, AnimatePresence, useScroll } from 'framer-motion';
 import { useEffect, useState, useRef } from 'react';
 
 interface UltraPremiumPageTransitionsProps {
@@ -9,7 +9,6 @@ interface UltraPremiumPageTransitionsProps {
 
 export default function UltraPremiumPageTransitions({ children }: UltraPremiumPageTransitionsProps) {
   const [isLoading, setIsLoading] = useState(true);
-  const [scrollProgress, setScrollProgress] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
 
@@ -20,12 +19,6 @@ export default function UltraPremiumPageTransitions({ children }: UltraPremiumPa
     }, 1500);
     return () => clearTimeout(timer);
   }, []);
-
-  // Track scroll for page transition effects
-  useEffect(() => {
-    const unsubscribe = scrollYProgress.onChange(setScrollProgress);
-    return unsubscribe;
-  }, [scrollYProgress]);
 
   // Ultra-premium loading screen
   const LoadingScreen = () => (
@@ -173,12 +166,6 @@ export default function UltraPremiumPageTransitions({ children }: UltraPremiumPa
     </motion.div>
   );
 
-  // Page transition effects based on scroll
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const pageTransform = useTransform(scrollYProgress, [0, 0.1, 0.9, 1], [0, 5, -5, 0]);
-  const pageOpacity = useTransform(scrollYProgress, [0, 0.05, 0.95, 1], [1, 0.95, 0.95, 1]);
-  const pageScale = useTransform(scrollYProgress, [0, 0.1, 0.9, 1], [1, 0.98, 0.98, 1]);
-
   return (
     <AnimatePresence mode="wait">
       {isLoading ? (
@@ -187,19 +174,9 @@ export default function UltraPremiumPageTransitions({ children }: UltraPremiumPa
         <motion.div
           ref={containerRef}
           className="relative"
-          initial={{ opacity: 0 }}
-          animate={{
-            opacity: 1,
-            transition: {
-              duration: 0.8,
-              ease: [0.25, 0.46, 0.45, 0.94]
-            }
-          }}
-          style={{
-            y: pageTransform,
-            opacity: pageOpacity,
-            scale: pageScale,
-          }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         >
           {children}
 
@@ -208,10 +185,10 @@ export default function UltraPremiumPageTransitions({ children }: UltraPremiumPa
             className="fixed inset-0 pointer-events-none z-40"
             style={{
               background: `linear-gradient(to bottom,
-                rgba(251, 191, 36, ${scrollProgress * 0.02}) 0%,
+                rgba(251, 191, 36, ${scrollYProgress.get() * 0.02}) 0%,
                 transparent 20%,
                 transparent 80%,
-                rgba(59, 130, 246, ${scrollProgress * 0.02}) 100%)`,
+                rgba(59, 130, 246, ${scrollYProgress.get() * 0.02}) 100%)`,
             }}
           />
         </motion.div>

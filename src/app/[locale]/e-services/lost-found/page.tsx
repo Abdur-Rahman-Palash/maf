@@ -10,8 +10,6 @@ import {
   FaMapMarkerAlt
 } from 'react-icons/fa';
 
-    { locale: 'ar' }
-
 export default function LostFound() {
   const [formData, setFormData] = useState({
     type: 'lost',
