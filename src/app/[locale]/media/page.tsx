@@ -1,7 +1,6 @@
 'use client';
+import { motion } from 'framer-motion';
 import { FaImages, FaVideo, FaNewspaper, FaMicrophone } from 'react-icons/fa';
-
-    { locale: 'ar' }
 
 export default function MediaPage() {
   const mediaCategories = [
@@ -32,6 +31,8 @@ export default function MediaPage() {
       description: "Listen to Quran recitations, lectures, and nasheeds",
       color: "purple",
       items: ["Quran Audio", "Lectures", "Nasheeds", "Podcasts"]
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-6">
@@ -111,7 +112,7 @@ export default function MediaPage() {
                 type: "News",
                 date: "March 2024",
                 description: "Report on our community iftar programs and activities"
-
+              }
             ].map((highlight, index) => (
               <div key={index} className="bg-white rounded-lg p-4">
                 <div className="text-xs text-gray-500 mb-2">{highlight.date}</div>
@@ -148,3 +149,4 @@ export default function MediaPage() {
       </div>
     </div>
   );
+}

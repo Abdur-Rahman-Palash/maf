@@ -1,7 +1,14 @@
 'use client';
 import { useState } from 'react';
-
-    { locale: 'ar' }
+import { motion } from 'framer-motion';
+import { 
+  FaSearch, 
+  FaClipboard, 
+  FaExclamationTriangle,
+  FaPhone,
+  FaEnvelope,
+  FaMapMarkerAlt
+} from 'react-icons/fa';
 
 export default function LostFound() {
   const [formData, setFormData] = useState({
@@ -178,7 +185,7 @@ export default function LostFound() {
               <h3 className="text-xl font-bold text-gray-900 mb-4">Process</h3>
               <div className="space-y-3">
                 <div className="flex items-start space-x-3">
-                  <FaClipboardList className="text-blue-600 mt-1" />
+                  <FaClipboard className="text-blue-600 mt-1" />
                   <div>
                     <h4 className="font-semibold text-gray-800">Report</h4>
                     <p className="text-gray-600 text-sm">Fill out the form with detailed information</p>
@@ -229,3 +236,4 @@ export default function LostFound() {
       </div>
     </div>
   );
+}

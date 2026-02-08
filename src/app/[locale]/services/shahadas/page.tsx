@@ -1,7 +1,6 @@
 'use client';
+import { motion } from 'framer-motion';
 import { FaHandHoldingHeart, FaBook, FaCalendarAlt, FaPhone } from 'react-icons/fa';
-
-    { locale: 'ar' }
 
 export default function Shahadas() {
   return (
@@ -136,3 +135,4 @@ export default function Shahadas() {
       </div>
     </div>
   );
+}

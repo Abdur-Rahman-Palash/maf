@@ -1,7 +1,6 @@
 'use client';
+import { motion } from 'framer-motion';
 import { FaMosque, FaUsers, FaHeart, FaCalendarAlt } from 'react-icons/fa';
-
-    { locale: 'ar' }
 
 export default function AboutPage() {
   return (
@@ -135,3 +134,4 @@ export default function AboutPage() {
       </div>
     </div>
   );
+}
