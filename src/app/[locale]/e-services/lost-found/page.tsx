@@ -1,8 +1,7 @@
 'use client';
-
-import { motion } from 'framer-motion';
-import { FaSearch, FaClipboardList, FaPhone, FaEnvelope } from 'react-icons/fa';
 import { useState } from 'react';
+
+    { locale: 'ar' }
 
 export default function LostFound() {
   const [formData, setFormData] = useState({
@@ -230,4 +229,3 @@ export default function LostFound() {
       </div>
     </div>
   );
-}

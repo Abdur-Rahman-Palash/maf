@@ -1,7 +1,7 @@
 'use client';
-
-import { motion } from 'framer-motion';
 import { FaMosque, FaUsers, FaHeart, FaCalendarAlt } from 'react-icons/fa';
+
+    { locale: 'ar' }
 
 export default function AboutPage() {
   return (
@@ -37,9 +37,9 @@ export default function AboutPage() {
               <h2 className="text-2xl font-bold text-gray-900">Our Mission</h2>
             </div>
             <p className="text-gray-600 leading-relaxed">
-              To provide a place of worship and spiritual guidance for the Muslim community, 
-              fostering unity, education, and service based on the teachings of Islam. 
-              We strive to create an environment where families can grow in faith and build 
+              To provide a place of worship and spiritual guidance for the Muslim community,
+              fostering unity, education, and service based on the teachings of Islam.
+              We strive to create an environment where families can grow in faith and build
               lasting relationships with fellow community members.
             </p>
           </motion.div>
@@ -135,4 +135,3 @@ export default function AboutPage() {
       </div>
     </div>
   );
-}

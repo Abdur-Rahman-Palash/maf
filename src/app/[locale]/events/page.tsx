@@ -1,7 +1,7 @@
 'use client';
-
-import { motion } from 'framer-motion';
 import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaUsers } from 'react-icons/fa';
+
+    { locale: 'ar' }
 
 export default function EventsPage() {
   const upcomingEvents = [
@@ -36,8 +36,6 @@ export default function EventsPage() {
       time: "Morning Prayer",
       description: "Eid prayer and community celebration",
       type: "special"
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-6">
@@ -63,8 +61,8 @@ export default function EventsPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 * index }}
               className={`bg-white rounded-xl shadow-lg p-6 border-l-4 ${
-                event.type === 'special' 
-                  ? 'border-l-amber-500' 
+                event.type === 'special'
+                  ? 'border-l-amber-500'
                   : 'border-l-emerald-500'
               }`}
             >
@@ -147,4 +145,3 @@ export default function EventsPage() {
       </div>
     </div>
   );
-}

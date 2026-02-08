@@ -1,7 +1,7 @@
 'use client';
-
-import { motion } from 'framer-motion';
 import { FaMapMarkerAlt, FaPhone, FaEnvelope } from 'react-icons/fa';
+
+    { locale: 'ar' }
 
 export default function ContactPage() {
   return (
@@ -175,7 +175,7 @@ export default function ContactPage() {
               {
                 question: "Is parking available at the mosque?",
                 answer: "Yes, we have ample parking space available for all visitors and worshippers."
-              }
+
             ].map((faq, index) => (
               <div key={index} className="bg-gray-50 rounded-lg p-4">
                 <h3 className="font-semibold text-gray-900 mb-2">{faq.question}</h3>
@@ -187,4 +187,3 @@ export default function ContactPage() {
       </div>
     </div>
   );
-}

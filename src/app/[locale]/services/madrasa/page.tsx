@@ -1,7 +1,7 @@
 'use client';
-
-import { motion } from 'framer-motion';
 import { FaBook, FaGraduationCap, FaUsers, FaCalendarAlt } from 'react-icons/fa';
+
+    { locale: 'ar' }
 
 export default function Madrasa() {
   return (
@@ -137,4 +137,3 @@ export default function Madrasa() {
       </div>
     </div>
   );
-}

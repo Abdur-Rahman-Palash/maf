@@ -24,74 +24,58 @@ const QuranReader: React.FC = () => {
   const [currentAyah, setCurrentAyah] = useState(1);
 
   const fetchNextVerse = async () => {
-    setLoading(true);
-    setError(null);
+    const ayahsInSurah = [7, 286, 200, 176, 120, 165, 206, 75, 129, 109, 123, 111, 43, 52, 99, 128, 111, 110, 98, 135, 112, 78, 118, 64, 77, 227, 93, 88, 69, 60, 34, 30, 73, 54, 45, 83, 182, 88, 75, 85, 54, 53, 89, 59, 37, 35, 38, 29, 18, 45, 60, 49, 62, 55, 78, 96, 29, 22, 24, 13, 14, 11, 11, 18, 12, 12, 30, 52, 44, 28, 28, 20, 56, 40, 31, 50, 40, 46, 42, 29, 19, 36, 25, 22, 26, 30, 20, 15, 21, 11, 8, 8, 19, 5, 8, 8, 11, 11, 8, 3, 9, 5, 4, 7, 3, 6, 3, 5, 4, 5, 6];
     
-    try {
-      const ayahsInSurah = [7, 286, 200, 176, 120, 165, 206, 75, 129, 109, 123, 111, 43, 52, 99, 128, 111, 110, 98, 135, 112, 78, 118, 64, 77, 227, 93, 88, 69, 60, 34, 30, 73, 54, 45, 83, 182, 88, 75, 85, 54, 53, 89, 59, 37, 35, 38, 29, 18, 45, 60, 49, 62, 55, 78, 96, 29, 22, 24, 13, 14, 11, 11, 18, 12, 12, 30, 52, 44, 28, 28, 20, 56, 40, 31, 50, 40, 46, 42, 29, 19, 36, 25, 22, 26, 30, 20, 15, 21, 11, 8, 8, 19, 5, 8, 8, 11, 11, 8, 3, 9, 5, 4, 7, 3, 6, 3, 5, 4, 5, 6];
-      
-      let nextSurah = currentSurah;
-      let nextAyah = currentAyah;
-      
-      // Move to next verse
-      if (currentAyah >= ayahsInSurah[currentSurah - 1]) {
-        // Move to next surah
-        if (currentSurah < 114) {
-          nextSurah = currentSurah + 1;
-          nextAyah = 1;
-        } else {
-          // Reset to beginning
-          nextSurah = 1;
-          nextAyah = 1;
-        }
+    let nextSurah = currentSurah;
+    let nextAyah = currentAyah;
+    
+    // Move to next verse
+    if (currentAyah >= ayahsInSurah[currentSurah - 1]) {
+      // Move to next surah
+      if (currentSurah < 114) {
+        nextSurah = currentSurah + 1;
+        nextAyah = 1;
       } else {
-        nextAyah = currentAyah + 1;
+        // Reset to beginning
+        nextSurah = 1;
+        nextAyah = 1;
       }
-      
-      await fetchVerse(nextSurah, nextAyah);
-    } catch (err) {
-      setError('Failed to load Quran verse. Please try again.');
-      console.error('Quran API Error:', err);
-    } finally {
-      setLoading(false);
+    } else {
+      nextAyah = currentAyah + 1;
     }
+    
+    await fetchVerse(nextSurah, nextAyah);
   };
 
   const fetchPreviousVerse = async () => {
+    const ayahsInSurah = [7, 286, 200, 176, 120, 165, 206, 75, 129, 109, 123, 111, 43, 52, 99, 128, 111, 110, 98, 135, 112, 78, 118, 64, 77, 227, 93, 88, 69, 60, 34, 30, 73, 54, 45, 83, 182, 88, 75, 85, 54, 53, 89, 59, 37, 35, 38, 29, 18, 45, 60, 49, 62, 55, 78, 96, 29, 22, 24, 13, 14, 11, 11, 18, 12, 12, 30, 52, 44, 28, 28, 20, 56, 40, 31, 50, 40, 46, 42, 29, 19, 36, 25, 22, 26, 30, 20, 15, 21, 11, 8, 8, 19, 5, 8, 8, 11, 11, 8, 3, 9, 5, 4, 7, 3, 6, 3, 5, 4, 5, 6];
+    
+    let prevSurah = currentSurah;
+    let prevAyah = currentAyah;
+    
+    // Move to previous verse
+    if (currentAyah <= 1) {
+      // Move to previous surah
+      if (currentSurah > 1) {
+        prevSurah = currentSurah - 1;
+        prevAyah = ayahsInSurah[prevSurah - 1];
+      } else {
+        // Go to last verse of Quran
+        prevSurah = 114;
+        prevAyah = 6;
+      }
+    } else {
+      prevAyah = currentAyah - 1;
+    }
+    
+    await fetchVerse(prevSurah, prevAyah);
+  };
+
+  const fetchVerse = async (surah: number, ayah: number) => {
     setLoading(true);
     setError(null);
     
     try {
-      const ayahsInSurah = [7, 286, 200, 176, 120, 165, 206, 75, 129, 109, 123, 111, 43, 52, 99, 128, 111, 110, 98, 135, 112, 78, 118, 64, 77, 227, 93, 88, 69, 60, 34, 30, 73, 54, 45, 83, 182, 88, 75, 85, 54, 53, 89, 59, 37, 35, 38, 29, 18, 45, 60, 49, 62, 55, 78, 96, 29, 22, 24, 13, 14, 11, 11, 18, 12, 12, 30, 52, 44, 28, 28, 20, 56, 40, 31, 50, 40, 46, 42, 29, 19, 36, 25, 22, 26, 30, 20, 15, 21, 11, 8, 8, 19, 5, 8, 8, 11, 11, 8, 3, 9, 5, 4, 7, 3, 6, 3, 5, 4, 5, 6];
-      
-      let prevSurah = currentSurah;
-      let prevAyah = currentAyah;
-      
-      // Move to previous verse
-      if (currentAyah <= 1) {
-        // Move to previous surah
-        if (currentSurah > 1) {
-          prevSurah = currentSurah - 1;
-          prevAyah = ayahsInSurah[prevSurah - 1];
-        } else {
-          // Go to last verse of Quran
-          prevSurah = 114;
-          prevAyah = 6;
-        }
-      } else {
-        prevAyah = currentAyah - 1;
-      }
-      
-      await fetchVerse(prevSurah, prevAyah);
-    } catch (err) {
-      setError('Failed to load Quran verse. Please try again.');
-      console.error('Quran API Error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchVerse = async (surah: number, ayah: number) => {
       const response = await fetch(
         `/api/quran?surah=${surah}&ayah=${ayah}`
       );
@@ -117,14 +101,25 @@ const QuranReader: React.FC = () => {
       setVerse(transformedVerse);
       setCurrentSurah(surah);
       setCurrentAyah(ayah);
+    } catch (err) {
+      setError('Failed to load Quran verse. Please try again.');
+      console.error('Quran API Error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     // Only fetch on client-side to prevent hydration issues
     if (typeof window !== 'undefined') {
-      fetchNextVerse();
+      fetchVerse(1, 1); // Load the first verse initially
     }
   }, []);
+
+  const handleRetry = () => {
+    setError(null);
+    fetchVerse(currentSurah, currentAyah);
+  };
 
   const playAudio = () => {
     if (verse?.audio) {
@@ -203,7 +198,7 @@ const QuranReader: React.FC = () => {
             <div className="text-center py-12">
               <p className="text-red-600 mb-4">{error}</p>
               <button
-                onClick={fetchNextVerse}
+                onClick={handleRetry}
                 className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
               >
                 Try Again

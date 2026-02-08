@@ -1,5 +1,15 @@
 import { Metadata } from 'next';
 
+// Generate static params for static export
+export async function generateStaticParams() {
+  return [
+    { locale: 'en' },
+    { locale: 'ar' }
+  ];
+}
+
+
+
 export const metadata: Metadata = {
   title: 'Terms of Use | Masjid Salman al Farsi',
   description: 'Terms of use for Masjid Salman al Farsi website',

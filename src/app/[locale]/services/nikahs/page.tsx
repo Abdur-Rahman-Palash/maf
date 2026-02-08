@@ -1,7 +1,7 @@
 'use client';
-
-import { motion } from 'framer-motion';
 import { FaHeart, FaCalendarAlt, FaRing, FaMosque } from 'react-icons/fa';
+
+    { locale: 'ar' }
 
 export default function Nikahs() {
   return (
@@ -132,4 +132,3 @@ export default function Nikahs() {
       </div>
     </div>
   );
-}

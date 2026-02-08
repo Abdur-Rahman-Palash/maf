@@ -1,8 +1,7 @@
 'use client';
-
-import { motion, AnimatePresence } from 'framer-motion';
-import { FaUserGraduate, FaBook, FaHandsHelping, FaEnvelope, FaPhone, FaClock, FaCalendarAlt, FaTimes } from 'react-icons/fa';
 import { useState } from 'react';
+
+    { locale: 'ar' }
 
 export default function MeetOurImamPage() {
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
@@ -23,13 +22,11 @@ export default function MeetOurImamPage() {
     'Religious / general education',
     'Community matters',
     'Other (please specify)'
-  ];
 
   const timeSlots = [
     '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM',
     '12:00 PM', '12:30 PM', '1:00 PM', '1:30 PM', '2:00 PM', '2:30 PM',
     '3:00 PM', '3:30 PM', '4:00 PM', '4:30 PM'
-  ];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,7 +134,7 @@ He is the founding President of Jamiatul Ikhlas where he is offering voluntary s
                   <span className="text-emerald-600 mr-2 mt-1">•</span>
                   <span>Ijazah (certification) in Quranic recitation and memorization</span>
                 </li>
-                
+
                 <li className="flex items-start">
                   <span className="text-emerald-600 mr-2 mt-1">•</span>
                   <span>Fluent in Arabic, English, and other community languages</span>
@@ -190,11 +187,11 @@ He is the founding President of Jamiatul Ikhlas where he is offering voluntary s
             <div className="bg-gradient-to-r from-emerald-50 to-amber-50 rounded-xl p-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Get in Touch</h2>
               <p className="text-gray-600 text-center mb-6">
-                Our Imam is available for spiritual guidance, counseling, and religious questions. 
+                Our Imam is available for spiritual guidance, counseling, and religious questions.
                 Please feel free to reach out during office hours or leave a message.
               </p>
               <div className="text-center">
-                <button 
+                <button
                   onClick={() => setShowAppointmentModal(true)}
                   className="bg-emerald-600 text-white px-8 py-3 rounded-lg hover:bg-emerald-700 transition-colors"
                 >
@@ -379,4 +376,3 @@ He is the founding President of Jamiatul Ikhlas where he is offering voluntary s
       </AnimatePresence>
     </div>
   );
-}

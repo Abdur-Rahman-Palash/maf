@@ -1,8 +1,7 @@
 'use client';
-
-import { motion } from 'framer-motion';
-import { FaSearch, FaBriefcase, FaUsers, FaClipboardList, FaCalendarCheck, FaUserTie } from 'react-icons/fa';
 import { Link } from '@/i18n/routing';
+
+    { locale: 'ar' }
 
 const eServices = [
   {
@@ -46,8 +45,6 @@ const eServices = [
     description: 'Exclusive private tours with personalized experiences',
     href: '/visitors/private-cultural-tours',
     color: 'from-red-500 to-red-600'
-  }
-];
 
 export default function EServices() {
   return (
@@ -133,4 +130,3 @@ export default function EServices() {
       </div>
     </div>
   );
-}

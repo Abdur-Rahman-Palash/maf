@@ -1,8 +1,7 @@
 'use client';
-
-import { useState, useEffect } from 'react';
-import AdminDashboard from '@/components/AdminDashboard';
 import AdminAuth from '@/components/AdminAuth';
+
+    { locale: 'ar' }
 
 interface AdminUser {
   id: string;
@@ -11,7 +10,6 @@ interface AdminUser {
   role: string;
   lastLogin: Date;
   permissions: string[];
-}
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -25,17 +23,16 @@ export default function AdminPage() {
         const session = JSON.parse(sessionData);
         const now = new Date();
         const expires = new Date(session.expires);
-        
+
         if (now < expires) {
           setAdminUser(session.user);
           setIsAuthenticated(true);
         } else {
           sessionStorage.removeItem('adminSession');
-        }
+
       } catch (error) {
         sessionStorage.removeItem('adminSession');
-      }
-    }
+
   }, []);
 
   const handleAuthSuccess = (user: AdminUser) => {
@@ -51,7 +48,6 @@ export default function AdminPage() {
 
   if (!isAuthenticated) {
     return <AdminAuth onAuthSuccess={handleAuthSuccess} />;
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -84,4 +80,3 @@ export default function AdminPage() {
       <AdminDashboard user={adminUser} onLogout={handleLogout} />
     </div>
   );
-}

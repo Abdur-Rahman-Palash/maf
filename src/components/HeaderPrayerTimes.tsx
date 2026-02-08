@@ -209,11 +209,11 @@ const HeaderPrayerTimes: React.FC = () => {
   // Prayer names in different languages
   const prayerNames = {
     en: {
-      fajr: 'FAJR<br/>(صلاة الصبح)',
-      zuhr: 'DHUHR<br/>(صلاة الظهر)', 
-      asr: 'ASR<br/>(صلاة العصر)',
-      maghrib: 'MAGHRIB<br/>(صلاة المغرب)',
-      isha: 'ISHA<br/>(صلاة العشاء)',
+      fajr: 'FAJR<br/>الفجر',
+      zuhr: 'DHUHR<br/>الظهر', 
+      asr: 'ASR<br/>العصر',
+      maghrib: 'MAGHRIB<br/>المغرب',
+      isha: 'ISHA<br/>العشاء',
       jamaat: "JAMA'AT",
       begins: 'BEGINS',
       juma: "JUMU'AH",
@@ -324,6 +324,18 @@ const HeaderPrayerTimes: React.FC = () => {
   }, []);
 
   const names = prayerNames[locale as keyof typeof prayerNames] || prayerNames.en;
+
+  // Helper function to get prayer name with proper mapping
+  const getPrayerName = (prayer: string) => {
+    switch (prayer.toLowerCase()) {
+      case 'dhuhr': return names.zuhr;
+      case 'fajr': return names.fajr;
+      case 'asr': return names.asr;
+      case 'maghrib': return names.maghrib;
+      case 'isha': return names.isha;
+      default: return prayer.toUpperCase();
+    }
+  };
 
   return (
     <div className="w-full relative overflow-hidden bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 border-b border-purple-300 shadow-2xl">
@@ -485,17 +497,17 @@ const HeaderPrayerTimes: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <div className="hidden lg:block text-gray-900 font-bold text-lg lg:text-xl bg-white/80 backdrop-blur-md px-6 py-3 rounded-xl shadow-2xl border border-purple-200" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+            <div className="hidden lg:block text-gray-900 font-bold text-lg lg:text-xl bg-white/80 backdrop-blur-md px-6 py-3 rounded-xl shadow-2xl border border-blue-200" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
               {currentDate.english} · {currentDate.hijri}
             </div>
-            <div className="text-gray-900 text-base lg:text-lg bg-gradient-to-r from-purple-100 to-pink-100 px-6 py-4 rounded-xl border-2 border-purple-300 shadow-lg" style={{ textTransform: locale === 'ar' ? 'none' : 'uppercase', fontWeight: 700 }}>
+            <div className="text-gray-900 text-base lg:text-lg bg-gradient-to-r from-blue-100 to-green-100 px-6 py-4 rounded-xl border-2 border-blue-300 shadow-lg" style={{ textTransform: locale === 'ar' ? 'none' : 'uppercase', fontWeight: 700 }}>
               <motion.a 
                 href="/worshippers/prayer-timings" 
-                className="hover:text-purple-700 transition-all duration-300 mr-3 inline-block group"
+                className="hover:text-blue-700 transition-all duration-300 mr-3 inline-block group"
                 whileHover={{ y: -3, scale: 1.08 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <span className="group-hover:text-purple-700 group-hover:drop-shadow-2xl transition-all duration-300 text-lg lg:text-xl font-bold">
+                <span className="group-hover:text-blue-700 group-hover:drop-shadow-2xl transition-all duration-300 text-lg lg:text-xl font-bold">
                   {locale === 'ar' ? 'الجمعة ١٣:٣٠' : 'JUMU\'AH  - 13:30'}
                 </span>
               </motion.a>
@@ -503,9 +515,9 @@ const HeaderPrayerTimes: React.FC = () => {
               <motion.div whileHover={{ y: -3, scale: 1.08 }} whileTap={{ scale: 0.95 }} className="inline-block">
                 <Link
                   href="/worshippers/prayer-timings" 
-                  className="hover:text-purple-700 transition-all duration-300 ml-3 inline-block group"
+                  className="hover:text-blue-700 transition-all duration-300 ml-3 inline-block group"
                 >
-                  <span className="group-hover:text-purple-700 group-hover:drop-shadow-2xl transition-all duration-300 text-lg lg:text-xl font-bold" dangerouslySetInnerHTML={{ __html: names.prayerTimes }}></span>
+                  <span className="group-hover:text-blue-700 group-hover:drop-shadow-2xl transition-all duration-300 text-lg lg:text-xl font-bold" dangerouslySetInnerHTML={{ __html: names.prayerTimes }}></span>
                 </Link>
               </motion.div>
             </div>
@@ -513,7 +525,7 @@ const HeaderPrayerTimes: React.FC = () => {
 
           {/* Right Column - Prayer Times Table */}
           <motion.div 
-            className="bg-gradient-to-br from-white via-purple-50/60 to-pink-50/60 border border-purple-300 lg:border-l lg:border-r lg:pl-6 lg:pr-6 rounded-xl lg:rounded-l-none lg:rounded-r-none shadow-2xl backdrop-blur-md"
+            className="bg-gradient-to-br from-blue-50 via-green-50/60 to-amber-50/60 border border-blue-300 lg:border-l lg:border-r lg:pl-6 lg:pr-6 rounded-xl lg:rounded-l-none lg:rounded-r-none shadow-2xl backdrop-blur-md"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
@@ -522,7 +534,7 @@ const HeaderPrayerTimes: React.FC = () => {
             <div className="lg:hidden">
               {loading ? (
                 <div className="flex justify-center items-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                   <span className="ml-3 text-gray-600">Loading prayer times...</span>
                 </div>
               ) : (
@@ -530,29 +542,29 @@ const HeaderPrayerTimes: React.FC = () => {
                   {(['fajr', 'Dhuhr', 'asr', 'maghrib', 'isha'] as const).map((prayer, index) => (
                     <motion.div 
                       key={prayer} 
-                      className="flex justify-between items-center bg-white rounded-lg shadow-md border border-purple-200 p-3 hover:shadow-lg transition-all duration-300"
+                      className="flex justify-between items-center bg-white rounded-lg shadow-md border border-blue-200 p-3 hover:shadow-lg transition-all duration-300"
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
                     >
                       <div className="flex items-center space-x-3">
                         <motion.span 
-                          className="text-xs font-semibold text-pink-700 bg-pink-100 px-2 py-1 rounded-md"
+                          className="text-xs font-semibold text-amber-700 bg-amber-100 px-2 py-1 rounded-md"
                           whileHover={{ scale: 1.05 }}
                           transition={{ duration: 0.2 }}
                           dangerouslySetInnerHTML={{ __html: names.begins }}
                         ></motion.span>
                         <motion.span 
-                          className="text-sm font-bold text-gray-900 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"
+                          className="text-sm font-bold text-gray-900 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent"
                           whileHover={{ scale: 1.05 }}
                           transition={{ duration: 0.2 }}
                           dangerouslySetInnerHTML={{ 
-                            __html: prayer === 'Dhuhr' ? names.zuhr : (names as any)[prayer.toLowerCase()] 
+                            __html: getPrayerName(prayer)
                           }}
                         ></motion.span>
                       </div>
                       <motion.span 
-                        className="text-base font-bold text-gray-900 hover:text-pink-600 transition-all duration-300 cursor-pointer"
+                        className="text-base font-bold text-gray-900 hover:text-amber-600 transition-all duration-300 cursor-pointer"
                         whileHover={{ y: -2, scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
@@ -568,21 +580,21 @@ const HeaderPrayerTimes: React.FC = () => {
             <div className="hidden lg:block">
               {loading ? (
                 <div className="flex justify-center items-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                   <span className="ml-3 text-gray-600">Loading prayer times...</span>
                 </div>
               ) : (
                 <div className="grid grid-cols-5 gap-4">
                   {(['fajr', 'Dhuhr', 'asr', 'maghrib', 'isha'] as const).map((prayer, index) => (
-                    <div key={prayer} className="bg-white rounded-xl shadow-lg border border-purple-200 p-4 hover:shadow-xl transition-all duration-300">
+                    <div key={prayer} className="bg-white rounded-xl shadow-lg border border-blue-200 p-4 hover:shadow-xl transition-all duration-300">
                       {/* Prayer Name */}
                       <div className="text-center mb-4">
                         <motion.span 
-                          className="text-sm font-bold text-gray-900 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent px-3 py-2 rounded-lg shadow-md"
+                          className="text-sm font-bold text-gray-900 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent px-3 py-2 rounded-lg shadow-md"
                           whileHover={{ scale: 1.05 }}
                           transition={{ duration: 0.2 }}
                           dangerouslySetInnerHTML={{ 
-                            __html: prayer === 'Dhuhr' ? names.zuhr : (names as any)[prayer.toLowerCase()] 
+                            __html: getPrayerName(prayer)
                           }}
                         ></motion.span>
                       </div>
@@ -590,7 +602,7 @@ const HeaderPrayerTimes: React.FC = () => {
                       {/* Adhan Time Only */}
                       <div className="text-center">
                         <motion.span 
-                          className="text-xs font-semibold text-pink-700 bg-pink-100 px-2 py-1 rounded-md"
+                          className="text-xs font-semibold text-amber-700 bg-amber-100 px-2 py-1 rounded-md"
                           whileHover={{ scale: 1.05 }}
                           transition={{ duration: 0.2 }}
                           dangerouslySetInnerHTML={{ __html: names.begins }}
@@ -602,7 +614,7 @@ const HeaderPrayerTimes: React.FC = () => {
                           className="mt-2"
                         >
                           <motion.span 
-                            className="text-2xl font-bold text-gray-900 hover:text-pink-600 transition-all duration-300 cursor-pointer"
+                            className="text-2xl font-bold text-gray-900 hover:text-amber-600 transition-all duration-300 cursor-pointer"
                             whileHover={{ y: -2, scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                           >

@@ -1,7 +1,7 @@
 'use client';
-
-import { motion } from 'framer-motion';
 import { FaCalendarAlt, FaUsers, FaHome, FaPhone } from 'react-icons/fa';
+
+    { locale: 'ar' }
 
 export default function GeneralEvents() {
   return (
@@ -139,4 +139,3 @@ export default function GeneralEvents() {
       </div>
     </div>
   );
-}
