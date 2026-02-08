@@ -6,7 +6,6 @@ export async function GET(request: Request) {
       'https://api.aladhan.com/v1/timingsByCity?city=Atlanta&country=US&method=2',
       {
         headers: {
-          'Origin': 'https://maf-wqvi.vercel.app',
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         },
         cache: 'no-store'
