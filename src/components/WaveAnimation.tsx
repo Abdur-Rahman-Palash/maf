@@ -25,10 +25,9 @@ const WaveAnimation: React.FC<WaveAnimationProps> = ({
     if (!svg) return;
 
     const paths = svg.querySelectorAll('path');
-    let offset = 0;
 
     const animate = () => {
-      offset += speed;
+      animationRef.current = (animationRef.current || 0) + speed;
       
       paths.forEach((path, index) => {
         const d = path.getAttribute('d');
