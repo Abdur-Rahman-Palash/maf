@@ -1,29 +1,14 @@
-// Temporarily disabled middleware to fix Vercel deployment
-// import createMiddleware from 'next-intl/middleware';
+import createMiddleware from 'next-intl/middleware';
 
-// export default createMiddleware({
-//   // A list of all locales that are supported
-//   locales: ['en', 'ar'],
+export default createMiddleware({
+  // A list of all locales that are supported
+  locales: ['en', 'ar'],
 
-//   // Used when no locale matches
-//   defaultLocale: 'en'
-// });
-
-// export const config = {
-//   // Match only internationalized pathnames, exclude API routes
-//   matcher: [
-//     // Skip all internal paths (_next)
-//     '/((?!_next|api|_next/static|_next/image|favicon.ico).*)',
-//     // Enable middleware for all other paths
-//     '/((?!api|_next/static|_next/image|favicon.ico).*)'
-//   ]
-// };
-
-export default function middleware(request: Request) {
-  // Basic middleware without next-intl
-  return;
-}
+  // Used when no locale matches
+  defaultLocale: 'en'
+});
 
 export const config = {
-  matcher: []
+  // Match only internationalized pathnames, exclude API routes
+  matcher: ['/', '/(ar|en)/:path*', '/((?!api|_next/static|_next/image|favicon.ico).*)']
 };
