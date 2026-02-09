@@ -7,6 +7,105 @@ interface UltraPremiumInteractionsProps {
   children: React.ReactNode;
 }
 
+// Ripple effect component
+const RippleEffect = ({ x, y }: { x: number; y: number }) => (
+  <motion.div
+    className="fixed pointer-events-none z-50"
+    style={{
+      left: x,
+      top: y,
+      x: '-50%',
+      y: '-50%',
+    }}
+  >
+    <motion.div
+      className="w-2 h-2 bg-amber-400/60 rounded-full"
+      initial={{ scale: 0, opacity: 1 }}
+      animate={{
+        scale: [0, 20, 40],
+        opacity: [1, 0.5, 0],
+      }}
+      transition={{
+        duration: 1,
+        ease: "easeOut"
+      }}
+    />
+    <motion.div
+      className="absolute inset-0 w-2 h-2 bg-blue-400/40 rounded-full"
+      initial={{ scale: 0, opacity: 1 }}
+      animate={{
+        scale: [0, 15, 30],
+        opacity: [1, 0.6, 0],
+      }}
+      transition={{
+        duration: 1.2,
+        ease: "easeOut",
+        delay: 0.1
+      }}
+    />
+  </motion.div>
+);
+
+// Cursor glow effect
+const CursorGlow = ({ mouseX, mouseY }: { mouseX: number; mouseY: number }) => (
+  <motion.div
+    className="fixed pointer-events-none z-40"
+    style={{
+      left: mouseX,
+      top: mouseY,
+      x: '-50%',
+      y: '-50%',
+    }}
+  >
+    <motion.div
+      className="w-8 h-8 rounded-full bg-gradient-radial from-amber-400/20 via-blue-400/10 to-transparent blur-sm"
+      animate={{
+        scale: [1, 1.5, 1],
+        opacity: [0.3, 0.6, 0.3],
+      }}
+      transition={{
+        duration: 2,
+        repeat: 2,
+        ease: "easeInOut"
+      }}
+    />
+  </motion.div>
+);
+
+// Interactive element highlighting
+const ElementHighlight = ({ hoveredElement, containerRef }: { hoveredElement: HTMLElement | null; containerRef: React.RefObject<HTMLDivElement> }) => {
+  if (!hoveredElement) return null;
+
+  const rect = hoveredElement.getBoundingClientRect();
+  const containerRect = containerRef.current?.getBoundingClientRect();
+
+  if (!containerRect) return null;
+
+  const relativeX = rect.left - containerRect.left;
+  const relativeY = rect.top - containerRect.top;
+
+  return (
+    <motion.div
+      className="fixed pointer-events-none z-30 border-2 border-amber-400/50 rounded-lg"
+      style={{
+        left: relativeX,
+        top: relativeY,
+        width: rect.width,
+        height: rect.height,
+      }}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{
+        opacity: [0, 0.5, 0],
+        scale: [0.95, 1.02, 0.98],
+      }}
+      transition={{
+        duration: 0.6,
+        ease: "easeOut"
+      }}
+    />
+  );
+};
+
 export default function UltraPremiumInteractions({ children }: UltraPremiumInteractionsProps) {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [hoveredElement, setHoveredElement] = useState<HTMLElement | null>(null);
@@ -59,112 +158,13 @@ export default function UltraPremiumInteractions({ children }: UltraPremiumInter
   const magneticX = useSpring(mouseX, { stiffness: 150, damping: 15 });
   const magneticY = useSpring(mouseY, { stiffness: 150, damping: 15 });
 
-  // Ripple effect component
-  const RippleEffect = ({ x, y }: { x: number; y: number }) => (
-    <motion.div
-      className="fixed pointer-events-none z-50"
-      style={{
-        left: x,
-        top: y,
-        x: '-50%',
-        y: '-50%',
-      }}
-    >
-      <motion.div
-        className="w-2 h-2 bg-amber-400/60 rounded-full"
-        initial={{ scale: 0, opacity: 1 }}
-        animate={{
-          scale: [0, 20, 40],
-          opacity: [1, 0.5, 0],
-        }}
-        transition={{
-          duration: 1,
-          ease: "easeOut"
-        }}
-      />
-      <motion.div
-        className="absolute inset-0 w-2 h-2 bg-blue-400/40 rounded-full"
-        initial={{ scale: 0, opacity: 1 }}
-        animate={{
-          scale: [0, 15, 30],
-          opacity: [1, 0.6, 0],
-        }}
-        transition={{
-          duration: 1.2,
-          ease: "easeOut",
-          delay: 0.1
-        }}
-      />
-    </motion.div>
-  );
-
-  // Cursor glow effect
-  const CursorGlow = () => (
-    <motion.div
-      className="fixed pointer-events-none z-40"
-      style={{
-        left: mouseX,
-        top: mouseY,
-        x: '-50%',
-        y: '-50%',
-      }}
-    >
-      <motion.div
-        className="w-8 h-8 rounded-full bg-gradient-radial from-amber-400/20 via-blue-400/10 to-transparent blur-sm"
-        animate={{
-          scale: [1, 1.5, 1],
-          opacity: [0.3, 0.6, 0.3],
-        }}
-        transition={{
-          duration: 2,
-          repeat: 2,
-          ease: "easeInOut"
-        }}
-      />
-    </motion.div>
-  );
-
-  // Interactive element highlighting
-  const ElementHighlight = () => {
-    if (!hoveredElement) return null;
-
-    const rect = hoveredElement.getBoundingClientRect();
-    const containerRect = containerRef.current?.getBoundingClientRect();
-
-    if (!containerRect) return null;
-
-    const relativeX = rect.left - containerRect.left;
-    const relativeY = rect.top - containerRect.top;
-
-    return (
-      <motion.div
-        className="fixed pointer-events-none z-30 border-2 border-amber-400/50 rounded-lg"
-        style={{
-          left: relativeX,
-          top: relativeY,
-          width: rect.width,
-          height: rect.height,
-        }}
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{
-          opacity: [0, 0.5, 0],
-          scale: [0.95, 1.02, 0.98],
-        }}
-        transition={{
-          duration: 0.6,
-          ease: "easeOut"
-        }}
-      />
-    );
-  };
-
   return (
     <div ref={containerRef} className="relative">
       {children}
 
       {/* Advanced interaction effects */}
-      <CursorGlow />
-      <ElementHighlight />
+      <CursorGlow mouseX={mouseX} mouseY={mouseY} />
+      <ElementHighlight hoveredElement={hoveredElement} containerRef={containerRef} />
 
       {/* Magnetic field effect for buttons and links */}
       <motion.div

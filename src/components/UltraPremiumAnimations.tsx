@@ -7,6 +7,54 @@ interface UltraPremiumAnimationsProps {
   children: React.ReactNode;
 }
 
+// Ultra-premium floating particles with enhanced quantum effects
+const FloatingParticles = () => (
+  <div className="fixed inset-0 pointer-events-none overflow-hidden z-10">
+    {/* Quantum Golden particles with advanced physics */}
+    {[...Array(20)].map((_, i) => {
+      const seed = i * 47.3;
+      const left = ((seed * 7.1) % 100);
+      const top = ((seed * 11.7) % 100);
+      const duration = 25 + ((seed * 9) % 20);
+      const delay = ((seed * 3) % 8);
+      const size = 1.5 + ((seed * 2) % 4);
+      const opacity = 0.15 + ((seed * 7) % 8) / 10;
+      
+      return (
+        <motion.div
+          key={i}
+          className="absolute w-2 h-2 bg-gradient-to-r from-amber-400/60 to-yellow-400/40 rounded-full shadow-lg shadow-amber-400/30"
+          style={{
+            left: `${left}%`,
+            top: `${top}%`
+          }}
+          animate={{
+            x: [0, 100, 50, 0],
+            y: [0, 100, 50, 0],
+            scale: [0, 1.2, 1],
+            opacity: [opacity, opacity * 0.7, opacity * 1.3, 0],
+            rotate: [0, 360, 720, 1080],
+            filter: [
+              'blur(0.5px) hue-rotate(0deg)',
+              'blur(1px) hue-rotate(45deg)',
+              'blur(0.8px) hue-rotate(90deg)',
+              'blur(0.5px) hue-rotate(180deg)',
+              'blur(0.5px) hue-rotate(360deg)'
+            ],
+          }}
+          transition={{
+            duration,
+            repeat: 3,
+            delay,
+            ease: [0.25, 0.46, 0.45, 0.94],
+            times: [0, 0.2, 0.4, 0.7, 1]
+          }}
+        />
+      );
+    })}
+  </div>
+);
+
 export default function UltraPremiumAnimations({ children }: UltraPremiumAnimationsProps) {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [scrollY, setScrollY] = useState(0);
