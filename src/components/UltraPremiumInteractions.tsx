@@ -47,7 +47,7 @@ const RippleEffect = ({ x, y }: { x: number; y: number }) => (
 );
 
 // Cursor glow effect
-const CursorGlow = ({ mouseX, mouseY }: { mouseX: number; mouseY: number }) => (
+const CursorGlow = ({ mouseX, mouseY }: { mouseX: any; mouseY: any }) => (
   <motion.div
     className="fixed pointer-events-none z-40"
     style={{
@@ -121,8 +121,10 @@ export default function UltraPremiumInteractions({ children }: UltraPremiumInter
         const rect = containerRef.current.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        mouseX.set(x);
-        mouseY.set(y);
+        // @ts-ignore
+        (mouseX as any).set(x * 20);
+        // @ts-ignore
+        (mouseY as any).set(y * 20);
         setMousePosition({ x, y });
       }
     };
