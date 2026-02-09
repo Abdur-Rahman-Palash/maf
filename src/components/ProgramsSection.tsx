@@ -32,60 +32,60 @@ const ProgramsSection = () => {
 
   const programs = [
     {
-      title: 'Hijri Calendar',
+      title: 'General Events',
       icon: FaCalendarAlt,
-      description: 'Islamic lunar calendar with important dates and events',
-      href: '/programs/hijri-calendar',
+      description: 'Community events and gatherings',
+      href: '/services/general-events',
       color: 'from-blue-500 to-blue-600'
     },
     {
-      title: 'The month of Ramadan',
-      icon: FaMoon,
-      description: 'Ramadan 1446/2025 schedule, programs, and activities',
-      href: '/worshippers/ramadan',
-      color: 'from-purple-500 to-purple-600'
-    },
-    {
-      title: 'Dhikr from the mosque',
-      icon: FaHands,
-      description: 'Daily remembrance and spiritual gatherings',
-      href: '/programs/dhikr',
-      color: 'from-green-500 to-green-600'
-    },
-    {
-      title: 'Names of Allah',
-      icon: FaHeart,
-      description: 'Learn and reflect on the 99 beautiful names of Allah',
-      href: '/programs/names-of-allah',
-      color: 'from-red-500 to-red-600'
-    },
-    {
-      title: 'Islamic Education',
+      title: 'Madrasa Classes',
       icon: FaBook,
-      description: 'Comprehensive Islamic education for all ages',
-      href: '/programs/education',
+      description: 'Islamic education for children and adults',
+      href: '/services/madrasa',
       color: 'from-indigo-500 to-indigo-600'
     },
     {
-      title: 'Community Services',
-      icon: FaHandsHelping,
-      description: 'Volunteer and community service opportunities',
-      href: '/programs/community',
-      color: 'from-pink-500 to-pink-600'
+      title: 'Meet with Imam',
+      icon: FaUser,
+      description: 'Schedule appointments with the Imam',
+      href: '/services/meet-imam',
+      color: 'from-green-500 to-green-600'
     },
     {
-      title: 'Youth Programs',
-      icon: FaUser,
-      description: 'Special programs for youth and young adults',
-      href: '/programs/youth',
-      color: 'from-yellow-500 to-yellow-600'
+      title: 'Nikah Services',
+      icon: FaHeart,
+      description: 'Islamic marriage ceremonies and counseling',
+      href: '/services/nikahs',
+      color: 'from-red-500 to-red-600'
+    },
+    {
+      title: 'Shahada Services',
+      icon: FaHands,
+      description: 'Support for new Muslims and shahada ceremonies',
+      href: '/services/shahadas',
+      color: 'from-purple-500 to-purple-600'
     },
     {
       title: 'Family Counseling',
       icon: FaHeart,
       description: 'Family and marriage counseling services',
-      href: '/programs/counseling',
+      href: '/services/meet-imam',
       color: 'from-teal-500 to-teal-600'
+    },
+    {
+      title: 'Youth Programs',
+      icon: FaUser,
+      description: 'Special programs for youth and young adults',
+      href: '/services/madrasa',
+      color: 'from-yellow-500 to-yellow-600'
+    },
+    {
+      title: 'Community Services',
+      icon: FaHandsHelping,
+      description: 'Volunteer and community service opportunities',
+      href: '/services/general-events',
+      color: 'from-pink-500 to-pink-600'
     }
   ];
 
@@ -125,25 +125,32 @@ const ProgramsSection = () => {
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Floating Particles */}
         <div className="absolute top-0 left-0 w-full h-full">
-          {[...Array(25)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-2 h-2 bg-gradient-to-r from-blue-400/25 to-indigo-400/30 rounded-full"
-              animate={{
-                x: [0, 100, 50, 0],
-                y: [Math.random() * 100, Math.random() * 100, Math.random() * 100, Math.random() * 100],
-              }}
-              transition={{
-                duration: 9 + Math.random() * 18,
-                repeat: Infinity,
-                ease: "linear"
-              }}
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-            />
-          ))}
+          {[...Array(25)].map((_, i) => {
+            const seed = i * 137.5;
+            const left = (seed * 9.7) % 100;
+            const top = (seed * 13.3) % 100;
+            const duration = 9 + ((seed * 7.1) % 18);
+            
+            return (
+              <motion.div
+                key={i}
+                className="absolute w-2 h-2 bg-gradient-to-r from-blue-400/25 to-indigo-400/30 rounded-full"
+                animate={{
+                  x: [0, 100, 50, 0],
+                  y: [0, 30, 70, 0],
+                }}
+                transition={{
+                  duration,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
+                style={{
+                  left: `${left}%`,
+                  top: `${top}%`,
+                }}
+              />
+            );
+          })}
         </div>
         
         {/* Gradient Wave Animation */}
@@ -523,7 +530,7 @@ const ProgramsSection = () => {
             transition={{ delay: 0.4 }}
           >
             <Link
-              href="/programs"
+              href="/services"
               className="inline-flex items-center bg-blue-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-blue-700 transition-colors duration-300"
             >
               View All Programs

@@ -388,25 +388,33 @@ const HeaderPrayerTimes: React.FC = () => {
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Floating Particles */}
         <div className="absolute top-0 left-0 w-full h-full">
-          {[...Array(25)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-2 h-2 bg-gradient-to-r from-purple-400/30 to-pink-400/30 rounded-full"
-              animate={{
-                x: [0, 100, 50, 0],
-                y: [Math.random() * 100, Math.random() * 100, Math.random() * 100, Math.random() * 100],
-              }}
-              transition={{
-                duration: 8 + Math.random() * 15,
-                repeat: Infinity,
-                ease: "linear"
-              }}
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-            />
-          ))}
+          {[...Array(25)].map((_, i) => {
+            // Use deterministic values based on index to avoid hydration mismatch
+            const seed = i * 137.5; // Prime number for better distribution
+            const left = ((seed * 9.7) % 100);
+            const top = ((seed * 13.3) % 100);
+            const duration = 8 + ((seed * 7.1) % 15);
+            
+            return (
+              <motion.div
+                key={i}
+                className="absolute w-2 h-2 bg-gradient-to-r from-purple-400/30 to-pink-400/30 rounded-full"
+                animate={{
+                  x: [0, 100, 50, 0],
+                  y: [0, 30, 70, 0],
+                }}
+                transition={{
+                  duration,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
+                style={{
+                  left: `${left}%`,
+                  top: `${top}%`,
+                }}
+              />
+            );
+          })}
         </div>
         
         {/* Gradient Wave Animation */}
