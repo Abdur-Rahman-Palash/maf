@@ -10,5 +10,10 @@ export default createMiddleware({
 
 export const config = {
   // Match only internationalized pathnames, exclude API routes
-  matcher: ['/', '/(ar|en)/:path*', '/((?!api|_next/static|_next/image|favicon.ico).*)']
+  matcher: [
+    // Skip all internal paths (_next)
+    '/((?!_next|api|_next/static|_next/image|favicon.ico).*)',
+    // Enable middleware for all other paths
+    '/((?!api|_next/static|_next/image|favicon.ico).*)'
+  ]
 };
