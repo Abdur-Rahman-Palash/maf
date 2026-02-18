@@ -9,6 +9,8 @@ import Services from '@/components/Services';
 import MosqueMap from '@/components/MosqueMap';
 import QuranSection from '@/components/QuranSection';
 import SermonStreaming from '@/components/SermonStreaming';
+import DynamicEvents from '@/components/DynamicEvents';
+import DynamicDonations from '@/components/DynamicDonations';
 
 export default function Home() {
   return (
@@ -22,8 +24,14 @@ export default function Home() {
             <div id="hero">
               <Hero />
             </div>
+            <div id="dynamic-events">
+              <DynamicEvents />
+            </div>
             <div id="sermons">
               <SermonStreaming />
+            </div>
+            <div id="dynamic-donations">
+              <DynamicDonations />
             </div>
             <div id="programs">
               <ProgramsSection />
