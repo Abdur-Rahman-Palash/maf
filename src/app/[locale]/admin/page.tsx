@@ -1,11 +1,16 @@
 'use client';
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { useLocale } from 'next-intl';
 import AdminAuth from '@/components/AdminAuth';
 import { getDashboardStats, initializeSampleData } from '@/lib/crudOperations';
 import EventManager from '@/components/admin/EventManager';
 import MemberManager from '@/components/admin/MemberManager';
 import DonationManager from '@/components/admin/DonationManager';
 import ContentManager from '@/components/admin/ContentManager';
+import QuranAyahManager from '@/components/admin/QuranAyahManager';
+import ServiceManager from '@/components/admin/ServiceManager';
+import MediaManager from '@/components/admin/MediaManager';
 import RealTimeSync from '@/components/admin/RealTimeSync';
 import { 
   FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaBell, FaMosque, 
@@ -13,7 +18,8 @@ import {
   FaEdit, FaTrash, FaPlus, FaDownload, FaUpload, FaSignOutAlt,
   FaUserCheck, FaUserTimes, FaEnvelope, FaFileAlt, FaImage,
   FaVideo, FaMicrophone, FaNewspaper, FaHandsHelping, FaPray,
-  FaGraduationCap, FaCheck, FaMapMarkerAlt, FaUser, FaPlay
+  FaGraduationCap, FaCheck, FaMapMarkerAlt, FaUser, FaPlay,
+  FaQuran
 } from 'react-icons/fa';
 
 interface AdminUser {
@@ -26,9 +32,11 @@ interface AdminUser {
 }
 
 export default function AdminPage() {
+  const router = useRouter();
+  const locale = useLocale();
+  console.log('AdminPage: Current locale:', locale);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
-  const [activeTab, setActiveTab] = useState('overview');
   const [stats, setStats] = useState({
     totalEvents: 0,
     upcomingEvents: 0,
@@ -86,128 +94,19 @@ export default function AdminPage() {
     setStats(dashboardStats);
   };
 
+  const handleNavigation = (path: string) => {
+    console.log('AdminPage: Navigating to:', `/${locale}${path}`);
+    router.push(`/${locale}${path}`);
+  };
+
   if (!isAuthenticated) {
     return <AdminAuth onAuthSuccess={handleAuthSuccess} />;
   }
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'events':
-        return <EventManager />;
-      case 'members':
-        return <MemberManager />;
-      case 'donations':
-        return <DonationManager />;
-      case 'content':
-        return <ContentManager />;
-      default:
-        return (
-          <div className="space-y-6">
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Total Events</p>
-                    <p className="text-2xl font-bold text-gray-900">{stats.totalEvents}</p>
-                    <p className="text-xs text-gray-500">{stats.upcomingEvents} upcoming</p>
-                  </div>
-                  <FaCalendarAlt className="text-3xl text-blue-500" />
-                </div>
-              </div>
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Total Members</p>
-                    <p className="text-2xl font-bold text-gray-900">{stats.totalMembers}</p>
-                    <p className="text-xs text-gray-500">{stats.activeMembers} active</p>
-                  </div>
-                  <FaUsers className="text-3xl text-green-500" />
-                </div>
-              </div>
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Total Donations</p>
-                    <p className="text-2xl font-bold text-gray-900">{stats.totalDonations}</p>
-                    <p className="text-xs text-gray-500">${stats.monthlyDonations.toLocaleString()} this month</p>
-                  </div>
-                  <FaDonate className="text-3xl text-purple-500" />
-                </div>
-              </div>
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Content</p>
-                    <p className="text-2xl font-bold text-gray-900">{stats.totalContent}</p>
-                    <p className="text-xs text-gray-500">{stats.publishedContent} published</p>
-                  </div>
-                  <FaBook className="text-3xl text-orange-500" />
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button
-                  onClick={() => setActiveTab('events')}
-                  className="flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  <FaPlus /> Add New Event
-                </button>
-                <button
-                  onClick={() => setActiveTab('members')}
-                  className="flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                >
-                  <FaUsers /> Add Member
-                </button>
-                <button
-                  onClick={() => setActiveTab('donations')}
-                  className="flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-                >
-                  <FaDonate /> Record Donation
-                </button>
-              </div>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Activity</h2>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between py-2 border-b border-gray-200">
-                  <div>
-                    <p className="text-gray-900 font-medium">System initialized successfully</p>
-                    <p className="text-gray-600 text-sm">Just now</p>
-                  </div>
-                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Success</span>
-                </div>
-                <div className="flex items-center justify-between py-2 border-b border-gray-200">
-                  <div>
-                    <p className="text-gray-900 font-medium">Sample data loaded</p>
-                    <p className="text-gray-600 text-sm">Just now</p>
-                  </div>
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Setup</span>
-                </div>
-                <div className="flex items-center justify-between py-2">
-                  <div>
-                    <p className="text-gray-900 font-medium">Admin dashboard ready</p>
-                    <p className="text-gray-600 text-sm">Just now</p>
-                  </div>
-                  <span className="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Ready</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Admin Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
@@ -229,74 +128,172 @@ export default function AdminPage() {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Navigation Tabs */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex space-x-8">
-            <button
-              onClick={() => setActiveTab('overview')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'overview'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              <FaChartBar className="inline mr-2" />
-              Overview
-            </button>
-            <button
-              onClick={() => setActiveTab('events')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'events'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              <FaCalendarAlt className="inline mr-2" />
-              Events
-            </button>
-            <button
-              onClick={() => setActiveTab('members')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'members'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              <FaUsers className="inline mr-2" />
-              Members
-            </button>
-            <button
-              onClick={() => setActiveTab('donations')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'donations'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              <FaDonate className="inline mr-2" />
-              Donations
-            </button>
-            <button
-              onClick={() => setActiveTab('content')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'content'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              <FaBook className="inline mr-2" />
-              Content
-            </button>
-          </nav>
+        {/* Navigation Tabs */}
+        <div className="bg-gray-50 border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav className="flex space-x-8 overflow-x-auto">
+              <button
+                onClick={() => handleNavigation('/admin')}
+                className="py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap border-blue-500 text-blue-600"
+              >
+                <FaChartBar className="inline mr-2" />
+                Overview
+              </button>
+              <button
+                onClick={() => handleNavigation('/admin/events')}
+                className="py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              >
+                <FaCalendarAlt className="inline mr-2" />
+                Events
+              </button>
+              <button
+                onClick={() => handleNavigation('/admin/members')}
+                className="py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              >
+                <FaUsers className="inline mr-2" />
+                Members
+              </button>
+              <button
+                onClick={() => handleNavigation('/admin/donations')}
+                className="py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              >
+                <FaDonate className="inline mr-2" />
+                Donations
+              </button>
+              <button
+                onClick={() => handleNavigation('/admin/content')}
+                className="py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              >
+                <FaBook className="inline mr-2" />
+                Content
+              </button>
+              <button
+                onClick={() => handleNavigation('/admin/quran')}
+                className="py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              >
+                <FaQuran className="inline mr-2" />
+                Quran Ayahs
+              </button>
+              <button
+                onClick={() => handleNavigation('/admin/services')}
+                className="py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              >
+                <FaMosque className="inline mr-2" />
+                Services
+              </button>
+              <button
+                onClick={() => handleNavigation('/admin/media')}
+                className="py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              >
+                <FaImage className="inline mr-2" />
+                Media
+              </button>
+            </nav>
+          </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {renderContent()}
+        <div className="space-y-6">
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Total Events</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.totalEvents}</p>
+                  <p className="text-xs text-gray-500">{stats.upcomingEvents} upcoming</p>
+                </div>
+                <FaCalendarAlt className="text-3xl text-blue-500" />
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Total Members</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.totalMembers}</p>
+                  <p className="text-xs text-gray-500">{stats.activeMembers} active</p>
+                </div>
+                <FaUsers className="text-3xl text-green-500" />
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Total Donations</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.totalDonations}</p>
+                  <p className="text-xs text-gray-500">${stats.monthlyDonations.toLocaleString()} this month</p>
+                </div>
+                <FaDonate className="text-3xl text-purple-500" />
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Content</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.totalContent}</p>
+                  <p className="text-xs text-gray-500">{stats.publishedContent} published</p>
+                </div>
+                <FaBook className="text-3xl text-orange-500" />
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <button
+                onClick={() => handleNavigation('/admin/events')}
+                className="flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <FaPlus /> Add New Event
+              </button>
+              <button
+                onClick={() => handleNavigation('/admin/members')}
+                className="flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              >
+                <FaUsers /> Add Member
+              </button>
+              <button
+                onClick={() => handleNavigation('/admin/donations')}
+                className="flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                <FaDonate /> Record Donation
+              </button>
+            </div>
+          </div>
+
+          {/* Recent Activity */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Activity</h2>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between py-2 border-b border-gray-200">
+                <div>
+                  <p className="text-gray-900 font-medium">System initialized successfully</p>
+                  <p className="text-gray-600 text-sm">Just now</p>
+                </div>
+                <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Success</span>
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-gray-200">
+                <div>
+                  <p className="text-gray-900 font-medium">Sample data loaded</p>
+                  <p className="text-gray-600 text-sm">Just now</p>
+                </div>
+                <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Setup</span>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <div>
+                  <p className="text-gray-900 font-medium">Admin dashboard ready</p>
+                  <p className="text-gray-600 text-sm">Just now</p>
+                </div>
+                <span className="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Ready</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Real-time Sync Indicator */}

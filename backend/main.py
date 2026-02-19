@@ -14,6 +14,7 @@ from schemas import (
     Event, EventCreate, EventUpdate,
     Donation, DonationCreate, DonationUpdate,
     Content, ContentCreate, ContentUpdate,
+    QuranAyah, QuranAyahCreate, QuranAyahUpdate,
     Token
 )
 import crud
@@ -239,6 +240,47 @@ def delete_content(content_id: int, db: Session = Depends(get_db)):
     if not success:
         raise HTTPException(status_code=404, detail="Content not found")
     return {"message": "Content deleted successfully"}
+
+# Quran Ayah endpoints
+@app.get("/quran-ayahs", response_model=List[QuranAyah])
+def read_quran_ayahs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    ayahs = crud.get_quran_ayahs(db, skip=skip, limit=limit)
+    return ayahs
+
+@app.post("/quran-ayahs", response_model=QuranAyah)
+def create_quran_ayah(ayah: QuranAyahCreate, db: Session = Depends(get_db)):
+    return crud.create_quran_ayah(db=db, ayah=ayah)
+
+@app.get("/quran-ayahs/search")
+def search_quran_ayahs(q: str, db: Session = Depends(get_db)):
+    ayahs = crud.search_quran_ayahs(db, query=q)
+    return ayahs
+
+@app.get("/quran-ayahs/surah/{surah_number}", response_model=List[QuranAyah])
+def read_quran_ayahs_by_surah(surah_number: int, db: Session = Depends(get_db)):
+    ayahs = crud.get_quran_ayahs_by_surah(db, surah_number=surah_number)
+    return ayahs
+
+@app.get("/quran-ayahs/{ayah_id}", response_model=QuranAyah)
+def read_quran_ayah(ayah_id: int, db: Session = Depends(get_db)):
+    db_ayah = crud.get_quran_ayah(db, ayah_id=ayah_id)
+    if db_ayah is None:
+        raise HTTPException(status_code=404, detail="Quran Ayah not found")
+    return db_ayah
+
+@app.put("/quran-ayahs/{ayah_id}", response_model=QuranAyah)
+def update_quran_ayah(ayah_id: int, ayah: QuranAyahUpdate, db: Session = Depends(get_db)):
+    db_ayah = crud.update_quran_ayah(db, ayah_id=ayah_id, ayah=ayah)
+    if db_ayah is None:
+        raise HTTPException(status_code=404, detail="Quran Ayah not found")
+    return db_ayah
+
+@app.delete("/quran-ayahs/{ayah_id}")
+def delete_quran_ayah(ayah_id: int, db: Session = Depends(get_db)):
+    success = crud.delete_quran_ayah(db, ayah_id=ayah_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Quran Ayah not found")
+    return {"message": "Quran Ayah deleted successfully"}
 
 # Statistics endpoint
 @app.get("/stats")

@@ -123,6 +123,99 @@ class Content(ContentBase):
     created_at: datetime
     updated_at: datetime
 
+# Quran Ayah Schemas
+class QuranAyahBase(BaseSchema):
+    surah_number: int
+    ayah_number: int
+    arabic_text: str
+    english_translation: str
+    bengali_translation: str
+    urdu_translation: Optional[str] = None
+    audio_url: Optional[str] = None
+    status: str = "active"
+
+class QuranAyahCreate(QuranAyahBase):
+    pass
+
+class QuranAyahUpdate(BaseSchema):
+    surah_number: Optional[int] = None
+    ayah_number: Optional[int] = None
+    arabic_text: Optional[str] = None
+    english_translation: Optional[str] = None
+    bengali_translation: Optional[str] = None
+    urdu_translation: Optional[str] = None
+    audio_url: Optional[str] = None
+    status: Optional[str] = None
+
+class QuranAyah(QuranAyahBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+# Service Schemas
+class ServiceBase(BaseSchema):
+    title: str
+    description: str
+    category: str  # prayer, education, community, welfare
+    icon: Optional[str] = None
+    image_url: Optional[str] = None
+    status: str = "active"
+    featured: bool = False
+    order_index: int = 0
+
+class ServiceCreate(ServiceBase):
+    pass
+
+class ServiceUpdate(BaseSchema):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    category: Optional[str] = None
+    icon: Optional[str] = None
+    image_url: Optional[str] = None
+    status: Optional[str] = None
+    featured: Optional[bool] = None
+    order_index: Optional[int] = None
+
+class Service(ServiceBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+# Media Schemas
+class MediaBase(BaseSchema):
+    title: str
+    description: Optional[str] = None
+    type: str  # image, video, audio, document
+    file_url: str
+    thumbnail_url: Optional[str] = None
+    category: str  # gallery, sermon, event, announcement
+    tags: Optional[List[str]] = []
+    file_size: Optional[int] = None
+    duration: Optional[str] = None
+    status: str = "active"
+    featured: bool = False
+
+class MediaCreate(MediaBase):
+    pass
+
+class MediaUpdate(BaseSchema):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    type: Optional[str] = None
+    file_url: Optional[str] = None
+    thumbnail_url: Optional[str] = None
+    category: Optional[str] = None
+    tags: Optional[List[str]] = None
+    file_size: Optional[int] = None
+    duration: Optional[str] = None
+    status: Optional[str] = None
+    featured: Optional[bool] = None
+
+class Media(MediaBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
 # Auth Schemas
 class Token(BaseSchema):
     access_token: str

@@ -4,8 +4,8 @@ from typing import List, Optional
 import json
 from datetime import datetime
 
-from database import User, Event, Donation, Content
-from schemas import UserCreate, UserUpdate, EventCreate, EventUpdate, DonationCreate, DonationUpdate, ContentCreate, ContentUpdate
+from database import User, Event, Donation, Content, QuranAyah, Service, Media
+from schemas import UserCreate, UserUpdate, EventCreate, EventUpdate, DonationCreate, DonationUpdate, ContentCreate, ContentUpdate, QuranAyahCreate, QuranAyahUpdate, ServiceCreate, ServiceUpdate, MediaCreate, MediaUpdate
 
 # User CRUD
 def get_user(db: Session, user_id: int) -> Optional[User]:
@@ -201,6 +201,164 @@ def delete_content(db: Session, content_id: int) -> bool:
     db_content = db.query(Content).filter(Content.id == content_id).first()
     if db_content:
         db.delete(db_content)
+        db.commit()
+        return True
+    return False
+
+# Quran Ayah CRUD
+def get_quran_ayah(db: Session, ayah_id: int) -> Optional[QuranAyah]:
+    return db.query(QuranAyah).filter(QuranAyah.id == ayah_id).first()
+
+def get_quran_ayahs(db: Session, skip: int = 0, limit: int = 100) -> List[QuranAyah]:
+    return db.query(QuranAyah).order_by(QuranAyah.surah_number, QuranAyah.ayah_number).offset(skip).limit(limit).all()
+
+def get_quran_ayahs_by_surah(db: Session, surah_number: int) -> List[QuranAyah]:
+    return db.query(QuranAyah).filter(QuranAyah.surah_number == surah_number).order_by(QuranAyah.ayah_number).all()
+
+def search_quran_ayahs(db: Session, query: str, fields: List[str] = None) -> List[QuranAyah]:
+    if not fields:
+        fields = ['arabic_text', 'english_translation', 'bengali_translation', 'urdu_translation']
+    
+    filters = []
+    for field in fields:
+        if hasattr(QuranAyah, field):
+            filters.append(getattr(QuranAyah, field).ilike(f'%{query}%'))
+    
+    if filters:
+        return db.query(QuranAyah).filter(or_(*filters)).all()
+    return []
+
+def create_quran_ayah(db: Session, ayah: QuranAyahCreate) -> QuranAyah:
+    db_ayah = QuranAyah(**ayah.dict())
+    db.add(db_ayah)
+    db.commit()
+    db.refresh(db_ayah)
+    return db_ayah
+
+def update_quran_ayah(db: Session, ayah_id: int, ayah: QuranAyahUpdate) -> Optional[QuranAyah]:
+    db_ayah = db.query(QuranAyah).filter(QuranAyah.id == ayah_id).first()
+    if db_ayah:
+        update_data = ayah.dict(exclude_unset=True)
+        for field, value in update_data.items():
+            setattr(db_ayah, field, value)
+        
+        db_ayah.updated_at = datetime.utcnow()
+        db.commit()
+        db.refresh(db_ayah)
+    return db_ayah
+
+def delete_quran_ayah(db: Session, ayah_id: int) -> bool:
+    db_ayah = db.query(QuranAyah).filter(QuranAyah.id == ayah_id).first()
+    if db_ayah:
+        db.delete(db_ayah)
+        db.commit()
+        return True
+    return False
+
+# Service CRUD
+def get_service(db: Session, service_id: int) -> Optional[Service]:
+    return db.query(Service).filter(Service.id == service_id).first()
+
+def get_services(db: Session, skip: int = 0, limit: int = 100) -> List[Service]:
+    return db.query(Service).order_by(Service.order_index, Service.created_at).offset(skip).limit(limit).all()
+
+def get_featured_services(db: Session) -> List[Service]:
+    return db.query(Service).filter(Service.featured == True, Service.status == "active").order_by(Service.order_index).all()
+
+def get_services_by_category(db: Session, category: str) -> List[Service]:
+    return db.query(Service).filter(Service.category == category, Service.status == "active").order_by(Service.order_index).all()
+
+def search_services(db: Session, query: str) -> List[Service]:
+    return db.query(Service).filter(
+        or_(
+            Service.title.ilike(f'%{query}%'),
+            Service.description.ilike(f'%{query}%'),
+            Service.category.ilike(f'%{query}%')
+        )
+    ).all()
+
+def create_service(db: Session, service: ServiceCreate) -> Service:
+    db_service = Service(**service.dict())
+    db.add(db_service)
+    db.commit()
+    db.refresh(db_service)
+    return db_service
+
+def update_service(db: Session, service_id: int, service: ServiceUpdate) -> Optional[Service]:
+    db_service = db.query(Service).filter(Service.id == service_id).first()
+    if db_service:
+        update_data = service.dict(exclude_unset=True)
+        for field, value in update_data.items():
+            setattr(db_service, field, value)
+        
+        db_service.updated_at = datetime.utcnow()
+        db.commit()
+        db.refresh(db_service)
+    return db_service
+
+def delete_service(db: Session, service_id: int) -> bool:
+    db_service = db.query(Service).filter(Service.id == service_id).first()
+    if db_service:
+        db.delete(db_service)
+        db.commit()
+        return True
+    return False
+
+# Media CRUD
+def get_media(db: Session, media_id: int) -> Optional[Media]:
+    return db.query(Media).filter(Media.id == media_id).first()
+
+def get_media_items(db: Session, skip: int = 0, limit: int = 100) -> List[Media]:
+    return db.query(Media).order_by(Media.created_at.desc()).offset(skip).limit(limit).all()
+
+def get_featured_media(db: Session) -> List[Media]:
+    return db.query(Media).filter(Media.featured == True, Media.status == "active").order_by(Media.created_at.desc()).all()
+
+def get_media_by_category(db: Session, category: str) -> List[Media]:
+    return db.query(Media).filter(Media.category == category, Media.status == "active").order_by(Media.created_at.desc()).all()
+
+def get_media_by_type(db: Session, media_type: str) -> List[Media]:
+    return db.query(Media).filter(Media.type == media_type, Media.status == "active").order_by(Media.created_at.desc()).all()
+
+def search_media(db: Session, query: str) -> List[Media]:
+    return db.query(Media).filter(
+        or_(
+            Media.title.ilike(f'%{query}%'),
+            Media.description.ilike(f'%{query}%'),
+            Media.category.ilike(f'%{query}%'),
+            Media.tags.ilike(f'%{query}%')
+        )
+    ).all()
+
+def create_media(db: Session, media: MediaCreate) -> Media:
+    db_media = Media(
+        **media.dict(),
+        tags=json.dumps(media.tags) if media.tags else None
+    )
+    db.add(db_media)
+    db.commit()
+    db.refresh(db_media)
+    return db_media
+
+def update_media(db: Session, media_id: int, media: MediaUpdate) -> Optional[Media]:
+    db_media = db.query(Media).filter(Media.id == media_id).first()
+    if db_media:
+        update_data = media.dict(exclude_unset=True)
+        if 'tags' in update_data:
+            update_data['tags'] = json.dumps(update_data['tags'])
+        
+        for field, value in update_data.items():
+            setattr(db_media, field, value)
+        
+        db_media.updated_at = datetime.utcnow()
+        db.commit()
+        db.refresh(db_media)
+    return db_media
+
+def delete_media(db: Session, media_id: int) -> bool:
+    db_media = db.query(Media).filter(Media.id == media_id).first()
+    if db_media:
+        db.delete(db_media)
         db.commit()
         return True
     return False

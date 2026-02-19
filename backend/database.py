@@ -83,6 +83,54 @@ class Content(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+class QuranAyah(Base):
+    __tablename__ = "quran_ayahs"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    surah_number = Column(Integer, nullable=False)
+    ayah_number = Column(Integer, nullable=False)
+    arabic_text = Column(Text, nullable=False)
+    english_translation = Column(Text, nullable=False)
+    bengali_translation = Column(Text, nullable=False)
+    urdu_translation = Column(Text)
+    audio_url = Column(String(500))
+    status = Column(String(20), default="active")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class Service(Base):
+    __tablename__ = "services"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(200), nullable=False)
+    description = Column(Text, nullable=False)
+    category = Column(String(50), nullable=False)  # prayer, education, community, welfare
+    icon = Column(String(100))  # icon name or URL
+    image_url = Column(String(500))
+    status = Column(String(20), default="active")
+    featured = Column(Boolean, default=False)
+    order_index = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class Media(Base):
+    __tablename__ = "media"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(200), nullable=False)
+    description = Column(Text)
+    type = Column(String(20), nullable=False)  # image, video, audio, document
+    file_url = Column(String(500), nullable=False)
+    thumbnail_url = Column(String(500))
+    category = Column(String(50), nullable=False)  # gallery, sermon, event, announcement
+    tags = Column(Text)  # JSON string
+    file_size = Column(Integer)  # in bytes
+    duration = Column(String(20))  # for video/audio
+    status = Column(String(20), default="active")
+    featured = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
 # Create tables
 def create_tables():
     Base.metadata.create_all(bind=engine)

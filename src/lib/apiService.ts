@@ -102,3 +102,60 @@ export const contentApi = {
     method: 'DELETE',
   }),
 };
+
+// Service API
+export const serviceApi = {
+  getAll: () => apiRequest<any[]>('/services'),
+  create: (service: any) => apiRequest<any>('/services', {
+    method: 'POST',
+    body: JSON.stringify(service),
+  }),
+  update: (id: string, service: any) => apiRequest<any>('/services', {
+    method: 'PUT',
+    body: JSON.stringify({ id, ...service }),
+  }),
+  delete: (id: string) => apiRequest<any>(`/services?id=${id}`, {
+    method: 'DELETE',
+  }),
+  getFeatured: () => apiRequest<any[]>('/services/featured'),
+  getByCategory: (category: string) => apiRequest<any[]>(`/services/category/${category}`),
+  search: (query: string) => apiRequest<any[]>(`/services/search?q=${query}`),
+};
+
+// Media API
+export const mediaApi = {
+  getAll: () => apiRequest<any[]>('/media'),
+  create: (media: any) => apiRequest<any>('/media', {
+    method: 'POST',
+    body: JSON.stringify(media),
+  }),
+  update: (id: string, media: any) => apiRequest<any>('/media', {
+    method: 'PUT',
+    body: JSON.stringify({ id, ...media }),
+  }),
+  delete: (id: string) => apiRequest<any>(`/media?id=${id}`, {
+    method: 'DELETE',
+  }),
+  getFeatured: () => apiRequest<any[]>('/media/featured'),
+  getByCategory: (category: string) => apiRequest<any[]>(`/media/category/${category}`),
+  getByType: (type: string) => apiRequest<any[]>(`/media/type/${type}`),
+  search: (query: string) => apiRequest<any[]>(`/media/search?q=${query}`),
+};
+
+// Quran Ayah API
+export const quranAyahApi = {
+  getAll: () => apiRequest<any[]>('/quran-ayahs'),
+  create: (ayah: any) => apiRequest<any>('/quran-ayahs', {
+    method: 'POST',
+    body: JSON.stringify(ayah),
+  }),
+  update: (id: string, ayah: any) => apiRequest<any>('/quran-ayahs', {
+    method: 'PUT',
+    body: JSON.stringify({ id, ...ayah }),
+  }),
+  delete: (id: string) => apiRequest<any>(`/quran-ayahs?id=${id}`, {
+    method: 'DELETE',
+  }),
+  getBySurah: (surahNumber: number) => apiRequest<any[]>(`/quran-ayahs/surah/${surahNumber}`),
+  search: (query: string) => apiRequest<any[]>(`/quran-ayahs/search?q=${query}`),
+};
