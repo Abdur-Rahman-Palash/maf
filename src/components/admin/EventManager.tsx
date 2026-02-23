@@ -9,6 +9,24 @@ import {
   FaMapMarkerAlt, FaUsers, FaClock, FaSave, FaTimes, FaEye
 } from 'react-icons/fa';
 
+// Body scroll lock utility
+const useBodyScrollLock = (isLocked: boolean) => {
+  useEffect(() => {
+    if (isLocked) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = '0px'; // Prevent layout shift
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    };
+  }, [isLocked]);
+};
+
 const EventManager: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
@@ -19,6 +37,10 @@ const EventManager: React.FC = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [formData, setFormData] = useState<Partial<Event>>({});
+
+  // Lock body scroll when any modal is open
+  const isAnyModalOpen = isCreateModalOpen || isEditModalOpen || isViewModalOpen;
+  useBodyScrollLock(isAnyModalOpen);
 
   useEffect(() => {
     initializeSampleData();
@@ -231,7 +253,7 @@ const EventManager: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-4 z-50 pt-20"
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -319,7 +341,7 @@ const EventManager: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-4 z-50 pt-20"
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -411,7 +433,7 @@ const EventManager: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-4 z-50 pt-20"
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}

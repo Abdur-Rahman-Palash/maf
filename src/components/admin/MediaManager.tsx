@@ -8,6 +8,24 @@ import {
   FaCalendar, FaClock, FaTag, FaDownload, FaStar
 } from 'react-icons/fa';
 
+// Body scroll lock utility
+const useBodyScrollLock = (isLocked: boolean) => {
+  useEffect(() => {
+    if (isLocked) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = '0px'; // Prevent layout shift
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    };
+  }, [isLocked]);
+};
+
 interface Media {
   id: string;
   title: string;
@@ -46,6 +64,10 @@ const MediaManager: React.FC = () => {
     status: 'active',
     featured: false
   });
+
+  // Lock body scroll when any modal is open
+  const isAnyModalOpen = isCreateModalOpen || isEditModalOpen || isViewModalOpen;
+  useBodyScrollLock(isAnyModalOpen);
 
   // Sample data for demonstration
   useEffect(() => {
@@ -458,7 +480,7 @@ const MediaManager: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center z-50 pt-20"
           >
             <motion.div
               initial={{ scale: 0.9 }}
@@ -602,7 +624,7 @@ const MediaManager: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center z-50 pt-20"
           >
             <motion.div
               initial={{ scale: 0.9 }}
@@ -741,7 +763,7 @@ const MediaManager: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center z-50 pt-20"
           >
             <motion.div
               initial={{ scale: 0.9 }}
