@@ -2,12 +2,48 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useDonations } from '@/hooks/useApiData';
-import { Donation } from '@/lib/crudOperations';
+import { eventSync, EVENT_TYPES } from '@/lib/eventSync';
 import { FaDonate, FaChartLine, FaUsers, FaBullseye } from 'react-icons/fa';
 
+interface Donation {
+  id: string;
+  donorName: string;
+  email: string;
+  phone: string;
+  amount: number;
+  type: string;
+  purpose: string;
+  notes: string;
+  date: string;
+  timestamp: string;
+}
+
 const DynamicDonations: React.FC = () => {
-  const { data: donations, loading, error } = useDonations();
+  const [donations, setDonations] = useState<Donation[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadDonations = () => {
+    try {
+      const storedDonations = JSON.parse(localStorage.getItem('donations') || '[]');
+      setDonations(storedDonations);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error loading donations:', error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // Initial load
+    loadDonations();
+
+    // Listen for real-time updates from admin dashboard
+    const unsubscribe = eventSync.subscribe(EVENT_TYPES.DONATIONS_UPDATED, loadDonations);
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   if (loading) {
     return (
@@ -17,31 +53,22 @@ const DynamicDonations: React.FC = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-red-600">Failed to load donation data. Please try again later.</p>
-      </div>
-    );
-  }
-
   // Calculate statistics
-  const completedDonations = (donations as Donation[]).filter(d => d.status === 'completed');
-  const totalAmount = completedDonations.reduce((sum, d) => sum + d.amount, 0);
-  const donorCount = new Set(completedDonations.map(d => d.email)).size;
+  const totalAmount = donations.reduce((sum, d) => sum + d.amount, 0);
+  const donorCount = new Set(donations.map(d => d.email)).size;
   
   // Monthly donations
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
-  const monthlyDonations = completedDonations.filter(d => {
+  const monthlyDonations = donations.filter(d => {
     const donationDate = new Date(d.date);
     return donationDate.getMonth() === currentMonth && donationDate.getFullYear() === currentYear;
   });
   const monthlyTotal = monthlyDonations.reduce((sum, d) => sum + d.amount, 0);
 
   // Recent donations
-  const recentDonations = completedDonations
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  const recentDonations = donations
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
     .slice(0, 5);
 
   return (
@@ -94,7 +121,7 @@ const DynamicDonations: React.FC = () => {
             className="bg-white rounded-lg shadow-lg p-6 text-center"
           >
             <FaBullseye className="text-4xl text-orange-500 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold text-gray-900">{completedDonations.length}</h3>
+            <h3 className="text-2xl font-bold text-gray-900">{donations.length}</h3>
             <p className="text-gray-600">Donations</p>
           </motion.div>
         </div>

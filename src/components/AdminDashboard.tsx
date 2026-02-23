@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { eventSync, EVENT_TYPES } from '@/lib/eventSync';
 import SermonStorage from '@/lib/sermonStorage';
 import EventStorage from '@/lib/eventStorage';
 import { 
@@ -95,6 +96,7 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
   const [showEditSermonModal, setShowEditSermonModal] = useState(false);
   const [selectedSermon, setSelectedSermon] = useState<any>(null);
   const [sermonFilter, setSermonFilter] = useState('all');
+  const [showAddDonationModal, setShowAddDonationModal] = useState(false);
   const [sermons, setSermons] = useState(SermonStorage.getSermons());
   const [contents, setContents] = useState([
     {
@@ -223,6 +225,8 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
     const event = EventStorage.addEvent(newEvent);
     setEvents(EventStorage.getEvents());
     setShowAddEventModal(false);
+    // Emit real-time sync event
+    eventSync.emit(EVENT_TYPES.EVENTS_UPDATED);
   };
 
   const handleEditEvent = (updatedEvent: any) => {
@@ -230,12 +234,16 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
     setEvents(EventStorage.getEvents());
     setShowEditEventModal(false);
     setSelectedEvent(null);
+    // Emit real-time sync event
+    eventSync.emit(EVENT_TYPES.EVENTS_UPDATED);
   };
 
   const handleDeleteEvent = (eventId: string | number) => {
     if (window.confirm('Are you sure you want to delete this event?')) {
       EventStorage.deleteEvent(eventId.toString());
       setEvents(EventStorage.getEvents());
+      // Emit real-time sync event
+      eventSync.emit(EVENT_TYPES.EVENTS_UPDATED);
     }
   };
 
@@ -303,6 +311,8 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
     });
     setSermons(SermonStorage.getSermons());
     setShowAddSermonModal(false);
+    // Emit real-time sync event
+    eventSync.emit(EVENT_TYPES.SERMONS_UPDATED);
   };
 
   const handleEditSermon = (updatedSermon: any) => {
@@ -310,12 +320,16 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
     setSermons(SermonStorage.getSermons());
     setShowEditSermonModal(false);
     setSelectedSermon(null);
+    // Emit real-time sync event
+    eventSync.emit(EVENT_TYPES.SERMONS_UPDATED);
   };
 
   const handleDeleteSermon = (sermonId: string | number) => {
     if (window.confirm('Are you sure you want to delete this sermon?')) {
       SermonStorage.deleteSermon(sermonId.toString());
       setSermons(SermonStorage.getSermons());
+      // Emit real-time sync event
+      eventSync.emit(EVENT_TYPES.SERMONS_UPDATED);
     }
   };
 
@@ -407,12 +421,32 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
       console.log('Sermon uploaded successfully:', sermon);
       console.log('=== UPLOAD COMPLETE ===');
       
+      // Emit real-time sync event for sermon upload
+      eventSync.emit(EVENT_TYPES.SERMONS_UPDATED);
+      
       // Show success message
       alert(`Sermon "${file.name}" uploaded successfully! It will appear in the homepage.`);
     } catch (error) {
       console.error('Error uploading sermon:', error);
       alert('Error uploading sermon. Please try again.');
     }
+  };
+
+  const handleAddDonation = (newDonation: any) => {
+    // Store donation in localStorage for now
+    const donations = JSON.parse(localStorage.getItem('donations') || '[]');
+    const donation = {
+      ...newDonation,
+      id: Date.now().toString(),
+      date: new Date().toISOString().split('T')[0],
+      timestamp: new Date().toISOString()
+    };
+    donations.push(donation);
+    localStorage.setItem('donations', JSON.stringify(donations));
+    setShowAddDonationModal(false);
+    // Emit real-time sync event
+    eventSync.emit(EVENT_TYPES.DONATIONS_UPDATED);
+    alert('Donation recorded successfully!');
   };
 
   const handleResetSermonStorage = () => {
@@ -492,9 +526,7 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
 
   const tabs = [
     { id: 'overview', name: 'Overview', icon: FaChartBar },
-    { id: 'members', name: 'Members', icon: FaUsers },
     { id: 'events', name: 'Events', icon: FaCalendarAlt },
-    { id: 'content', name: 'Content', icon: FaBook },
     { id: 'sermons', name: 'Sermons', icon: FaMicrophone },
     { id: 'donations', name: 'Donations', icon: FaDonate },
     { id: 'community', name: 'Community', icon: FaComments },
@@ -552,18 +584,11 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
-          title="Total Members"
-          value={stats.totalMembers.toLocaleString()}
-          icon={FaUsers}
+          title="Total Events"
+          value={stats.totalEvents.toLocaleString()}
+          icon={FaCalendarAlt}
           trend={12}
           color="bg-blue-500"
-        />
-        <StatCard
-          title="Active Members"
-          value={stats.activeMembers.toLocaleString()}
-          icon={FaUserCheck}
-          trend={8}
-          color="bg-green-500"
         />
         <StatCard
           title="Monthly Donations"
@@ -571,6 +596,13 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
           icon={FaDonate}
           trend={15}
           color="bg-emerald-500"
+        />
+        <StatCard
+          title="Total Sermons"
+          value={stats.totalSermons.toLocaleString()}
+          icon={FaMicrophone}
+          trend={8}
+          color="bg-purple-500"
         />
         <StatCard
           title="Upcoming Events"
@@ -600,358 +632,6 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
             );
           })}
         </div>
-      </div>
-    </div>
-  );
-
-  const MembersTab = () => {
-    console.log('MembersTab is rendering');
-    return (
-      <div className="space-y-6">
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-bold text-gray-800">Member Management</h3>
-            <button 
-              onClick={() => setShowAddMemberModal(true)}
-              className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 flex items-center gap-2"
-            >
-              <FaPlus />
-              Add Member
-            </button>
-          </div>
-          
-          {/* Member Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Name</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Email</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Role</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Joined</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {members.map((member) => (
-                  <tr key={member.id} className="border-b border-gray-100 hover:bg-gray-50">
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold ${
-                          member.role === 'Member' ? 'bg-emerald-500' :
-                          member.role === 'Volunteer' ? 'bg-purple-500' :
-                          member.role === 'Donor' ? 'bg-amber-500' : 'bg-gray-500'
-                        }`}>
-                          {member.name.split(' ').map(n => n[0]).join('')}
-                        </div>
-                        <span className="font-medium">{member.name}</span>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4 text-gray-600">{member.email}</td>
-                    <td className="py-3 px-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        member.role === 'Member' ? 'bg-blue-100 text-blue-600' :
-                        member.role === 'Volunteer' ? 'bg-purple-100 text-purple-600' :
-                        member.role === 'Donor' ? 'bg-amber-100 text-amber-600' :
-                        'bg-gray-100 text-gray-600'
-                      }`}>
-                        {member.role}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className="px-2 py-1 bg-green-100 text-green-600 rounded-full text-xs font-medium">
-                        {member.status}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-gray-600">{member.joined}</td>
-                    <td className="py-3 px-4">
-                      <div className="flex gap-2">
-                        <button 
-                          onClick={() => openEditModal(member)}
-                          className="text-blue-500 hover:text-blue-700"
-                          title="Edit Member"
-                        >
-                          <FaEdit />
-                        </button>
-                        <button 
-                          onClick={() => handleDeleteMember(member.id)}
-                          className="text-red-500 hover:text-red-700"
-                          title="Delete Member"
-                        >
-                          <FaUserTimes />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const ContentTab = () => (
-    <div className="space-y-6">
-      {/* Content Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm">Quranic Verses</p>
-              <p className="text-2xl font-bold text-gray-800">6,236</p>
-              <p className="text-xs text-green-600 mt-1">Fully Indexed</p>
-            </div>
-            <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
-              <FaBook className="text-emerald-600 text-xl" />
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm">Hadith Collection</p>
-              <p className="text-2xl font-bold text-gray-800">75,000+</p>
-              <p className="text-xs text-blue-600 mt-1">Sahih Collections</p>
-            </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <FaNewspaper className="text-blue-600 text-xl" />
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm">Islamic Articles</p>
-              <p className="text-2xl font-bold text-gray-800">1,247</p>
-              <p className="text-xs text-purple-600 mt-1">Educational Content</p>
-            </div>
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-              <FaFileAlt className="text-purple-600 text-xl" />
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm">Media Files</p>
-              <p className="text-2xl font-bold text-gray-800">892</p>
-              <p className="text-xs text-amber-600 mt-1">Videos & Audio</p>
-            </div>
-            <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
-              <FaVideo className="text-amber-600 text-xl" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Content Management Sections */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h3 className="text-xl font-bold text-gray-800">Islamic Content Library</h3>
-            <p className="text-gray-600 text-sm mt-1">Manage religious and educational content</p>
-          </div>
-          <div className="flex gap-3">
-            <button 
-              onClick={() => {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = 'video/*,audio/*,.pdf,.doc,.docx';
-                input.onchange = (e) => {
-                  const file = (e.target as HTMLInputElement).files?.[0];
-                  if (file) handleUploadContent(file);
-                };
-                input.click();
-              }}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 flex items-center gap-2"
-            >
-              <FaUpload />
-              Upload
-            </button>
-            <button 
-              onClick={() => setShowAddContentModal(true)}
-              className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 flex items-center gap-2"
-            >
-              <FaPlus />
-              Add Content
-            </button>
-          </div>
-        </div>
-        
-        {/* Content Filter Tabs */}
-        <div className="flex gap-2 mb-6 border-b border-gray-200">
-          <button 
-            onClick={() => setContentFilter('all')}
-            className={`px-4 py-2 font-medium transition-colors ${
-              contentFilter === 'all' 
-                ? 'text-emerald-600 border-b-2 border-emerald-600' 
-                : 'text-gray-600 hover:text-gray-800'
-            }`}
-          >
-            All Content ({contents.length})
-          </button>
-          <button 
-            onClick={() => setContentFilter('published')}
-            className={`px-4 py-2 font-medium transition-colors ${
-              contentFilter === 'published' 
-                ? 'text-emerald-600 border-b-2 border-emerald-600' 
-                : 'text-gray-600 hover:text-gray-800'
-            }`}
-          >
-            Published ({contents.filter(c => c.status === 'Published').length})
-          </button>
-          <button 
-            onClick={() => setContentFilter('draft')}
-            className={`px-4 py-2 font-medium transition-colors ${
-              contentFilter === 'draft' 
-                ? 'text-emerald-600 border-b-2 border-emerald-600' 
-                : 'text-gray-600 hover:text-gray-800'
-            }`}
-          >
-            Draft ({contents.filter(c => c.status === 'Draft').length})
-          </button>
-        </div>
-        
-        {/* Content Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {contents.filter(content => {
-            if (contentFilter === 'all') return true;
-            if (contentFilter === 'published') return content.status === 'Published';
-            if (contentFilter === 'draft') return content.status === 'Draft';
-            return true;
-          }).map((content) => (
-            <div key={content.id} className="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
-              {/* Content Thumbnail */}
-              <div className="h-48 bg-gradient-to-br from-emerald-400 to-blue-500 relative">
-                <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                  <div className={`w-16 h-16 rounded-full bg-white/90 flex items-center justify-center ${
-                    content.type === 'Quran' ? 'text-emerald-600' :
-                    content.type === 'Hadith' ? 'text-blue-600' :
-                    content.type === 'Article' ? 'text-purple-600' :
-                    content.type === 'Sermon' ? 'text-amber-600' :
-                    'text-gray-600'
-                  }`}>
-                    {content.type === 'Quran' && <FaBook className="text-2xl" />}
-                    {content.type === 'Hadith' && <FaNewspaper className="text-2xl" />}
-                    {content.type === 'Article' && <FaFileAlt className="text-2xl" />}
-                    {content.type === 'Sermon' && <FaMicrophone className="text-2xl" />}
-                    {content.type === 'Video' && <FaVideo className="text-2xl" />}
-                    {content.type === 'Audio' && <FaMicrophone className="text-2xl" />}
-                  </div>
-                </div>
-                <div className="absolute top-4 right-4">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    content.status === 'Published' ? 'bg-green-100 text-green-600' :
-                    'bg-yellow-100 text-yellow-600'
-                  }`}>
-                    {content.status}
-                  </span>
-                </div>
-                <div className="absolute bottom-4 left-4 bg-black/60 text-white px-2 py-1 rounded text-xs">
-                  {content.duration}
-                </div>
-              </div>
-              
-              {/* Content Details */}
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-3">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    content.category === 'Quranic Verses' ? 'bg-emerald-100 text-emerald-600' :
-                    content.category === 'Hadith Collection' ? 'bg-blue-100 text-blue-600' :
-                    content.category === 'Islamic Articles' ? 'bg-purple-100 text-purple-600' :
-                    content.category === 'Sermons & Lectures' ? 'bg-amber-100 text-amber-600' :
-                    'bg-gray-100 text-gray-600'
-                  }`}>
-                    {content.category}
-                  </span>
-                  <div className="flex gap-2">
-                    <button 
-                      onClick={() => openEditContentModal(content)}
-                      className="text-blue-500 hover:text-blue-700"
-                      title="Edit Content"
-                    >
-                      <FaEdit />
-                    </button>
-                    <button 
-                      onClick={() => handleDeleteContent(content.id)}
-                      className="text-red-500 hover:text-red-700"
-                      title="Delete Content"
-                    >
-                      <FaTrash />
-                    </button>
-                  </div>
-                </div>
-                
-                <h4 className="font-bold text-gray-800 mb-2 line-clamp-2">{content.title}</h4>
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2">{content.description}</p>
-                
-                <div className="space-y-2 text-sm text-gray-600">
-                  <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <FaUser className="text-gray-400" />
-                      {content.author}
-                    </span>
-                    <span className="flex items-center gap-2">
-                      <FaEye className="text-gray-400" />
-                      {content.views.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <FaCalendarAlt className="text-gray-400" />
-                      {content.date}
-                    </span>
-                    <span className="flex items-center gap-2">
-                      <FaDownload className="text-gray-400" />
-                      {content.downloads}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500">{content.fileSize}</span>
-                    <span className={`text-xs font-medium ${
-                      content.status === 'Published' ? 'text-green-600' : 'text-yellow-600'
-                    }`}>
-                      {content.status}
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500">Type: {content.type}</span>
-                    <button className="text-emerald-600 hover:text-emerald-700 text-sm font-medium">
-                      View Details →
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        {contents.filter(content => {
-          if (contentFilter === 'all') return true;
-          if (contentFilter === 'published') return content.status === 'Published';
-          if (contentFilter === 'draft') return content.status === 'Draft';
-          return true;
-        }).length === 0 && (
-          <div className="text-center py-12">
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <FaFileAlt className="text-gray-400 text-2xl" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">No content found</h3>
-            <p className="text-gray-600 mb-4">No content matches the current filter criteria</p>
-            <button 
-              onClick={() => setShowAddContentModal(true)}
-              className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600"
-            >
-              Add First Content
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
@@ -1006,8 +686,6 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
             transition={{ duration: 0.3 }}
           >
             {activeTab === 'overview' && <OverviewTab />}
-            {activeTab === 'members' && <MembersTab />}
-            {activeTab === 'content' && <ContentTab />}
             {activeTab === 'sermons' && (
               <div className="space-y-6">
                 {/* Sermon Library Stats */}
@@ -1515,9 +1193,84 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
               </div>
             )}
             {activeTab === 'donations' && (
-              <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-                <h3 className="text-xl font-bold text-gray-800 mb-4">Donation Management</h3>
-                <p className="text-gray-600">Donation management features coming soon...</p>
+              <div className="space-y-6">
+                {/* Donation Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-gray-600 text-sm">Total Donations</p>
+                        <p className="text-2xl font-bold text-gray-800">${stats.totalDonations.toLocaleString()}</p>
+                        <p className="text-xs text-green-600 mt-1">+12% from last month</p>
+                      </div>
+                      <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                        <FaDonate className="text-emerald-600 text-xl" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-gray-600 text-sm">Monthly Donations</p>
+                        <p className="text-2xl font-bold text-gray-800">${stats.monthlyDonations.toLocaleString()}</p>
+                        <p className="text-xs text-blue-600 mt-1">Current month</p>
+                      </div>
+                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <FaChartLine className="text-blue-600 text-xl" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-gray-600 text-sm">Active Donors</p>
+                        <p className="text-2xl font-bold text-gray-800">892</p>
+                        <p className="text-xs text-purple-600 mt-1">This month</p>
+                      </div>
+                      <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <FaUsers className="text-purple-600 text-xl" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-gray-600 text-sm">Avg. Donation</p>
+                        <p className="text-2xl font-bold text-gray-800">$156</p>
+                        <p className="text-xs text-amber-600 mt-1">Per donor</p>
+                      </div>
+                      <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                        <FaChartBar className="text-amber-600 text-xl" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Donation Management */}
+                <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-xl font-bold text-gray-800">Donation Management</h3>
+                    <button 
+                      onClick={() => setShowAddDonationModal(true)}
+                      className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 flex items-center gap-2"
+                    >
+                      <FaPlus />
+                      Record Donation
+                    </button>
+                  </div>
+                  
+                  <div className="text-center py-8">
+                    <FaDonate className="text-6xl text-gray-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">No donations recorded yet</h3>
+                    <p className="text-gray-600 mb-4">Start by recording your first donation</p>
+                    <button 
+                      onClick={() => setShowAddDonationModal(true)}
+                      className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600"
+                    >
+                      Record First Donation
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
             {activeTab === 'community' && (
@@ -2711,6 +2464,151 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
         </AnimatePresence>
         </AnimatePresence>
         </div>
+
+        {/* Add Donation Modal */}
+        <AnimatePresence>
+          {showAddDonationModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+              onClick={() => setShowAddDonationModal(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.9 }}
+                className="bg-white rounded-xl p-8 max-w-md w-full mx-4"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h3 className="text-2xl font-bold text-gray-800 mb-6">Record New Donation</h3>
+                
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.target as HTMLFormElement);
+                    const newDonation = {
+                      donorName: formData.get('donorName') as string,
+                      email: formData.get('email') as string,
+                      phone: formData.get('phone') as string,
+                      amount: parseFloat(formData.get('amount') as string),
+                      type: formData.get('type') as string,
+                      purpose: formData.get('purpose') as string,
+                      notes: formData.get('notes') as string
+                    };
+                    handleAddDonation(newDonation);
+                  }}
+                  className="space-y-4"
+                >
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Donor Name</label>
+                    <input
+                      type="text"
+                      name="donorName"
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                      placeholder="Enter donor name"
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                      <input
+                        type="email"
+                        name="email"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                        placeholder="donor@example.com"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                        placeholder="+1 234-567-8900"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Amount ($)</label>
+                      <input
+                        type="number"
+                        name="amount"
+                        required
+                        min="1"
+                        step="0.01"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                        placeholder="100.00"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Donation Type</label>
+                      <select
+                        name="type"
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                      >
+                        <option value="one-time">One-time</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="zakat">Zakat</option>
+                        <option value="sadaqah">Sadaqah</option>
+                        <option value="fundraising">Fundraising</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Purpose</label>
+                    <select
+                      name="purpose"
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                    >
+                      <option value="general">General Fund</option>
+                      <option value="mosque">Mosque Maintenance</option>
+                      <option value="education">Education Programs</option>
+                      <option value="community">Community Services</option>
+                      <option value="ramadan">Ramadan Programs</option>
+                      <option value="eid">Eid Programs</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
+                    <textarea
+                      name="notes"
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                      placeholder="Any additional notes..."
+                    />
+                  </div>
+                  
+                  <div className="flex gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddDonationModal(false)}
+                      className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600"
+                    >
+                      Record Donation
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </section>
   );

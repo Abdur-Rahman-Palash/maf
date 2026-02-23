@@ -2,12 +2,45 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useEvents } from '@/hooks/useApiData';
-import { Event } from '@/lib/crudOperations';
+import EventStorage, { Event } from '@/lib/eventStorage';
+import { eventSync, EVENT_TYPES } from '@/lib/eventSync';
 import { FaCalendarAlt, FaMapMarkerAlt, FaUsers, FaClock } from 'react-icons/fa';
 
 const DynamicEvents: React.FC = () => {
-  const { data: events, loading, error } = useEvents();
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Load events from storage on mount and set up interval for updates
+  useEffect(() => {
+    const loadEvents = () => {
+      try {
+        const storedEvents = EventStorage.getEvents();
+        console.log('Loading events from storage:', storedEvents);
+        setEvents(storedEvents);
+        setError(null);
+      } catch (err) {
+        console.error('Error loading events:', err);
+        setError('Failed to load events');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Initial load
+    loadEvents();
+
+    // Set up interval to check for new events every 2 seconds
+    const interval = setInterval(loadEvents, 2000);
+
+    // Listen for real-time updates from admin dashboard
+    const unsubscribe = eventSync.subscribe(EVENT_TYPES.EVENTS_UPDATED, loadEvents);
+
+    return () => {
+      clearInterval(interval);
+      unsubscribe();
+    };
+  }, []);
 
   if (loading) {
     return (
@@ -26,8 +59,8 @@ const DynamicEvents: React.FC = () => {
   }
 
   // Filter upcoming events
-  const upcomingEvents = (events as Event[]).filter(event => 
-    event.status === 'upcoming' && new Date(event.date) >= new Date()
+  const upcomingEvents = events.filter(event => 
+    event.status === 'Upcoming' && new Date(event.date) >= new Date()
   ).slice(0, 3); // Show only next 3 events
 
   if (upcomingEvents.length === 0) {

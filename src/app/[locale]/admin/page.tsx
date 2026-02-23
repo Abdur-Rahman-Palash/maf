@@ -5,9 +5,7 @@ import { useLocale } from 'next-intl';
 import AdminAuth from '@/components/AdminAuth';
 import { getDashboardStats, initializeSampleData } from '@/lib/crudOperations';
 import EventManager from '@/components/admin/EventManager';
-import MemberManager from '@/components/admin/MemberManager';
 import DonationManager from '@/components/admin/DonationManager';
-import ContentManager from '@/components/admin/ContentManager';
 import QuranAyahManager from '@/components/admin/QuranAyahManager';
 import ServiceManager from '@/components/admin/ServiceManager';
 import MediaManager from '@/components/admin/MediaManager';
@@ -40,8 +38,6 @@ export default function AdminPage() {
   const [stats, setStats] = useState({
     totalEvents: 0,
     upcomingEvents: 0,
-    totalMembers: 0,
-    activeMembers: 0,
     totalDonations: 0,
     monthlyDonations: 0,
     totalContent: 0,
@@ -148,25 +144,11 @@ export default function AdminPage() {
                 Events
               </button>
               <button
-                onClick={() => handleNavigation('/admin/members')}
-                className="py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              >
-                <FaUsers className="inline mr-2" />
-                Members
-              </button>
-              <button
                 onClick={() => handleNavigation('/admin/donations')}
                 className="py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
               >
                 <FaDonate className="inline mr-2" />
                 Donations
-              </button>
-              <button
-                onClick={() => handleNavigation('/admin/content')}
-                className="py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              >
-                <FaBook className="inline mr-2" />
-                Content
               </button>
               <button
                 onClick={() => handleNavigation('/admin/quran')}
@@ -212,16 +194,6 @@ export default function AdminPage() {
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total Members</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalMembers}</p>
-                  <p className="text-xs text-gray-500">{stats.activeMembers} active</p>
-                </div>
-                <FaUsers className="text-3xl text-green-500" />
-              </div>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between">
-                <div>
                   <p className="text-sm font-medium text-gray-600">Total Donations</p>
                   <p className="text-2xl font-bold text-gray-900">{stats.totalDonations}</p>
                   <p className="text-xs text-gray-500">${stats.monthlyDonations.toLocaleString()} this month</p>
@@ -232,11 +204,21 @@ export default function AdminPage() {
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Content</p>
+                  <p className="text-sm font-medium text-gray-600">Quran Content</p>
                   <p className="text-2xl font-bold text-gray-900">{stats.totalContent}</p>
                   <p className="text-xs text-gray-500">{stats.publishedContent} published</p>
                 </div>
                 <FaBook className="text-3xl text-orange-500" />
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Services</p>
+                  <p className="text-2xl font-bold text-gray-900">8</p>
+                  <p className="text-xs text-gray-500">Active services</p>
+                </div>
+                <FaMosque className="text-3xl text-green-500" />
               </div>
             </div>
           </div>
@@ -244,18 +226,12 @@ export default function AdminPage() {
           {/* Quick Actions */}
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <button
                 onClick={() => handleNavigation('/admin/events')}
                 className="flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <FaPlus /> Add New Event
-              </button>
-              <button
-                onClick={() => handleNavigation('/admin/members')}
-                className="flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-              >
-                <FaUsers /> Add Member
               </button>
               <button
                 onClick={() => handleNavigation('/admin/donations')}

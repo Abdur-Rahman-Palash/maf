@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlay, FaPause, FaVolumeUp, FaVolumeMute, FaExpand, FaCompress, FaDownload, FaShare, FaHeart, FaClock, FaCalendar, FaUser, FaMicrophone, FaVideo, FaFileAudio } from 'react-icons/fa';
 import SermonStorage from '@/lib/sermonStorage';
+import { eventSync, EVENT_TYPES } from '@/lib/eventSync';
 
 interface Sermon {
   id: string;
@@ -38,39 +39,49 @@ const SermonStreaming: React.FC = () => {
   // Load sermons from storage on mount and set up interval for updates
   useEffect(() => {
     const loadSermons = () => {
-      const storedSermons = SermonStorage.getSermons();
-      console.log('Loading sermons from storage:', storedSermons);
-      const formattedSermons = storedSermons.map(sermon => {
-        // Check if the video URL is a blob URL that might be invalid
-        let videoUrl = sermon.videoUrl;
-        if (sermon.videoUrl && sermon.videoUrl.startsWith('blob:')) {
-          console.log('Detected blob URL, checking validity:', sermon.videoUrl);
-          // For blob URLs, we'll use a fallback approach
-          videoUrl = sermon.videoUrl; // Keep the blob URL, but add error handling
-        }
-        
-        const formatted = {
-          ...sermon,
-          url: videoUrl,
-          type: sermon.type || 'video',
-          thumbnail: sermon.thumbnail,
-          likes: Math.floor(sermon.views * 0.07), // Estimate likes from views
-          category: (sermon.category || 'lecture').toLowerCase().replace(' ', '-') as any
-        };
-        console.log('Formatted sermon:', formatted);
-        console.log('Video URL type:', typeof formatted.url, 'URL:', formatted.url);
-        return formatted;
-      });
-      setSermons(formattedSermons);
+      try {
+        const storedSermons = SermonStorage.getSermons();
+        console.log('Loading sermons from storage:', storedSermons);
+        const formattedSermons = storedSermons.map(sermon => {
+          // Check if video URL is a blob URL that might be invalid
+          let videoUrl = sermon.videoUrl;
+          if (sermon.videoUrl && sermon.videoUrl.startsWith('blob:')) {
+            console.log('Detected blob URL, checking validity:', sermon.videoUrl);
+            // For blob URLs, we'll use a fallback approach
+            videoUrl = sermon.videoUrl; // Keep blob URL, but add error handling
+          }
+          
+          const formatted = {
+            ...sermon,
+            url: videoUrl,
+            type: sermon.type || 'video',
+            thumbnail: sermon.thumbnail,
+            likes: Math.floor(sermon.views * 0.07), // Estimate likes from views
+            category: (sermon.category || 'lecture').toLowerCase().replace(' ', '-') as any
+          };
+          console.log('Formatted sermon:', formatted);
+          console.log('Video URL type:', typeof formatted.url, 'URL:', formatted.url);
+          return formatted;
+        });
+        setSermons(formattedSermons);
+      } catch (error) {
+        console.error('Error loading sermons:', error);
+      }
     };
 
     // Initial load
     loadSermons();
 
-    // Set up interval to check for new sermons every 2 seconds
-    const interval = setInterval(loadSermons, 2000);
+    // Auto-refresh disabled - comment out the interval
+    // const interval = setInterval(loadSermons, 2000);
 
-    return () => clearInterval(interval);
+    // Listen for real-time updates from admin dashboard
+    const unsubscribe = eventSync.subscribe(EVENT_TYPES.SERMONS_UPDATED, loadSermons);
+
+    return () => {
+      // clearInterval(interval); // Commented out since interval is disabled
+      unsubscribe();
+    };
   }, []);
 
   const handleSelectSermon = (sermon: Sermon) => {

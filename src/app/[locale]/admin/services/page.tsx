@@ -1,8 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import AdminAuth from '@/components/AdminAuth';
 import ServiceManager from '@/components/admin/ServiceManager';
+import { FaArrowLeft } from 'react-icons/fa';
 
 interface AdminUser {
   id: string;
@@ -14,6 +17,8 @@ interface AdminUser {
 }
 
 export default function ServicesPage() {
+  const router = useRouter();
+  const locale = useLocale();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
 
@@ -96,6 +101,15 @@ export default function ServicesPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Back Button */}
+        <button
+          onClick={() => router.push(`/${locale}/admin`)}
+          className="mb-6 flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+        >
+          <FaArrowLeft />
+          Back to Admin Dashboard
+        </button>
+
         <ServiceManager />
       </div>
     </div>
