@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { FaBook, FaMosque, FaSyncAlt, FaVolumeUp, FaPause, FaPlay } from 'react-icons/fa';
+import { FaBook, FaMosque, FaSyncAlt } from 'react-icons/fa';
 import WaveAnimation from '@/components/WaveAnimation';
 
 interface Verse {
@@ -115,13 +115,7 @@ const QuranReader: React.FC = () => {
       setCurrentAyah(ayah);
       
       // Auto-play audio if enabled and audio is available
-      if (autoPlay && transformedVerse.audio && !isPaused) {
-        setTimeout(() => {
-          if (transformedVerse.audio) {
-            playAudio(transformedVerse.audio);
-          }
-        }, 1000); // Wait 1 second before playing
-      }
+      // Auto-play disabled - removed automatic playback
     } catch (err) {
       setError('Failed to load Quran verse. Please try again.');
       console.error('Quran API Error:', err);
@@ -171,13 +165,7 @@ const QuranReader: React.FC = () => {
       audio.addEventListener('ended', () => {
         setIsPlaying(false);
         audioRef.current = null;
-        
-        // Auto-play next verse if auto-play is enabled and not paused
-        if (autoPlay && !isPaused) {
-          setTimeout(() => {
-            fetchNextVerse();
-          }, 2000); // Wait 2 seconds before next verse
-        }
+        // Auto-play next verse functionality removed
       });
       
       audio.addEventListener('error', (err) => {
@@ -335,75 +323,25 @@ const QuranReader: React.FC = () => {
 
               {/* Action Buttons */}
               <motion.div
-                className="flex flex-col gap-4"
+                className="flex justify-center gap-4"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.8 }}
               >
-                {/* Audio Controls */}
-                <div className="flex justify-center gap-4 mb-4">
-                  {!isPlaying ? (
-                    <button
-                      onClick={() => {
-                        if (verse?.audio) {
-                          playAudio(verse.audio);
-                          setIsPaused(false);
-                        }
-                      }}
-                      className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-                      disabled={!verse?.audio}
-                    >
-                      <FaPlay />
-                      {isPaused ? 'Resume' : 'Play'}
-                    </button>
-                  ) : (
-                    <button
-                      onClick={pauseAudio}
-                      className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                    >
-                      <FaPause />
-                      Pause
-                    </button>
-                  )}
-                  
-                  <button
-                    onClick={toggleAutoPlay}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                      autoPlay 
-                        ? 'bg-amber-600 text-white hover:bg-amber-700' 
-                        : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
-                    }`}
-                  >
-                    <FaVolumeUp />
-                    Auto-Play: {autoPlay ? 'ON' : 'OFF'}
-                  </button>
-                </div>
-
-                {/* Navigation Controls */}
-                <div className="flex justify-center gap-4">
-                  <button
-                    onClick={fetchPreviousVerse}
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-                  >
-                    <FaSyncAlt className="rotate-180" />
-                    Previous Verse
-                  </button>
-                  <button
-                    onClick={fetchNextVerse}
-                    className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
-                  >
-                    <FaSyncAlt />
-                    Next Verse
-                  </button>
-                </div>
-
-                {/* Status Indicator */}
-                <div className="text-center text-sm text-gray-600">
-                  {isPlaying && '🔊 Playing...'}
-                  {isPaused && '⏸️ Paused'}
-                  {autoPlay && !isPaused && !isPlaying && '⏭️ Auto-play enabled - Next verse will play automatically'}
-                  {!autoPlay && !isPaused && !isPlaying && '🔇 Manual mode - Use Play button'}
-                </div>
+                <button
+                  onClick={fetchPreviousVerse}
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                  <FaSyncAlt className="rotate-180" />
+                  Previous Verse
+                </button>
+                <button
+                  onClick={fetchNextVerse}
+                  className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
+                >
+                  <FaSyncAlt />
+                  Next Verse
+                </button>
               </motion.div>
             </div>
           ) : (
