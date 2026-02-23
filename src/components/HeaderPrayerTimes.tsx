@@ -209,22 +209,22 @@ const HeaderPrayerTimes: React.FC = () => {
   // Prayer names in different languages
   const prayerNames = {
     en: {
-      fajr: 'FAJR<br/>الفجر',
-      zuhr: 'DHUHR<br/>الظهر', 
-      asr: 'ASR<br/>العصر',
-      maghrib: 'MAGHRIB<br/>المغرب',
-      isha: 'ISHA<br/>العشاء',
+      fajr: '<div class="text-base font-extrabold leading-tight">FAJR</div><div class="text-xs font-medium text-gray-600 leading-tight mt-1">الفجر</div>',
+      zuhr: '<div class="text-base font-extrabold leading-tight">DHUHR</div><div class="text-xs font-medium text-gray-600 leading-tight mt-1">الظهر</div>', 
+      asr: '<div class="text-base font-extrabold leading-tight">ASR</div><div class="text-xs font-medium text-gray-600 leading-tight mt-1">العصر</div>',
+      maghrib: '<div class="text-sm font-extrabold leading-tight">MAGHRIB</div><div class="text-xs font-medium text-gray-600 leading-tight mt-1">المغرب</div>',
+      isha: '<div class="text-base font-extrabold leading-tight">ISHA</div><div class="text-xs font-medium text-gray-600 leading-tight mt-1">العشاء</div>',
       jamaat: "JAMA'AT",
       begins: 'BEGINS',
       juma: "JUMU'AH",
       prayerTimes: 'PRAYER TIMES'
     },
     ar: {
-      fajr: 'الفجر',
-      zuhr: 'الظهر',
-      asr: 'العصر', 
-      maghrib: 'المغرب',
-      isha: 'العشاء',
+      fajr: '<div class="text-base font-extrabold leading-tight">الفجر</div>',
+      zuhr: '<div class="text-base font-extrabold leading-tight">الظهر</div>',
+      asr: '<div class="text-base font-extrabold leading-tight">العصر</div>', 
+      maghrib: '<div class="text-sm font-extrabold leading-tight">المغرب</div>',
+      isha: '<div class="text-base font-extrabold leading-tight">العشاء</div>',
       jamaat: 'الجماعة',
       begins: 'البداية',
       juma: 'الجمعة',
@@ -555,24 +555,24 @@ const HeaderPrayerTimes: React.FC = () => {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
                     >
-                      <div className="flex items-center space-x-3">
+                      <div className="flex items-center space-x-3 min-h-[60px]">
                         <motion.span 
-                          className="text-xs font-semibold text-black bg-amber-100 px-2 py-1 rounded-md"
+                          className="text-sm font-semibold text-black bg-amber-100 px-3 py-2 rounded-lg shadow-md flex-shrink-0"
                           whileHover={{ scale: 1.05 }}
                           transition={{ duration: 0.2 }}
                           dangerouslySetInnerHTML={{ __html: names.begins }}
                         ></motion.span>
-                        <motion.span 
-                          className="text-sm font-bold text-black"
-                          whileHover={{ scale: 1.05 }}
+                        <motion.div 
+                          className={`${prayer === 'maghrib' ? 'text-sm' : 'text-base'} font-extrabold text-black bg-gradient-to-r from-blue-50 to-green-50 px-4 py-2 rounded-lg border border-blue-200 shadow-md flex-1`}
+                          whileHover={{ scale: 1.05, y: -2 }}
                           transition={{ duration: 0.2 }}
                           dangerouslySetInnerHTML={{ 
                             __html: getPrayerName(prayer)
                           }}
-                        ></motion.span>
+                        ></motion.div>
                       </div>
                       <motion.span 
-                        className="text-base font-bold text-black hover:text-amber-600 transition-all duration-300 cursor-pointer"
+                        className="text-lg font-bold text-black hover:text-amber-600 transition-all duration-300 cursor-pointer"
                         whileHover={{ y: -2, scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
@@ -592,25 +592,25 @@ const HeaderPrayerTimes: React.FC = () => {
                   <span className="ml-3 text-black">Loading prayer times...</span>
                 </div>
               ) : (
-                <div className="grid grid-cols-5 gap-4">
+                <div className="grid grid-cols-5 gap-3">
                   {(['fajr', 'Dhuhr', 'asr', 'maghrib', 'isha'] as const).map((prayer, index) => (
-                    <div key={prayer} className="bg-white rounded-xl shadow-lg border border-blue-200 p-4 hover:shadow-xl transition-all duration-300">
+                    <div key={prayer} className="bg-white rounded-xl shadow-lg border border-blue-200 p-3 hover:shadow-xl transition-all duration-300">
                       {/* Prayer Name */}
-                      <div className="text-center mb-4">
-                        <motion.span 
-                          className="text-sm font-bold text-black px-3 py-2 rounded-lg shadow-md"
-                          whileHover={{ scale: 1.05 }}
+                      <div className="text-center mb-4 min-h-[100px] flex items-center justify-center">
+                        <motion.div 
+                          className="text-base font-extrabold text-black px-3 py-2 rounded-xl shadow-lg bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 w-full"
+                          whileHover={{ scale: 1.05, y: -2 }}
                           transition={{ duration: 0.2 }}
                           dangerouslySetInnerHTML={{ 
                             __html: getPrayerName(prayer)
                           }}
-                        ></motion.span>
+                        ></motion.div>
                       </div>
                       
                       {/* Adhan Time Only */}
                       <div className="text-center">
                         <motion.span 
-                          className="text-xs font-semibold text-black bg-amber-100 px-2 py-1 rounded-md"
+                          className="text-sm font-semibold text-black bg-amber-100 px-2 py-1 rounded-md"
                           whileHover={{ scale: 1.05 }}
                           transition={{ duration: 0.2 }}
                           dangerouslySetInnerHTML={{ __html: names.begins }}
@@ -622,7 +622,7 @@ const HeaderPrayerTimes: React.FC = () => {
                           className="mt-2"
                         >
                           <motion.span 
-                            className="text-2xl font-bold text-black hover:text-amber-600 transition-all duration-300 cursor-pointer"
+                            className="text-3xl font-bold text-black hover:text-amber-600 transition-all duration-300 cursor-pointer"
                             whileHover={{ y: -2, scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                           >
