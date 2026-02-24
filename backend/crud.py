@@ -4,8 +4,8 @@ from typing import List, Optional
 import json
 from datetime import datetime
 
-from database import User, Event, Donation, Content, QuranAyah, Service, Media
-from schemas import UserCreate, UserUpdate, EventCreate, EventUpdate, DonationCreate, DonationUpdate, ContentCreate, ContentUpdate, QuranAyahCreate, QuranAyahUpdate, ServiceCreate, ServiceUpdate, MediaCreate, MediaUpdate
+from database import User, Event, Donation, Content, QuranAyah, Service, Media, PrayerTime
+from schemas import UserCreate, UserUpdate, EventCreate, EventUpdate, DonationCreate, DonationUpdate, ContentCreate, ContentUpdate, QuranAyahCreate, QuranAyahUpdate, ServiceCreate, ServiceUpdate, MediaCreate, MediaUpdate, PrayerTimeCreate, PrayerTimeUpdate
 
 # User CRUD
 def get_user(db: Session, user_id: int) -> Optional[User]:
@@ -362,6 +362,59 @@ def delete_media(db: Session, media_id: int) -> bool:
         db.commit()
         return True
     return False
+
+# PrayerTimes CRUD
+def get_prayer_time(db: Session, prayer_time_id: int) -> Optional[PrayerTime]:
+    return db.query(PrayerTime).filter(PrayerTime.id == prayer_time_id).first()
+
+def get_prayer_times(db: Session, skip: int = 0, limit: int = 100) -> List[PrayerTime]:
+    return db.query(PrayerTime).order_by(PrayerTime.created_at.desc()).offset(skip).limit(limit).all()
+
+def get_active_prayer_times(db: Session) -> Optional[PrayerTime]:
+    return db.query(PrayerTime).filter(PrayerTime.is_active == True).first()
+
+def create_prayer_time(db: Session, prayer_time: PrayerTimeCreate) -> PrayerTime:
+    # Deactivate all existing prayer times
+    db.query(PrayerTime).update({"is_active": False})
+    
+    db_prayer_time = PrayerTime(**prayer_time.dict())
+    db.add(db_prayer_time)
+    db.commit()
+    db.refresh(db_prayer_time)
+    return db_prayer_time
+
+def update_prayer_time(db: Session, prayer_time_id: int, prayer_time: PrayerTimeUpdate) -> Optional[PrayerTime]:
+    db_prayer_time = db.query(PrayerTime).filter(PrayerTime.id == prayer_time_id).first()
+    if db_prayer_time:
+        update_data = prayer_time.dict(exclude_unset=True)
+        for field, value in update_data.items():
+            setattr(db_prayer_time, field, value)
+        
+        db_prayer_time.updated_at = datetime.utcnow()
+        db.commit()
+        db.refresh(db_prayer_time)
+    return db_prayer_time
+
+def delete_prayer_time(db: Session, prayer_time_id: int) -> bool:
+    db_prayer_time = db.query(PrayerTime).filter(PrayerTime.id == prayer_time_id).first()
+    if db_prayer_time:
+        db.delete(db_prayer_time)
+        db.commit()
+        return True
+    return False
+
+def activate_prayer_time(db: Session, prayer_time_id: int) -> Optional[PrayerTime]:
+    # Deactivate all existing prayer times
+    db.query(PrayerTime).update({"is_active": False})
+    
+    # Activate the selected prayer time
+    db_prayer_time = db.query(PrayerTime).filter(PrayerTime.id == prayer_time_id).first()
+    if db_prayer_time:
+        db_prayer_time.is_active = True
+        db_prayer_time.updated_at = datetime.utcnow()
+        db.commit()
+        db.refresh(db_prayer_time)
+    return db_prayer_time
 
 # Utility Functions
 from passlib.context import CryptContext

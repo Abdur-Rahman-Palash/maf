@@ -216,6 +216,43 @@ class Media(MediaBase):
     created_at: datetime
     updated_at: datetime
 
+# PrayerTime Schemas
+class PrayerTimeBase(BaseSchema):
+    fajr_begins: str
+    fajr_jamaat: str
+    dhuhr_begins: str
+    dhuhr_jamaat: str
+    asr_begins: str
+    asr_jamaat: str
+    maghrib_begins: str
+    maghrib_jamaat: str
+    isha_begins: str
+    isha_jamaat: str
+    jumuah_time: str = "13:30"
+    is_active: bool = True
+
+class PrayerTimeCreate(PrayerTimeBase):
+    pass
+
+class PrayerTimeUpdate(BaseSchema):
+    fajr_begins: Optional[str] = None
+    fajr_jamaat: Optional[str] = None
+    dhuhr_begins: Optional[str] = None
+    dhuhr_jamaat: Optional[str] = None
+    asr_begins: Optional[str] = None
+    asr_jamaat: Optional[str] = None
+    maghrib_begins: Optional[str] = None
+    maghrib_jamaat: Optional[str] = None
+    isha_begins: Optional[str] = None
+    isha_jamaat: Optional[str] = None
+    jumuah_time: Optional[str] = None
+    is_active: Optional[bool] = None
+
+class PrayerTime(PrayerTimeBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
 # Auth Schemas
 class Token(BaseSchema):
     access_token: str

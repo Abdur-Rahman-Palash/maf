@@ -67,7 +67,7 @@ const MosqueMap = () => {
           <div className="relative h-96 lg:h-[500px] bg-gray-100">
             {/* Embedded Google Map */}
             <iframe
-              src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTQTbL0F-s9BrWmW2b0k&q=${encodeURIComponent(mosqueInfo.address)}`}
+              src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3304.8954329!2d-84.2198!3d33.8545!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88f5a1a5a5a5a5a5%3A0x5a5a5a5a5a5a5a5a!2s${encodeURIComponent(mosqueInfo.address)}!5e0!3m2!1sen!2sus!4v1234567890`}
               width="100%"
               height="100%"
               style={{ border: 0 }}
@@ -77,39 +77,6 @@ const MosqueMap = () => {
               className="w-full h-full"
               title="Masjid Salman Al Farsi Location"
             />
-            
-            {/* Fallback static map image */}
-            <div 
-              className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-emerald-100 to-amber-100"
-              style={{
-                borderTopLeftRadius: '2rem',
-                borderTopRightRadius: '0.5rem',
-                borderBottomRightRadius: '3rem',
-                borderBottomLeftRadius: '1rem'
-              }}
-            >
-              <div className="text-center">
-                <FaMapMarkerAlt className="text-6xl text-emerald-600 mx-auto mb-4" />
-                <p className="text-gray-700 font-semibold text-2xl mb-2">2187 Fellowship Rd</p>
-                <p className="text-gray-600 text-xl mb-6">Tucker, GA 30084</p>
-                <div className="flex justify-center">
-                  <button
-                    onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mosqueInfo.address)}`, '_blank')}
-                    className="px-8 py-3 bg-emerald-600 text-white hover:bg-emerald-700 transition-colors flex items-center gap-2 text-lg font-semibold"
-                    style={{
-                      borderRadius: '1.5rem 0.25rem 2rem 0.75rem',
-                      borderTopLeftRadius: '1.5rem',
-                      borderTopRightRadius: '0.25rem',
-                      borderBottomRightRadius: '2rem',
-                      borderBottomLeftRadius: '0.75rem'
-                    }}
-                  >
-                    <FaDirections />
-                    Get Directions
-                  </button>
-                </div>
-              </div>
-            </div>
           </div>
         </motion.div>
       </div>

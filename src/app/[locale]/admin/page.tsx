@@ -9,6 +9,7 @@ import DonationManager from '@/components/admin/DonationManager';
 import QuranAyahManager from '@/components/admin/QuranAyahManager';
 import ServiceManager from '@/components/admin/ServiceManager';
 import MediaManager from '@/components/admin/MediaManager';
+import PrayerTimesManager from '@/components/admin/PrayerTimesManager';
 import RealTimeSync from '@/components/admin/RealTimeSync';
 import { 
   FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaBell, FaMosque, 
@@ -165,6 +166,13 @@ export default function AdminPage() {
                 Services
               </button>
               <button
+                onClick={() => handleNavigation('/admin/prayer-times')}
+                className="py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              >
+                <FaClock className="inline mr-2" />
+                Prayer Times
+              </button>
+              <button
                 onClick={() => handleNavigation('/admin/media')}
                 className="py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
               >
@@ -269,6 +277,9 @@ export default function AdminPage() {
               </div>
             </div>
           </div>
+
+          {/* Prayer Times Manager */}
+          <PrayerTimesManager onDataUpdate={handleDataUpdate} />
         </div>
       </div>
 

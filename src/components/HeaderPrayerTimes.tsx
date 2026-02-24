@@ -86,7 +86,23 @@ const HeaderPrayerTimes: React.FC = () => {
   useEffect(() => {
     const fetchPrayerTimes = async () => {
       try {
-        // Check cache first
+        // First check for manually set prayer times from admin dashboard
+        const manualPrayerTimes = localStorage.getItem('prayerTimes');
+        const manualJamaatTimes = localStorage.getItem('jamaatTimes');
+        
+        if (manualPrayerTimes && manualJamaatTimes) {
+          const prayerTimesData = JSON.parse(manualPrayerTimes);
+          const jamaatTimesData = JSON.parse(manualJamaatTimes);
+          
+          setPrayerTimes({
+            jamaat: jamaatTimesData,
+            begins: prayerTimesData
+          });
+          setLoading(false);
+          return;
+        }
+
+        // Check cache second
         const cachedTimes = getCachedPrayerTimes();
         if (cachedTimes) {
           setPrayerTimes(cachedTimes);
@@ -339,18 +355,31 @@ const HeaderPrayerTimes: React.FC = () => {
 
   return (
     <div className="w-full relative overflow-hidden bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 border-b border-purple-300 shadow-2xl">
-      {/* Islamic Greeting */}
-      <div className="absolute top-0 left-0 right-0 z-20 flex justify-center pointer-events-none">
+      {/* Date - Left Top */}
+      <div className="absolute top-4 left-4 z-20">
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="text-black font-bold text-lg lg:text-xl bg-white/90 backdrop-blur-md px-4 py-2 rounded-xl shadow-lg border border-blue-200"
+          dir={locale === 'ar' ? 'rtl' : 'ltr'}
+        >
+          {currentDate.english} · {currentDate.hijri}
+        </motion.div>
+      </div>
+
+      {/* Islamic Greeting - Right Side Small */}
+      <div className="absolute top-4 right-4 z-20">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.5 }}
-          className="text-center"
+          className="text-right"
         >
-          <div className="bg-white/90 backdrop-blur-md px-8 py-1 rounded-2xl shadow-2xl border border-purple-400">
-            {/* English Greeting */}
+          <div className="bg-white/90 backdrop-blur-md px-6 py-2 rounded-xl shadow-lg border border-purple-400">
+            {/* English Greeting - Small */}
             <motion.p 
-              className="text-2xl lg:text-3xl font-bold text-black mb-2"
+              className="text-sm lg:text-base font-bold text-black mb-1"
               style={{ fontFamily: 'Georgia, serif' }}
               animate={{
                 backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
@@ -364,9 +393,9 @@ const HeaderPrayerTimes: React.FC = () => {
               Assalamu Alaikum wa Rahmatullahi wa Barakatuh
             </motion.p>
             
-            {/* Arabic Greeting */}
+            {/* Arabic Greeting - Small */}
             <motion.p 
-              className="text-2xl lg:text-3xl font-bold text-black"
+              className="text-sm lg:text-base font-bold text-black"
               style={{ fontFamily: 'Amiri Quran, Traditional Arabic, serif', direction: 'rtl' }}
               animate={{
                 opacity: [0, 1, 1],
@@ -496,39 +525,72 @@ const HeaderPrayerTimes: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mt-20">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 py-4 lg:py-6">
-          {/* Left Column - Date and Jum'a Info */}
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10 mt-20">
+        {/* Jumu'ah and Prayer Times - Between Date and Greeting */}
+        <motion.div 
+          className="flex justify-center mb-6"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+        >
+          <div className="text-black text-base lg:text-lg bg-gradient-to-r from-blue-100 to-green-100 px-6 py-3 rounded-xl border-2 border-blue-300 shadow-lg" style={{ textTransform: locale === 'ar' ? 'none' : 'uppercase', fontWeight: 700 }}>
+            <motion.a 
+              href="/worshippers/prayer-timings" 
+              className="hover:text-blue-700 transition-all duration-300 mr-3 inline-block group"
+              whileHover={{ y: -3, scale: 1.08 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <span className="group-hover:text-blue-700 group-hover:drop-shadow-2xl transition-all duration-300 text-lg lg:text-xl font-bold">
+                {locale === 'ar' ? 'الجمعة ١٣:٣٠' : 'JUMU\'AH  - 13:30'}
+              </span>
+            </motion.a>
+            <span className="text-black mx-3 text-lg">·</span>
+            <motion.div whileHover={{ y: -3, scale: 1.08 }} whileTap={{ scale: 0.95 }} className="inline-block">
+              <Link
+                href="/worshippers/prayer-timings" 
+                className="hover:text-blue-700 transition-all duration-300 ml-3 inline-block group"
+              >
+                <span className="group-hover:text-blue-700 group-hover:drop-shadow-2xl transition-all duration-300 text-lg lg:text-xl font-bold" dangerouslySetInnerHTML={{ __html: names.prayerTimes }}></span>
+              </Link>
+            </motion.div>
+          </div>
+        </motion.div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 py-4 lg:py-6 max-w-7xl mx-auto">
+          {/* Left Column - Masjid Information */}
           <motion.div 
-            className="flex flex-col justify-center space-y-3"
+            className="flex flex-col justify-center items-center lg:items-start space-y-4"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <div className="hidden lg:block text-black font-bold text-lg lg:text-xl bg-white/80 backdrop-blur-md px-6 py-3 rounded-xl shadow-2xl border border-blue-200" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-              {currentDate.english} · {currentDate.hijri}
-            </div>
-            <div className="text-black text-base lg:text-lg bg-gradient-to-r from-blue-100 to-green-100 px-6 py-4 rounded-xl border-2 border-blue-300 shadow-lg" style={{ textTransform: locale === 'ar' ? 'none' : 'uppercase', fontWeight: 700 }}>
-              <motion.a 
-                href="/worshippers/prayer-timings" 
-                className="hover:text-blue-700 transition-all duration-300 mr-3 inline-block group"
-                whileHover={{ y: -3, scale: 1.08 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <span className="group-hover:text-blue-700 group-hover:drop-shadow-2xl transition-all duration-300 text-lg lg:text-xl font-bold">
-                  {locale === 'ar' ? 'الجمعة ١٣:٣٠' : 'JUMU\'AH  - 13:30'}
-                </span>
-              </motion.a>
-              <span className="text-black mx-3 text-lg">·</span>
-              <motion.div whileHover={{ y: -3, scale: 1.08 }} whileTap={{ scale: 0.95 }} className="inline-block">
-                <Link
-                  href="/worshippers/prayer-timings" 
-                  className="hover:text-blue-700 transition-all duration-300 ml-3 inline-block group"
-                >
-                  <span className="group-hover:text-blue-700 group-hover:drop-shadow-2xl transition-all duration-300 text-lg lg:text-xl font-bold" dangerouslySetInnerHTML={{ __html: names.prayerTimes }}></span>
-                </Link>
-              </motion.div>
-            </div>
+            {/* Masjid Name - Big Font */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="text-black text-center lg:text-left"
+            >
+              <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent leading-tight">
+                Masjid Salman Al-Farsi
+              </h1>
+            </motion.div>
+
+            {/* Organization Information */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+              className="bg-white/80 backdrop-blur-md px-4 py-3 rounded-xl shadow-lg border border-blue-200 w-full"
+            >
+              <p className="text-sm lg:text-base text-gray-700 leading-relaxed">
+                <span className="font-semibold">The DBA of MUNA Center of Georgia Inc. is Masjid Salman Al-Farsi.</span>
+                <br className="hidden lg:block" />
+                MUNA Center of Georgia Inc. has 501(c)3 status and is a non-profit.
+                <br className="hidden lg:block" />
+                This organization's goal is to serve the neighborhood's religious, educational, charitable, and social needs.
+              </p>
+            </motion.div>
           </motion.div>
 
           {/* Right Column - Prayer Times Table */}

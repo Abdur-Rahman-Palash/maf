@@ -131,6 +131,25 @@ class Media(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+class PrayerTime(Base):
+    __tablename__ = "prayer_times"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    fajr_begins = Column(String(10), nullable=False)
+    fajr_jamaat = Column(String(10), nullable=False)
+    dhuhr_begins = Column(String(10), nullable=False)
+    dhuhr_jamaat = Column(String(10), nullable=False)
+    asr_begins = Column(String(10), nullable=False)
+    asr_jamaat = Column(String(10), nullable=False)
+    maghrib_begins = Column(String(10), nullable=False)
+    maghrib_jamaat = Column(String(10), nullable=False)
+    isha_begins = Column(String(10), nullable=False)
+    isha_jamaat = Column(String(10), nullable=False)
+    jumuah_time = Column(String(10), default="13:30")
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
 # Create tables
 def create_tables():
     Base.metadata.create_all(bind=engine)

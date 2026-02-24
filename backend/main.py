@@ -15,6 +15,7 @@ from schemas import (
     Donation, DonationCreate, DonationUpdate,
     Content, ContentCreate, ContentUpdate,
     QuranAyah, QuranAyahCreate, QuranAyahUpdate,
+    PrayerTime, PrayerTimeCreate, PrayerTimeUpdate,
     Token
 )
 import crud
@@ -315,6 +316,44 @@ def get_stats(db: Session = Depends(get_db)):
             "active": active_users
         }
     }
+
+# Prayer Times Endpoints
+@app.get("/api/prayer-times/", response_model=List[PrayerTime])
+def get_prayer_times(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    prayer_times = crud.get_prayer_times(db, skip=skip, limit=limit)
+    return prayer_times
+
+@app.get("/api/prayer-times/active", response_model=PrayerTime)
+def get_active_prayer_times(db: Session = Depends(get_db)):
+    prayer_times = crud.get_active_prayer_times(db)
+    if not prayer_times:
+        raise HTTPException(status_code=404, detail="No active prayer times found")
+    return prayer_times
+
+@app.post("/api/prayer-times/", response_model=PrayerTime)
+def create_prayer_time(prayer_time: PrayerTimeCreate, db: Session = Depends(get_db)):
+    return crud.create_prayer_time(db, prayer_time)
+
+@app.put("/api/prayer-times/{prayer_time_id}", response_model=PrayerTime)
+def update_prayer_time(prayer_time_id: int, prayer_time: PrayerTimeUpdate, db: Session = Depends(get_db)):
+    db_prayer_time = crud.update_prayer_time(db, prayer_time_id, prayer_time)
+    if not db_prayer_time:
+        raise HTTPException(status_code=404, detail="Prayer time not found")
+    return db_prayer_time
+
+@app.delete("/api/prayer-times/{prayer_time_id}")
+def delete_prayer_time(prayer_time_id: int, db: Session = Depends(get_db)):
+    success = crud.delete_prayer_time(db, prayer_time_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Prayer time not found")
+    return {"message": "Prayer time deleted successfully"}
+
+@app.put("/api/prayer-times/{prayer_time_id}/activate", response_model=PrayerTime)
+def activate_prayer_time(prayer_time_id: int, db: Session = Depends(get_db)):
+    db_prayer_time = crud.activate_prayer_time(db, prayer_time_id)
+    if not db_prayer_time:
+        raise HTTPException(status_code=404, detail="Prayer time not found")
+    return db_prayer_time
 
 if __name__ == "__main__":
     import uvicorn

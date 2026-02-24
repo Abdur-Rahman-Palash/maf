@@ -149,7 +149,7 @@ const Header = () => {
           <div className="flex items-center space-x-4">
             {/* Donate Button - Desktop Only */}
             <div className="hidden lg:block">
-              <DonateButton href="/donate" className="my-0">
+              <DonateButton href="https://us.mohid.co/ga/atlanta/muna/masjid/online/donation" target="_blank" rel="noopener noreferrer" className="my-0">
                 Donate
               </DonateButton>
             </div>
@@ -219,7 +219,9 @@ const Header = () => {
 
                 {/* Mobile Donate Button */}
                 <DonateButton 
-                  href="/donate"
+                  href="https://us.mohid.co/ga/atlanta/muna/masjid/online/donation"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                   }}

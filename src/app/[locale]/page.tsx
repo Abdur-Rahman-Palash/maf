@@ -1,7 +1,6 @@
 import QuranReader from '@/components/QuranReader';
 import Hero from '@/components/Hero';
 import ProgramsSection from '@/components/ProgramsSection';
-import EServicesSection from '@/components/EServicesSection';
 // import PremiumScrollAnimation from '@/components/PremiumScrollAnimation';
 // import PremiumAnimatedBackground from '@/components/PremiumAnimatedBackground';
 // import PremiumFloatingElements from '@/components/PremiumFloatingElements';
@@ -11,7 +10,7 @@ import MosqueMap from '@/components/MosqueMap';
 import QuranSection from '@/components/QuranSection';
 import SermonStreaming from '@/components/SermonStreaming';
 import DynamicEvents from '@/components/DynamicEvents';
-import DynamicDonations from '@/components/DynamicDonations';
+import Announcement from '@/components/Announcement';
 
 export default function Home() {
   return (
@@ -19,6 +18,10 @@ export default function Home() {
       <div className="flex flex-col min-h-screen">
         <div className="relative z-10">
           <div className="relative">
+            {/* Announcement Section */}
+            <div id="announcement">
+              <Announcement />
+            </div>
             <div id="quran-reader">
               <QuranReader />
             </div>
@@ -31,14 +34,8 @@ export default function Home() {
             <div id="sermons">
               <SermonStreaming />
             </div>
-            <div id="dynamic-donations">
-              <DynamicDonations />
-            </div>
             <div id="programs">
               <ProgramsSection />
-            </div>
-            <div id="e-services">
-              <EServicesSection />
             </div>
             <div id="dynamic-services">
               <DynamicServices />
