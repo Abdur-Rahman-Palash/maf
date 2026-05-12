@@ -1,6 +1,5 @@
 import QuranReader from '@/components/QuranReader';
 import Hero from '@/components/Hero';
-import ProgramsSection from '@/components/ProgramsSection';
 // import PremiumScrollAnimation from '@/components/PremiumScrollAnimation';
 // import PremiumAnimatedBackground from '@/components/PremiumAnimatedBackground';
 // import PremiumFloatingElements from '@/components/PremiumFloatingElements';
@@ -33,9 +32,6 @@ export default function Home() {
             </div>
             <div id="sermons">
               <SermonStreaming />
-            </div>
-            <div id="programs">
-              <ProgramsSection />
             </div>
             <div id="dynamic-services">
               <DynamicServices />

@@ -28,11 +28,11 @@ const useBodyScrollLock = (isLocked: boolean) => {
 
 interface QuranAyah {
   id: string;
-  surah_number: number;
-  ayah_number: number;
-  arabic_text: string;
+  surah: number;
+  ayah: number;
+  arabic: string;
   english_translation: string;
-  bengali_translation: string;
+  bengali_translation?: string;
   urdu_translation?: string;
   audio_url?: string;
   status: string;
@@ -49,10 +49,19 @@ const QuranAyahManager: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedAyah, setSelectedAyah] = useState<QuranAyah | null>(null);
-  const [formData, setFormData] = useState({
-    surah_number: '',
-    ayah_number: '',
-    arabic_text: '',
+  const [formData, setFormData] = useState<{
+    surah: string;
+    ayah: string;
+    arabic: string;
+    english_translation: string;
+    bengali_translation: string;
+    urdu_translation: string;
+    audio_url: string;
+    status: string;
+  }>({
+    surah: '',
+    ayah: '',
+    arabic: '',
     english_translation: '',
     bengali_translation: '',
     urdu_translation: '',
@@ -78,11 +87,10 @@ const QuranAyahManager: React.FC = () => {
         const sampleAyahs: QuranAyah[] = [
           {
             id: '1',
-            surah_number: 1,
-            ayah_number: 1,
-            arabic_text: 'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ',
+            surah: 1,
+            ayah: 1,
+            arabic: 'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ',
             english_translation: 'In the name of Allah, the Entirely Merciful, the Especially Merciful.',
-            bengali_translation: 'পরম করুণাময় অসীম দয়ালু আল্লাহর নামে শুরু করছি',
             urdu_translation: 'اللہ کے نام سے جو بہت مہربان اور نہایت رحم فرمانے والا ہے',
             status: 'active',
             created_at: '2024-01-01T00:00:00Z',
@@ -102,18 +110,18 @@ const QuranAyahManager: React.FC = () => {
     // Search filter
     if (searchTerm) {
       filtered = filtered.filter(ayah => 
-        ayah.arabic_text.includes(searchTerm) ||
+        ayah.arabic.includes(searchTerm) ||
         ayah.english_translation.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ayah.bengali_translation.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        ayah.english_translation.toLowerCase().includes(searchTerm.toLowerCase()) ||
         ayah.urdu_translation?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ayah.surah_number.toString().includes(searchTerm) ||
-        ayah.ayah_number.toString().includes(searchTerm)
+        ayah.surah.toString().includes(searchTerm) ||
+        ayah.ayah.toString().includes(searchTerm)
       );
     }
 
     // Surah filter
     if (surahFilter) {
-      filtered = filtered.filter(ayah => ayah.surah_number.toString() === surahFilter);
+      filtered = filtered.filter(ayah => ayah.surah.toString() === surahFilter);
     }
 
     setFilteredAyahs(filtered);
@@ -122,9 +130,9 @@ const QuranAyahManager: React.FC = () => {
   const handleCreate = async () => {
     try {
       const newAyah = {
-        surah_number: parseInt(formData.surah_number),
-        ayah_number: parseInt(formData.ayah_number),
-        arabic_text: formData.arabic_text,
+        surah: parseInt(formData.surah),
+        ayah: parseInt(formData.ayah),
+        arabic: formData.arabic,
         english_translation: formData.english_translation,
         bengali_translation: formData.bengali_translation,
         urdu_translation: formData.urdu_translation || undefined,
@@ -137,9 +145,9 @@ const QuranAyahManager: React.FC = () => {
         setAyahs([...ayahs, response.data]);
         setIsCreateModalOpen(false);
         setFormData({
-          surah_number: '',
-          ayah_number: '',
-          arabic_text: '',
+          surah: '',
+          ayah: '',
+          arabic: '',
           english_translation: '',
           bengali_translation: '',
           urdu_translation: '',
@@ -158,9 +166,9 @@ const QuranAyahManager: React.FC = () => {
 
     const updatedAyah: QuranAyah = {
       ...selectedAyah,
-      surah_number: parseInt(formData.surah_number),
-      ayah_number: parseInt(formData.ayah_number),
-      arabic_text: formData.arabic_text,
+      surah: parseInt(formData.surah),
+      ayah: parseInt(formData.ayah),
+      arabic: formData.arabic,
       english_translation: formData.english_translation,
       bengali_translation: formData.bengali_translation,
       urdu_translation: formData.urdu_translation || undefined,
@@ -173,9 +181,9 @@ const QuranAyahManager: React.FC = () => {
     setIsEditModalOpen(false);
     setSelectedAyah(null);
     setFormData({
-      surah_number: '',
-      ayah_number: '',
-      arabic_text: '',
+      surah: '',
+      ayah: '',
+      arabic: '',
       english_translation: '',
       bengali_translation: '',
       urdu_translation: '',
@@ -193,11 +201,11 @@ const QuranAyahManager: React.FC = () => {
   const openEditModal = (ayah: QuranAyah) => {
     setSelectedAyah(ayah);
     setFormData({
-      surah_number: ayah.surah_number.toString(),
-      ayah_number: ayah.ayah_number.toString(),
-      arabic_text: ayah.arabic_text,
+      surah: ayah.surah.toString(),
+      ayah: ayah.ayah.toString(),
+      arabic: ayah.arabic,
       english_translation: ayah.english_translation,
-      bengali_translation: ayah.bengali_translation,
+      bengali_translation: ayah.bengali_translation || '',
       urdu_translation: ayah.urdu_translation || '',
       audio_url: ayah.audio_url || '',
       status: ayah.status
@@ -281,12 +289,12 @@ const QuranAyahManager: React.FC = () => {
                 <tr key={ayah.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
-                      {ayah.surah_number}:{ayah.ayah_number}
+                      {ayah.surah}:{ayah.ayah}
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm text-gray-900 font-arabic" style={{ direction: 'rtl' }}>
-                      {ayah.arabic_text.substring(0, 50)}...
+                      {ayah.arabic?.substring(0, 50) || 'No Arabic text'}...
                     </div>
                   </td>
                   <td className="px-6 py-4">
@@ -296,7 +304,7 @@ const QuranAyahManager: React.FC = () => {
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm text-gray-900">
-                      {ayah.bengali_translation.substring(0, 50)}...
+                      {ayah.english_translation.substring(0, 50)}...
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -359,8 +367,8 @@ const QuranAyahManager: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Surah Number</label>
                   <input
                     type="number"
-                    value={formData.surah_number}
-                    onChange={(e) => setFormData({...formData, surah_number: e.target.value})}
+                    value={formData.surah}
+                    onChange={(e) => setFormData({...formData, surah: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     placeholder="1"
                   />
@@ -369,8 +377,8 @@ const QuranAyahManager: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Ayah Number</label>
                   <input
                     type="number"
-                    value={formData.ayah_number}
-                    onChange={(e) => setFormData({...formData, ayah_number: e.target.value})}
+                    value={formData.ayah}
+                    onChange={(e) => setFormData({...formData, ayah: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     placeholder="1"
                   />
@@ -378,8 +386,8 @@ const QuranAyahManager: React.FC = () => {
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Arabic Text</label>
                   <textarea
-                    value={formData.arabic_text}
-                    onChange={(e) => setFormData({...formData, arabic_text: e.target.value})}
+                    value={formData.arabic}
+                    onChange={(e) => setFormData({...formData, arabic: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-arabic"
                     rows={3}
                     style={{ direction: 'rtl' }}
@@ -397,10 +405,10 @@ const QuranAyahManager: React.FC = () => {
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Bengali Translation</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">English Translation</label>
                   <textarea
-                    value={formData.bengali_translation}
-                    onChange={(e) => setFormData({...formData, bengali_translation: e.target.value})}
+                    value={formData.english_translation}
+                    onChange={(e) => setFormData({...formData, english_translation: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     rows={3}
                     placeholder="পরম করুণাময় অসীম দয়ালু আল্লাহর নামে শুরু করছি"
@@ -479,8 +487,8 @@ const QuranAyahManager: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Surah Number</label>
                   <input
                     type="number"
-                    value={formData.surah_number}
-                    onChange={(e) => setFormData({...formData, surah_number: e.target.value})}
+                    value={formData.surah}
+                    onChange={(e) => setFormData({...formData, surah: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -488,16 +496,16 @@ const QuranAyahManager: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Ayah Number</label>
                   <input
                     type="number"
-                    value={formData.ayah_number}
-                    onChange={(e) => setFormData({...formData, ayah_number: e.target.value})}
+                    value={formData.ayah}
+                    onChange={(e) => setFormData({...formData, ayah: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Arabic Text</label>
                   <textarea
-                    value={formData.arabic_text}
-                    onChange={(e) => setFormData({...formData, arabic_text: e.target.value})}
+                    value={formData.arabic}
+                    onChange={(e) => setFormData({...formData, arabic: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-arabic"
                     rows={3}
                     style={{ direction: 'rtl' }}
@@ -513,10 +521,10 @@ const QuranAyahManager: React.FC = () => {
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Bengali Translation</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">English Translation</label>
                   <textarea
-                    value={formData.bengali_translation}
-                    onChange={(e) => setFormData({...formData, bengali_translation: e.target.value})}
+                    value={formData.english_translation}
+                    onChange={(e) => setFormData({...formData, english_translation: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     rows={3}
                   />
@@ -599,7 +607,7 @@ const QuranAyahManager: React.FC = () => {
               <div className="space-y-6">
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <h3 className="text-lg font-semibold mb-2">Reference</h3>
-                  <p className="text-gray-700">Surah {selectedAyah.surah_number}, Ayah {selectedAyah.ayah_number}</p>
+                  <p className="text-gray-700">Surah {selectedAyah.surah}, Ayah {selectedAyah.ayah}</p>
                 </div>
 
                 <div className="bg-blue-50 p-4 rounded-lg">
@@ -608,7 +616,7 @@ const QuranAyahManager: React.FC = () => {
                     Arabic Text
                   </h3>
                   <p className="text-gray-900 text-xl font-arabic leading-relaxed" style={{ direction: 'rtl' }}>
-                    {selectedAyah.arabic_text}
+                    {selectedAyah.arabic}
                   </p>
                 </div>
 
@@ -620,9 +628,9 @@ const QuranAyahManager: React.FC = () => {
                 </div>
 
                 <div className="bg-yellow-50 p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold mb-2">Bengali Translation</h3>
+                  <h3 className="text-lg font-semibold mb-2">English Translation</h3>
                   <p className="text-gray-700 leading-relaxed">
-                    {selectedAyah.bengali_translation}
+                    {selectedAyah.english_translation}
                   </p>
                 </div>
 

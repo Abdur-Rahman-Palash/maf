@@ -75,13 +75,13 @@ const SermonStreaming: React.FC = () => {
     // Auto-refresh disabled - comment out the interval
     // const interval = setInterval(loadSermons, 2000);
 
-    // Listen for real-time updates from admin dashboard
-    const unsubscribe = eventSync.subscribe(EVENT_TYPES.SERMONS_UPDATED, loadSermons);
+    // Listen for real-time updates from admin dashboard (temporarily disabled)
+    // const unsubscribe = eventSync.subscribe(EVENT_TYPES.SERMONS_UPDATED, loadSermons);
 
-    return () => {
-      // clearInterval(interval); // Commented out since interval is disabled
-      unsubscribe();
-    };
+    // return () => {
+    //   // clearInterval(interval); // Commented out since interval is disabled
+    //   unsubscribe();
+    // };
   }, []);
 
   const handleSelectSermon = (sermon: Sermon) => {

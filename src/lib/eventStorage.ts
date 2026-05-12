@@ -21,19 +21,42 @@ class EventStorage {
 
   // Get all events from localStorage
   static getEvents(): Event[] {
-    if (typeof window === 'undefined') return [];
+    console.log('EventStorage.getEvents() called');
+    if (typeof window === 'undefined') {
+      console.log('EventStorage: window is undefined, returning empty array');
+      return [];
+    }
     
     try {
       const stored = localStorage.getItem(this.STORAGE_KEY);
+      console.log('EventStorage: localStorage data exists:', !!stored);
       if (stored) {
-        return JSON.parse(stored);
+        const events = JSON.parse(stored);
+        console.log('EventStorage: Loaded events from localStorage:', events.length);
+        console.log('EventStorage: Events from storage:', events.map((e: Event) => ({
+          id: e.id,
+          title: e.title,
+          date: e.date,
+          status: e.status
+        })));
+        return events;
+      } else {
+        console.log('EventStorage: No data in localStorage, loading defaults');
       }
     } catch (error) {
       console.error('Error loading events from storage:', error);
     }
     
     // Return default events if no stored data
-    return this.getDefaultEvents();
+    const defaultEvents = this.getDefaultEvents();
+    console.log('EventStorage: Returning default events:', defaultEvents.length);
+    console.log('EventStorage: Default events:', defaultEvents.map((e: Event) => ({
+      id: e.id,
+      title: e.title,
+      date: e.date,
+      status: e.status
+    })));
+    return defaultEvents;
   }
 
   // Save events to localStorage
@@ -44,6 +67,29 @@ class EventStorage {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(events));
     } catch (error) {
       console.error('Error saving events to storage:', error);
+    }
+  }
+
+  // Clear all events (useful for testing)
+  static clearEvents(): void {
+    if (typeof window === 'undefined') return;
+    
+    try {
+      localStorage.removeItem(this.STORAGE_KEY);
+    } catch (error) {
+      console.error('Error clearing events:', error);
+    }
+  }
+
+  // Reset events to defaults (useful for updating old events)
+  static resetToDefaults(): void {
+    if (typeof window === 'undefined') return;
+    
+    try {
+      const defaultEvents = this.getDefaultEvents();
+      this.saveEvents(defaultEvents);
+    } catch (error) {
+      console.error('Error resetting events:', error);
     }
   }
 
@@ -95,7 +141,7 @@ class EventStorage {
         id: '1',
         title: 'Friday Jumu\'ah Prayer',
         description: 'Weekly congregational prayer with sermon',
-        date: '2024-02-09',
+        date: '2026-05-09',
         time: '1:00 PM',
         location: 'Main Prayer Hall',
         category: 'Prayer',
@@ -109,7 +155,7 @@ class EventStorage {
         id: '2',
         title: 'Islamic Lecture Series',
         description: 'Weekly educational lecture on Islamic topics',
-        date: '2024-02-10',
+        date: '2026-05-10',
         time: '7:00 PM',
         location: 'Community Hall',
         category: 'Education',
@@ -123,12 +169,12 @@ class EventStorage {
         id: '3',
         title: 'Ramadan Iftar Dinner',
         description: 'Community iftar dinner during Ramadan',
-        date: '2024-03-15',
+        date: '2026-05-15',
         time: '6:30 PM',
         location: 'Community Center',
         category: 'Community',
         status: 'Upcoming',
-        organizer: 'Community Committee',
+        organizer: 'Ramadan Committee',
         maxAttendees: 300,
         currentAttendees: 0,
         image: '/events/iftar-dinner.jpg'
@@ -137,7 +183,7 @@ class EventStorage {
         id: '4',
         title: 'Eid Celebration',
         description: 'Eid al-Fitr celebration with prayers and festivities',
-        date: '2024-04-10',
+        date: '2026-05-20',
         time: '10:00 AM',
         location: 'Main Prayer Hall',
         category: 'Celebration',
@@ -151,7 +197,7 @@ class EventStorage {
         id: '5',
         title: 'Youth Islamic Study Circle',
         description: 'Weekly study circle for young Muslims',
-        date: '2024-02-14',
+        date: '2026-05-12',
         time: '6:00 PM',
         location: 'Library Room',
         category: 'Education',
@@ -165,7 +211,7 @@ class EventStorage {
         id: '6',
         title: 'Charity Fundraiser',
         description: 'Monthly charity fundraiser for community projects',
-        date: '2024-02-20',
+        date: '2026-05-18',
         time: '2:00 PM',
         location: 'Community Center',
         category: 'Charity',

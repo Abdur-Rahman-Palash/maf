@@ -5,16 +5,15 @@ import { motion } from 'framer-motion';
 import { FaCalendarAlt, FaMoon, FaHands, FaHeart, FaClock, FaMapMarkerAlt, FaUsers, FaPlay, FaUser, FaArrowRight, FaChevronLeft, FaChevronRight, FaBook, FaHandsHelping } from 'react-icons/fa';
 import { Link } from '@/i18n/routing';
 import EventStorage from '@/lib/eventStorage';
+import { eventSync, EVENT_TYPES } from '@/lib/eventSync';
 
 const ProgramsSection = () => {
   const [events, setEvents] = useState(EventStorage.getEvents());
   const [currentEventPage, setCurrentEventPage] = useState(0);
-  const [currentProgramPage, setCurrentProgramPage] = useState(0);
   const [registrationMessage, setRegistrationMessage] = useState('');
   const eventsPerPage = 3;
-  const programsPerPage = 4;
 
-  // Load events from storage on mount and set up interval for updates
+  // Load events from storage and set up real-time sync
   useEffect(() => {
     const loadEvents = () => {
       const storedEvents = EventStorage.getEvents();
@@ -24,83 +23,25 @@ const ProgramsSection = () => {
     // Initial load
     loadEvents();
 
-    // Set up interval to check for new events every 2 seconds
-    const interval = setInterval(loadEvents, 2000);
+    // Set up real-time sync for events
+    const unsubscribe = eventSync.subscribe(EVENT_TYPES.EVENTS_UPDATED, () => {
+      const updatedEvents = EventStorage.getEvents();
+      setEvents(updatedEvents);
+    });
 
-    return () => clearInterval(interval);
+    return () => unsubscribe();
   }, []);
 
-  const programs = [
-    {
-      title: 'General Events',
-      icon: FaCalendarAlt,
-      description: 'Community events and gatherings',
-      href: '/services/general-events',
-      color: 'from-blue-500 to-blue-600'
-    },
-    {
-      title: 'Madrasa Classes',
-      icon: FaBook,
-      description: 'Islamic education for children and adults',
-      href: '/services/madrasa',
-      color: 'from-indigo-500 to-indigo-600'
-    },
-    {
-      title: 'Meet with Imam',
-      icon: FaUser,
-      description: 'Schedule appointments with the Imam',
-      href: '/services/meet-imam',
-      color: 'from-green-500 to-green-600'
-    },
-    {
-      title: 'Nikah Services',
-      icon: FaHeart,
-      description: 'Islamic marriage ceremonies and counseling',
-      href: '/services/nikahs',
-      color: 'from-red-500 to-red-600'
-    },
-    {
-      title: 'Shahada Services',
-      icon: FaHands,
-      description: 'Support for new Muslims and shahada ceremonies',
-      href: '/services/shahadas',
-      color: 'from-purple-500 to-purple-600'
-    },
-    {
-      title: 'Family Counseling',
-      icon: FaHeart,
-      description: 'Family and marriage counseling services',
-      href: '/services/meet-imam',
-      color: 'from-teal-500 to-teal-600'
-    },
-    {
-      title: 'Youth Programs',
-      icon: FaUser,
-      description: 'Special programs for youth and young adults',
-      href: '/services/madrasa',
-      color: 'from-yellow-500 to-yellow-600'
-    },
-    {
-      title: 'Community Services',
-      icon: FaHandsHelping,
-      description: 'Volunteer and community service opportunities',
-      href: '/services/general-events',
-      color: 'from-pink-500 to-pink-600'
-    }
-  ];
-
+  // Filter upcoming events only
+  const upcomingEvents = events.filter(event => 
+    event.status === 'Upcoming' && new Date(event.date) >= new Date()
+  );
+  
   // Pagination for events
-  const totalEventPages = Math.ceil(events.length / eventsPerPage);
-  const currentEvents = events.slice(
+  const totalEventPages = Math.ceil(upcomingEvents.length / eventsPerPage);
+  const currentEvents = upcomingEvents.slice(
     currentEventPage * eventsPerPage,
     (currentEventPage + 1) * eventsPerPage
-  );
-
-  // Pagination for programs
-  const totalProgramPages = Math.ceil(programs.length / programsPerPage);
-  const currentPrograms = programs.slice(
-    currentProgramPage * programsPerPage,
-    (currentProgramPage + 1) * programsPerPage
   );
 
   const handleEventPageChange = (direction: 'prev' | 'next') => {
@@ -108,14 +49,6 @@ const ProgramsSection = () => {
       setCurrentEventPage(currentEventPage - 1);
     } else if (direction === 'next' && currentEventPage < totalEventPages - 1) {
       setCurrentEventPage(currentEventPage + 1);
-    }
-  };
-
-  const handleProgramPageChange = (direction: 'prev' | 'next') => {
-    if (direction === 'prev' && currentProgramPage > 0) {
-      setCurrentProgramPage(currentProgramPage - 1);
-    } else if (direction === 'next' && currentProgramPage < totalProgramPages - 1) {
-      setCurrentProgramPage(currentProgramPage + 1);
     }
   };
 
@@ -238,10 +171,10 @@ const ProgramsSection = () => {
           className="text-center mb-12"
         >
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'var(--font-philosopher), sans-serif' }}>
-            Programs & Events
+            Upcoming Events
           </h2>
           <p className="text-xl text-gray-600 max-w-4xl mx-auto">
-            Explore our Islamic programs and upcoming events
+            Join our community events and gatherings
           </p>
           
           {/* Registration Success Message */}
@@ -386,6 +319,8 @@ const ProgramsSection = () => {
                       <button 
                         onClick={() => {
                           EventStorage.incrementAttendees(event.id);
+                          // Emit real-time sync event
+                          eventSync.emit(EVENT_TYPES.EVENTS_UPDATED);
                           // Update local state to reflect the change
                           setEvents(EventStorage.getEvents());
                           // Show success message
@@ -429,115 +364,9 @@ const ProgramsSection = () => {
           )}
         </div>
 
-        {/* Programs Section */}
-        <div className="mb-12">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-2xl font-bold text-gray-800">Our Programs</h3>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <span>Page {currentProgramPage + 1} of {totalProgramPages}</span>
-              <div className="flex gap-1">
-                <button
-                  onClick={() => handleProgramPageChange('prev')}
-                  disabled={currentProgramPage === 0}
-                  className="p-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <FaChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => handleProgramPageChange('next')}
-                  disabled={currentProgramPage === totalProgramPages - 1}
-                  className="p-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <FaChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {currentPrograms.map((program, index) => (
-              <motion.div
-                key={program.title}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ 
-                  duration: 0.8, 
-                  delay: index * 0.1,
-                  type: "spring",
-                  stiffness: 100
-                }}
-                whileHover={{ 
-                  y: -10,
-                  scale: 1.05,
-                  transition: { duration: 0.3 }
-                }}
-                className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer border border-gray-100"
-              >
-                {/* Program Icon */}
-                <div className={`h-32 ${program.color} relative`}>
-                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                    <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
-                      <program.icon className="text-white text-2xl" />
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Program Content */}
-                <div className="p-6">
-                  <h3 className="text-lg font-bold text-gray-800 mb-2">{program.title}</h3>
-                  <p className="text-gray-600 text-sm">{program.description}</p>
-                  <div className="mt-4">
-                    <Link 
-                      href={program.href}
-                      className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 font-medium"
-                    >
-                      Learn More
-                      <FaArrowRight className="text-sm" />
-                    </Link>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Program Pagination */}
-          {totalProgramPages > 1 && (
-            <div className="flex justify-center mt-6 gap-2">
-              {Array.from({ length: totalProgramPages }, (_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrentProgramPage(i)}
-                  className={`w-8 h-8 rounded-full text-sm font-medium ${
-                    currentProgramPage === i
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
-                >
-                  {i + 1}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* View All Links */}
-        <div className="flex justify-center gap-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.4 }}
-          >
-            <Link
-              href="/services"
-              className="inline-flex items-center bg-blue-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-blue-700 transition-colors duration-300"
-            >
-              View All Programs
-              <FaArrowRight className="w-5 h-5 ml-2" />
-            </Link>
-          </motion.div>
-          
+        
+        {/* View All Events Link */}
+        <div className="flex justify-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

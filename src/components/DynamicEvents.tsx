@@ -10,13 +10,26 @@ const DynamicEvents: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showAllEvents, setShowAllEvents] = useState(false);
 
   // Load events from storage on mount and set up interval for updates
   useEffect(() => {
     const loadEvents = () => {
       try {
+        console.log('DynamicEvents: About to call EventStorage.getEvents()');
         const storedEvents = EventStorage.getEvents();
-        console.log('Loading events from storage:', storedEvents);
+        console.log('DynamicEvents: Loaded events:', storedEvents.length);
+        console.log('DynamicEvents: Events data:', storedEvents.map(e => ({
+          id: e.id,
+          title: e.title,
+          date: e.date,
+          status: e.status
+        })));
+        
+        // Also check localStorage directly
+        const localStorageEvents = localStorage.getItem('mosque_events');
+        console.log('DynamicEvents: Raw localStorage data:', localStorageEvents);
+        
         setEvents(storedEvents);
         setError(null);
       } catch (err) {
@@ -30,16 +43,12 @@ const DynamicEvents: React.FC = () => {
     // Initial load
     loadEvents();
 
-    // Set up interval to check for new events every 2 seconds
-    const interval = setInterval(loadEvents, 2000);
+    // Listen for real-time updates from admin dashboard (temporarily disabled)
+    // const unsubscribe = eventSync.subscribe(EVENT_TYPES.EVENTS_UPDATED, loadEvents);
 
-    // Listen for real-time updates from admin dashboard
-    const unsubscribe = eventSync.subscribe(EVENT_TYPES.EVENTS_UPDATED, loadEvents);
-
-    return () => {
-      clearInterval(interval);
-      unsubscribe();
-    };
+    // return () => {
+    //   unsubscribe();
+    // };
   }, []);
 
   if (loading) {
@@ -58,12 +67,14 @@ const DynamicEvents: React.FC = () => {
     );
   }
 
-  // Filter upcoming events
-  const upcomingEvents = events.filter(event => 
-    event.status === 'Upcoming' && new Date(event.date) >= new Date()
-  ).slice(0, 3); // Show only next 3 events
+  // Filter events based on showAllEvents state
+  const displayEvents = showAllEvents ? 
+    events.filter(event => event.status === 'Upcoming') : // Show all upcoming events
+    events.filter(event => 
+      event.status === 'Upcoming' && new Date(event.date) >= new Date()
+    ).slice(0, 3); // Show only next 3 events
 
-  if (upcomingEvents.length === 0) {
+  if (displayEvents.length === 0) {
     return (
       <div className="text-center py-12">
         <p className="text-gray-600">No upcoming events at the moment.</p>
@@ -80,7 +91,7 @@ const DynamicEvents: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {upcomingEvents.map((event: Event, index) => (
+          {displayEvents.map((event: Event, index: number) => (
             <motion.div
               key={event.id}
               initial={{ opacity: 0, y: 20 }}
@@ -132,8 +143,11 @@ const DynamicEvents: React.FC = () => {
         </div>
 
         <div className="text-center mt-12">
-          <button className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
-            View All Events
+          <button 
+            onClick={() => setShowAllEvents(!showAllEvents)}
+            className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+          >
+            {showAllEvents ? 'Show Less Events' : 'View All Events'}
           </button>
         </div>
       </div>

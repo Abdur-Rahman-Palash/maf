@@ -4,20 +4,45 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import WaveSurfer from 'wavesurfer.js';
 import { FaPlay, FaPause, FaVolumeUp } from 'react-icons/fa';
-
-const recitations = [
-  { id: 1, surah: 'Al-Fatiha', reciter: 'Abdul Basit Abdul Samad', url: 'https://server7.mp3quran.net/basit/Almusshaf-Al-Mojawwad/001.mp3', arabic: 'الفاتحة' },
-  { id: 2, surah: 'Al-Ikhlas', reciter: 'Abdul Basit Abdul Samad', url: 'https://server7.mp3quran.net/basit/Almusshaf-Al-Mojawwad/112.mp3', arabic: 'الإخلاص' },
-  { id: 3, surah: 'Al-Falaq', reciter: 'Abdul Basit Abdul Samad', url: 'https://server7.mp3quran.net/basit/Almusshaf-Al-Mojawwad/113.mp3', arabic: 'الفلق' },
-  { id: 4, surah: 'An-Nas', reciter: 'Abdul Basit Abdul Samad', url: 'https://server7.mp3quran.net/basit/Almusshaf-Al-Mojawwad/114.mp3', arabic: 'الناس' },
-];
+import MediaStorage, { Media } from '@/lib/mediaStorage';
+import { eventSync, EVENT_TYPES } from '@/lib/eventSync';
 
 export default function QuranSection() {
   const waveformRef = useRef<HTMLDivElement>(null);
   const wavesurfer = useRef<WaveSurfer | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTrack, setCurrentTrack] = useState(recitations[0]);
+  const [recitations, setRecitations] = useState<Media[]>([]);
+  const [currentTrack, setCurrentTrack] = useState<Media | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Load recitations from MediaStorage and set up real-time sync
+  useEffect(() => {
+    console.log('QuranSection: Loading audio recitations...');
+    const allMedia = MediaStorage.getMedia();
+    console.log('QuranSection: Total media loaded:', allMedia.length);
+    const audioRecitations = allMedia.filter(media => media.type === 'audio');
+    console.log('QuranSection: Audio recitations found:', audioRecitations.length);
+    console.log('QuranSection: Audio items:', audioRecitations.map(m => ({id: m.id, title: m.title, category: m.category})));
+    setRecitations(audioRecitations);
+    if (audioRecitations.length > 0) {
+      setCurrentTrack(audioRecitations[0]);
+    }
+
+    // Set up real-time sync for media updates
+    const unsubscribe = eventSync.subscribe(EVENT_TYPES.MEDIA_UPDATED, () => {
+      console.log('QuranSection: Received MEDIA_UPDATED event, reloading audio...');
+      const allMedia = MediaStorage.getMedia();
+      const audioRecitations = allMedia.filter(media => media.type === 'audio');
+      setRecitations(audioRecitations);
+      if (audioRecitations.length > 0 && (!currentTrack || !audioRecitations.find(r => r.id === currentTrack.id))) {
+        setCurrentTrack(audioRecitations[0]);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []); // Remove currentTrack dependency to prevent infinite loops
 
   useEffect(() => {
     if (waveformRef.current) {
@@ -33,14 +58,18 @@ export default function QuranSection() {
         normalize: true,
       });
 
-      wavesurfer.current.load(currentTrack.url);
+      if (currentTrack) {
+        wavesurfer.current.load(currentTrack.file_url);
+      }
 
       wavesurfer.current.on('finish', () => {
         setIsPlaying(false);
         // Auto-play next track
-        const currentIndex = recitations.findIndex(t => t.id === currentTrack.id);
-        const nextIndex = (currentIndex + 1) % recitations.length;
-        setCurrentTrack(recitations[nextIndex]);
+        if (currentTrack && recitations.length > 0) {
+          const currentIndex = recitations.findIndex(t => t.id === currentTrack.id);
+          const nextIndex = (currentIndex + 1) % recitations.length;
+          setCurrentTrack(recitations[nextIndex]);
+        }
       });
 
       wavesurfer.current.on('play', () => setIsPlaying(true));
@@ -59,7 +88,7 @@ export default function QuranSection() {
     }
   };
 
-  const changeTrack = (track: typeof recitations[0]) => {
+  const changeTrack = (track: Media) => {
     setCurrentTrack(track);
     setIsLoading(true);
   };
@@ -179,16 +208,18 @@ export default function QuranSection() {
             >
                 {/* Header with Current Track */}
                 <div className="bg-gradient-to-r from-amber-500 to-amber-600 p-8 text-white">
-                    <motion.div
-                      key={currentTrack.id}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.5 }}
-                    >
-                        <h3 className="text-3xl font-bold mb-2">{currentTrack.surah}</h3>
-                        <p className="text-amber-100 text-lg mb-1">{currentTrack.arabic}</p>
-                        <p className="text-amber-200">{currentTrack.reciter}</p>
-                    </motion.div>
+                    {currentTrack && (
+                      <motion.div
+                        key={currentTrack.id}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5 }}
+                      >
+                          <h3 className="text-3xl font-bold mb-2">{currentTrack.title}</h3>
+                          <p className="text-amber-100 text-lg mb-1">{currentTrack.description}</p>
+                          <p className="text-amber-200">Duration: {currentTrack.duration}</p>
+                      </motion.div>
+                    )}
                 </div>
 
                 {/* Waveform and Controls */}
@@ -257,7 +288,7 @@ export default function QuranSection() {
                                 key={track.id}
                                 onClick={() => changeTrack(track)}
                                 className={`p-4 rounded-xl text-left transition-all border-2 ${
-                                    currentTrack.id === track.id 
+                                    currentTrack?.id === track.id 
                                         ? 'bg-gradient-to-r from-amber-50 to-amber-100 border-amber-400 shadow-md' 
                                         : 'bg-slate-50 border-transparent hover:bg-slate-100 hover:border-amber-200'
                                 }`}
@@ -269,11 +300,11 @@ export default function QuranSection() {
                             >
                                 <div className="flex items-center justify-between">
                                     <div className="text-left">
-                                        <span className="font-bold block text-slate-800 text-lg">{track.surah}</span>
-                                        <span className="text-amber-600 text-sm">{track.arabic}</span>
-                                        <span className="text-slate-500 text-xs block">Beautiful Recitation</span>
+                                        <span className="font-bold block text-slate-800 text-lg">{track.title}</span>
+                                        <span className="text-amber-600 text-sm">{track.category}</span>
+                                        <span className="text-slate-500 text-xs block">{track.description}</span>
                                     </div>
-                                    {currentTrack.id === track.id && (
+                                    {currentTrack?.id === track.id && (
                                         <motion.div
                                             className="w-3 h-3 bg-amber-500 rounded-full"
                                             animate={{ scale: [1, 1.5, 1] }}

@@ -5,7 +5,6 @@ import { useLocale } from 'next-intl';
 import AdminAuth from '@/components/AdminAuth';
 import { getDashboardStats, initializeSampleData } from '@/lib/crudOperations';
 import EventManager from '@/components/admin/EventManager';
-import DonationManager from '@/components/admin/DonationManager';
 import QuranAyahManager from '@/components/admin/QuranAyahManager';
 import ServiceManager from '@/components/admin/ServiceManager';
 import MediaManager from '@/components/admin/MediaManager';
@@ -13,7 +12,7 @@ import PrayerTimesManager from '@/components/admin/PrayerTimesManager';
 import RealTimeSync from '@/components/admin/RealTimeSync';
 import { 
   FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaBell, FaMosque, 
-  FaDonate, FaBook, FaComments, FaClock, FaChartLine, FaEye,
+  FaBook, FaComments, FaClock, FaChartLine, FaEye,
   FaEdit, FaTrash, FaPlus, FaDownload, FaUpload, FaSignOutAlt,
   FaUserCheck, FaUserTimes, FaEnvelope, FaFileAlt, FaImage,
   FaVideo, FaMicrophone, FaNewspaper, FaHandsHelping, FaPray,
@@ -39,8 +38,8 @@ export default function AdminPage() {
   const [stats, setStats] = useState({
     totalEvents: 0,
     upcomingEvents: 0,
-    totalDonations: 0,
-    monthlyDonations: 0,
+    totalMembers: 0,
+    activeMembers: 0,
     totalContent: 0,
     publishedContent: 0
   });
@@ -145,13 +144,6 @@ export default function AdminPage() {
                 Events
               </button>
               <button
-                onClick={() => handleNavigation('/admin/donations')}
-                className="py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              >
-                <FaDonate className="inline mr-2" />
-                Donations
-              </button>
-              <button
                 onClick={() => handleNavigation('/admin/quran')}
                 className="py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
               >
@@ -171,6 +163,13 @@ export default function AdminPage() {
               >
                 <FaClock className="inline mr-2" />
                 Prayer Times
+              </button>
+              <button
+                onClick={() => handleNavigation('/admin/announcements')}
+                className="py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              >
+                <FaBell className="inline mr-2" />
+                Announcements
               </button>
               <button
                 onClick={() => handleNavigation('/admin/media')}
@@ -199,17 +198,7 @@ export default function AdminPage() {
                 <FaCalendarAlt className="text-3xl text-blue-500" />
               </div>
             </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Total Donations</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalDonations}</p>
-                  <p className="text-xs text-gray-500">${stats.monthlyDonations.toLocaleString()} this month</p>
-                </div>
-                <FaDonate className="text-3xl text-purple-500" />
-              </div>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
+                        <div className="bg-white rounded-lg shadow p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Quran Content</p>
@@ -241,14 +230,7 @@ export default function AdminPage() {
               >
                 <FaPlus /> Add New Event
               </button>
-              <button
-                onClick={() => handleNavigation('/admin/donations')}
-                className="flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-              >
-                <FaDonate /> Record Donation
-              </button>
-            </div>
-          </div>
+                        </div>
 
           {/* Recent Activity */}
           <div className="bg-white rounded-lg shadow p-6">
@@ -286,5 +268,6 @@ export default function AdminPage() {
       {/* Real-time Sync Indicator */}
       <RealTimeSync onDataUpdate={handleDataUpdate} />
     </div>
+  </div>
   );
 }

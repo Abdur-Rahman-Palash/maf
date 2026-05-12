@@ -1,36 +1,76 @@
 'use client';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaImages, FaVideo, FaNewspaper, FaMicrophone } from 'react-icons/fa';
+import MediaStorage, { Media } from '@/lib/mediaStorage';
+import { eventSync, EVENT_TYPES } from '@/lib/eventSync';
 
 export default function MediaPage() {
+  const [mediaItems, setMediaItems] = useState<Media[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    console.log('MediaPage: Loading media from storage...');
+    const loadedMedia = MediaStorage.getMedia();
+    console.log('MediaPage: Loaded media:', loadedMedia.length, 'items');
+    console.log('MediaPage: Media items:', loadedMedia.map(m => ({id: m.id, title: m.title, type: m.type})));
+    setMediaItems(loadedMedia);
+    setLoading(false);
+
+    // Set up real-time sync listener
+    const unsubscribe = eventSync.subscribe(EVENT_TYPES.MEDIA_UPDATED, () => {
+      console.log('MediaPage: Received MEDIA_UPDATED event, reloading...');
+      const updatedMedia = MediaStorage.getMedia();
+      setMediaItems(updatedMedia);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-6 flex justify-center items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+      </div>
+    );
+  }
+
+  // Group media by type
+  const images = mediaItems.filter(m => m.type === 'image');
+  const videos = mediaItems.filter(m => m.type === 'video');
+  const audio = mediaItems.filter(m => m.type === 'audio');
+  const documents = mediaItems.filter(m => m.type === 'document');
+
   const mediaCategories = [
     {
       icon: FaImages,
       title: "Photo Gallery",
-      description: "View images from our events, prayers, and community activities",
+      description: `View ${images.length} images from our events, prayers, and community activities`,
       color: "emerald",
-      items: ["Ramadan 2024", "Eid Celebration", "Weekend School", "Community Iftar"]
+      items: images.slice(0, 4).map(img => img.title)
     },
     {
       icon: FaVideo,
       title: "Video Library",
-      description: "Watch recorded lectures, prayers, and special events",
+      description: `Watch ${videos.length} recorded lectures, prayers, and special events`,
       color: "blue",
-      items: ["Friday Khutbah", "Islamic Lectures", "Quran Recitation", "Event Highlights"]
+      items: videos.slice(0, 4).map(video => video.title)
     },
     {
       icon: FaNewspaper,
       title: "News & Updates",
-      description: "Stay updated with our latest announcements and community news",
+      description: `Stay updated with our latest announcements and community news`,
       color: "amber",
-      items: ["Recent News", "Press Releases", "Community Updates", "Announcements"]
+      items: documents.slice(0, 4).map(doc => doc.title)
     },
     {
       icon: FaMicrophone,
       title: "Audio Resources",
-      description: "Listen to Quran recitations, lectures, and nasheeds",
+      description: `Listen to ${audio.length} Quran recitations, lectures, and nasheeds`,
       color: "purple",
-      items: ["Quran Audio", "Lectures", "Nasheeds", "Podcasts"]
+      items: audio.slice(0, 4).map(audio => audio.title)
     }
   ];
 
@@ -94,33 +134,21 @@ export default function MediaPage() {
         >
           <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Recent Highlights</h2>
           <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                title: "Eid al-Fitr 2024",
-                type: "Photo Gallery",
-                date: "April 2024",
-                description: "Celebration highlights from our Eid prayer and community gathering"
-              },
-              {
-                title: "Ramadan Lecture Series",
-                type: "Video",
-                date: "March 2024",
-                description: "Special lectures delivered during the holy month of Ramadan"
-              },
-              {
-                title: "Community Iftar",
-                type: "News",
-                date: "March 2024",
-                description: "Report on our community iftar programs and activities"
-              }
-            ].map((highlight, index) => (
-              <div key={index} className="bg-white rounded-lg p-4">
-                <div className="text-xs text-gray-500 mb-2">{highlight.date}</div>
-                <h3 className="font-bold text-gray-900 mb-2">{highlight.title}</h3>
-                <div className="text-xs text-emerald-600 font-medium mb-2">{highlight.type}</div>
-                <p className="text-sm text-gray-600">{highlight.description}</p>
-              </div>
-            ))}
+            {mediaItems
+              .filter(media => media.featured)
+              .slice(0, 3)
+              .map((media, index) => (
+                <div key={media.id} className="bg-white rounded-lg p-4">
+                  <div className="text-xs text-gray-500 mb-2">
+                    {new Date(media.created_at).toLocaleDateString()}
+                  </div>
+                  <h3 className="font-bold text-gray-900 mb-2">{media.title}</h3>
+                  <div className="text-xs text-emerald-600 font-medium mb-2 capitalize">
+                    {media.type}
+                  </div>
+                  <p className="text-sm text-gray-600">{media.description}</p>
+                </div>
+              ))}
           </div>
         </motion.div>
 

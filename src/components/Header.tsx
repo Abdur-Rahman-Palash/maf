@@ -7,7 +7,6 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
 import { useRouter } from 'next/navigation';
 import HeaderPrayerTimes from './HeaderPrayerTimes';
-import DonateButton from './DonateButton';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -147,13 +146,7 @@ const Header = () => {
 
           {/* Right Side - Donate Button (Desktop) + Mobile Menu Button */}
           <div className="flex items-center space-x-4">
-            {/* Donate Button - Desktop Only */}
-            <div className="hidden lg:block">
-              <DonateButton href="https://us.mohid.co/ga/atlanta/muna/masjid/online/donation" target="_blank" rel="noopener noreferrer" className="my-0">
-                Donate
-              </DonateButton>
-            </div>
-
+            
             {/* Mobile Menu Button */}
             <motion.button
               className="lg:hidden text-gray-800 hover:text-yellow-600 transition-colors duration-200"
@@ -216,19 +209,6 @@ const Header = () => {
                     </motion.div>
                   ))}
                 </nav>
-
-                {/* Mobile Donate Button */}
-                <DonateButton 
-                  href="https://us.mohid.co/ga/atlanta/muna/masjid/online/donation"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="w-full text-center my-4 px-2 py-1 text-xs"
-                >
-                  Donate
-                </DonateButton>
               </div>
             </motion.div>
           </motion.div>

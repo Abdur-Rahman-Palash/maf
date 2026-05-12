@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import MediaStorage, { Media as MediaType } from '@/lib/mediaStorage';
+import { eventSync, EVENT_TYPES } from '@/lib/eventSync';
 import { 
   FaPlus, FaEdit, FaTrash, FaSearch, FaFilter, FaSave, FaTimes, FaEye,
   FaImage, FaVideo, FaMusic, FaFile, FaPlay, FaPause, FaVolumeUp,
@@ -26,41 +28,24 @@ const useBodyScrollLock = (isLocked: boolean) => {
   }, [isLocked]);
 };
 
-interface Media {
-  id: string;
-  title: string;
-  description?: string;
-  type: string;
-  file_url: string;
-  thumbnail_url?: string;
-  category: string;
-  tags: string[];
-  file_size?: number;
-  duration?: string;
-  status: string;
-  featured: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
 const MediaManager: React.FC = () => {
-  const [mediaItems, setMediaItems] = useState<Media[]>([]);
-  const [filteredMedia, setFilteredMedia] = useState<Media[]>([]);
+  const [mediaItems, setMediaItems] = useState<MediaType[]>([]);
+  const [filteredMedia, setFilteredMedia] = useState<MediaType[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [selectedMedia, setSelectedMedia] = useState<Media | null>(null);
-  const [formData, setFormData] = useState({
+  const [selectedMedia, setSelectedMedia] = useState<MediaType | null>(null);
+  const [formData, setFormData] = useState<Partial<MediaType>>({
     title: '',
     description: '',
     type: 'image',
     file_url: '',
     thumbnail_url: '',
     category: 'gallery',
-    tags: '',
+    tags: [],
     status: 'active',
     featured: false
   });
@@ -69,75 +54,14 @@ const MediaManager: React.FC = () => {
   const isAnyModalOpen = isCreateModalOpen || isEditModalOpen || isViewModalOpen;
   useBodyScrollLock(isAnyModalOpen);
 
-  // Sample data for demonstration
+  // Load media from storage on mount
   useEffect(() => {
-    const sampleMedia: Media[] = [
-      {
-        id: '1',
-        title: 'Friday Prayer - Jumuah',
-        description: 'Weekly Friday congregation prayer with sermon',
-        type: 'video',
-        file_url: '/videos/friday-prayer.mp4',
-        thumbnail_url: '/thumbnails/friday-prayer.jpg',
-        category: 'sermon',
-        tags: ['friday', 'prayer', 'jumuah', 'sermon'],
-        file_size: 52428800,
-        duration: '45:30',
-        status: 'active',
-        featured: true,
-        created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z'
-      },
-      {
-        id: '2',
-        title: 'Ramadan Iftar',
-        description: 'Community iftar during Ramadan 2024',
-        type: 'image',
-        file_url: '/images/iftar-2024.jpg',
-        thumbnail_url: '/thumbnails/iftar-2024.jpg',
-        category: 'event',
-        tags: ['ramadan', 'iftar', 'community', 'event'],
-        file_size: 2097152,
-        status: 'active',
-        featured: true,
-        created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z'
-      },
-      {
-        id: '3',
-        title: 'Eid Mubarak Celebration',
-        description: 'Eid prayer and celebration highlights',
-        type: 'video',
-        file_url: '/videos/eid-celebration.mp4',
-        thumbnail_url: '/thumbnails/eid-celebration.jpg',
-        category: 'announcement',
-        tags: ['eid', 'celebration', 'prayer', 'festival'],
-        file_size: 78643200,
-        duration: '12:15',
-        status: 'active',
-        featured: false,
-        created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z'
-      },
-      {
-        id: '4',
-        title: 'Quran Recitation - Surah Al-Fatiha',
-        description: 'Beautiful recitation of Surah Al-Fatiha',
-        type: 'audio',
-        file_url: '/audio/surah-fatiha.mp3',
-        thumbnail_url: '/thumbnails/quran-recitation.jpg',
-        category: 'sermon',
-        tags: ['quran', 'recitation', 'surah', 'fatiha'],
-        file_size: 3145728,
-        duration: '3:45',
-        status: 'active',
-        featured: true,
-        created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z'
-      }
-    ];
-    setMediaItems(sampleMedia);
-    setFilteredMedia(sampleMedia);
+    console.log('MediaManager: Loading media from storage...');
+    const loadedMedia = MediaStorage.getMedia();
+    console.log('MediaManager: Loaded media:', loadedMedia.length, 'items');
+    console.log('MediaManager: Media items:', loadedMedia.map(m => ({id: m.id, title: m.title, type: m.type})));
+    setMediaItems(loadedMedia);
+    setFilteredMedia(loadedMedia);
   }, []);
 
   useEffect(() => {
@@ -167,22 +91,26 @@ const MediaManager: React.FC = () => {
   }, [mediaItems, searchTerm, typeFilter, categoryFilter]);
 
   const handleCreate = () => {
-    const newMedia: Media = {
-      id: Date.now().toString(),
-      title: formData.title,
-      description: formData.description,
-      type: formData.type,
-      file_url: formData.file_url,
-      thumbnail_url: formData.thumbnail_url,
-      category: formData.category,
-      tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
-      status: formData.status,
-      featured: formData.featured,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
+    const newMedia = MediaStorage.addMedia({
+      title: formData.title || '',
+      description: formData.description || '',
+      type: formData.type as MediaType['type'] || 'image',
+      file_url: formData.file_url || '',
+      thumbnail_url: formData.thumbnail_url || '',
+      category: formData.category || 'gallery',
+      tags: formData.tags || [],
+      file_size: 0,
+      duration: '0:00',
+      status: formData.status as MediaType['status'] || 'active',
+      featured: false
+    });
 
-    setMediaItems([...mediaItems, newMedia]);
+    setMediaItems(MediaStorage.getMedia());
+    
+    // Emit real-time sync event
+    eventSync.emit(EVENT_TYPES.MEDIA_UPDATED);
+    console.log('MediaManager: Emitted MEDIA_UPDATED event');
+    
     setIsCreateModalOpen(false);
     setFormData({
       title: '',
@@ -191,7 +119,7 @@ const MediaManager: React.FC = () => {
       file_url: '',
       thumbnail_url: '',
       category: 'gallery',
-      tags: '',
+      tags: [],
       status: 'active',
       featured: false
     });
@@ -200,21 +128,26 @@ const MediaManager: React.FC = () => {
   const handleUpdate = () => {
     if (!selectedMedia) return;
 
-    const updatedMedia: Media = {
-      ...selectedMedia,
+    const updatedMedia = MediaStorage.updateMedia(selectedMedia.id, {
       title: formData.title,
       description: formData.description,
-      type: formData.type,
+      type: formData.type as MediaType['type'],
       file_url: formData.file_url,
       thumbnail_url: formData.thumbnail_url,
       category: formData.category,
-      tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
-      status: formData.status,
-      featured: formData.featured,
-      updated_at: new Date().toISOString()
-    };
+      tags: formData.tags || [],
+      status: formData.status as MediaType['status'],
+      featured: formData.featured
+    });
 
-    setMediaItems(mediaItems.map(media => media.id === selectedMedia.id ? updatedMedia : media));
+    if (updatedMedia) {
+      setMediaItems(MediaStorage.getMedia());
+      
+      // Emit real-time sync event
+      eventSync.emit(EVENT_TYPES.MEDIA_UPDATED);
+      console.log('MediaManager: Emitted MEDIA_UPDATED event for update');
+    }
+
     setIsEditModalOpen(false);
     setSelectedMedia(null);
     setFormData({
@@ -224,7 +157,7 @@ const MediaManager: React.FC = () => {
       file_url: '',
       thumbnail_url: '',
       category: 'gallery',
-      tags: '',
+      tags: [],
       status: 'active',
       featured: false
     });
@@ -232,11 +165,18 @@ const MediaManager: React.FC = () => {
 
   const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this media file?')) {
-      setMediaItems(mediaItems.filter(media => media.id !== id));
+      const deleted = MediaStorage.deleteMedia(id);
+      if (deleted) {
+        setMediaItems(MediaStorage.getMedia());
+        
+        // Emit real-time sync event
+        eventSync.emit(EVENT_TYPES.MEDIA_UPDATED);
+        console.log('MediaManager: Emitted MEDIA_UPDATED event for delete');
+      }
     }
   };
 
-  const openEditModal = (media: Media) => {
+  const openEditModal = (media: MediaType) => {
     setSelectedMedia(media);
     setFormData({
       title: media.title,
@@ -245,14 +185,14 @@ const MediaManager: React.FC = () => {
       file_url: media.file_url,
       thumbnail_url: media.thumbnail_url || '',
       category: media.category,
-      tags: media.tags.join(', '),
+      tags: media.tags,
       status: media.status,
       featured: media.featured
     });
     setIsEditModalOpen(true);
   };
 
-  const openViewModal = (media: Media) => {
+  const openViewModal = (media: MediaType) => {
     setSelectedMedia(media);
     setIsViewModalOpen(true);
   };
@@ -505,7 +445,7 @@ const MediaManager: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
                     <select
                       value={formData.type}
-                      onChange={(e) => setFormData({...formData, type: e.target.value})}
+                      onChange={(e) => setFormData({...formData, type: e.target.value as MediaType['type']})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="image">Image</option>
@@ -527,14 +467,32 @@ const MediaManager: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">File URL</label>
-                    <input
-                      type="url"
-                      value={formData.file_url}
-                      onChange={(e) => setFormData({...formData, file_url: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      placeholder="https://example.com/media.jpg"
-                    />
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {formData.type === 'audio' ? 'Upload MP3 File' : 'File URL'}
+                    </label>
+                    {formData.type === 'audio' ? (
+                      <input
+                        type="file"
+                        accept="audio/mp3,audio/mpeg"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            // Create a local URL for the uploaded file
+                            const localUrl = URL.createObjectURL(file);
+                            setFormData({...formData, file_url: localUrl});
+                          }
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <input
+                        type="url"
+                        value={formData.file_url}
+                        onChange={(e) => setFormData({...formData, file_url: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="https://example.com/media.jpg"
+                      />
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Thumbnail URL</label>
@@ -565,8 +523,8 @@ const MediaManager: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
                     <input
                       type="text"
-                      value={formData.tags}
-                      onChange={(e) => setFormData({...formData, tags: e.target.value})}
+                      value={formData.tags ? formData.tags.join(', ') : ''}
+                      onChange={(e) => setFormData({...formData, tags: e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag)})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                       placeholder="tag1, tag2, tag3"
                     />
@@ -577,7 +535,7 @@ const MediaManager: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                     <select
                       value={formData.status}
-                      onChange={(e) => setFormData({...formData, status: e.target.value})}
+                      onChange={(e) => setFormData({...formData, status: e.target.value as MediaType['status']})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="active">Active</option>
@@ -648,7 +606,7 @@ const MediaManager: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
                     <select
                       value={formData.type}
-                      onChange={(e) => setFormData({...formData, type: e.target.value})}
+                      onChange={(e) => setFormData({...formData, type: e.target.value as MediaType['type']})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="image">Image</option>
@@ -669,13 +627,31 @@ const MediaManager: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">File URL</label>
-                    <input
-                      type="url"
-                      value={formData.file_url}
-                      onChange={(e) => setFormData({...formData, file_url: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    />
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {formData.type === 'audio' ? 'Upload MP3 File' : 'File URL'}
+                    </label>
+                    {formData.type === 'audio' ? (
+                      <input
+                        type="file"
+                        accept="audio/mp3,audio/mpeg"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            // Create a local URL for the uploaded file
+                            const localUrl = URL.createObjectURL(file);
+                            setFormData({...formData, file_url: localUrl});
+                          }
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <input
+                        type="url"
+                        value={formData.file_url}
+                        onChange={(e) => setFormData({...formData, file_url: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      />
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Thumbnail URL</label>
@@ -705,8 +681,8 @@ const MediaManager: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
                     <input
                       type="text"
-                      value={formData.tags}
-                      onChange={(e) => setFormData({...formData, tags: e.target.value})}
+                      value={formData.tags ? formData.tags.join(', ') : ''}
+                      onChange={(e) => setFormData({...formData, tags: e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag)})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
@@ -716,7 +692,7 @@ const MediaManager: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                     <select
                       value={formData.status}
-                      onChange={(e) => setFormData({...formData, status: e.target.value})}
+                      onChange={(e) => setFormData({...formData, status: e.target.value as MediaType['status']})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="active">Active</option>

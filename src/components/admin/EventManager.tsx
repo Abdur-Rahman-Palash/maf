@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { eventManager, Event, initializeSampleData } from '@/lib/crudOperations';
+import EventStorage, { Event } from '@/lib/eventStorage';
 import { eventsApi } from '@/lib/apiService';
 import { 
   FaPlus, FaEdit, FaTrash, FaSearch, FaFilter, FaCalendarAlt,
@@ -28,22 +28,21 @@ const useBodyScrollLock = (isLocked: boolean) => {
 };
 
 const EventManager: React.FC = () => {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
+  const [events, setEvents] = useState<any[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [formData, setFormData] = useState<Partial<Event>>({});
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [formData, setFormData] = useState<any>({});
 
   // Lock body scroll when any modal is open
   const isAnyModalOpen = isCreateModalOpen || isEditModalOpen || isViewModalOpen;
   useBodyScrollLock(isAnyModalOpen);
 
   useEffect(() => {
-    initializeSampleData();
     loadEvents();
   }, []);
 
@@ -52,7 +51,7 @@ const EventManager: React.FC = () => {
   }, [events, searchTerm, statusFilter]);
 
   const loadEvents = () => {
-    const allEvents = eventManager.readAll();
+    const allEvents = EventStorage.getEvents();
     setEvents(allEvents);
   };
 
@@ -60,7 +59,12 @@ const EventManager: React.FC = () => {
     let filtered = events;
 
     if (searchTerm) {
-      filtered = eventManager.search(searchTerm, ['title', 'description', 'location', 'category']);
+      filtered = filtered.filter(event => 
+        event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.category.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
 
     if (statusFilter !== 'all') {
@@ -72,56 +76,46 @@ const EventManager: React.FC = () => {
 
   const handleCreate = async () => {
     try {
-      const newEvent = eventManager.create({
+      const newEvent = EventStorage.addEvent({
         title: formData.title || '',
         description: formData.description || '',
         date: formData.date || '',
         time: formData.time || '',
         location: formData.location || '',
         category: formData.category || '',
-        maxAttendees: formData.maxAttendees,
+        maxAttendees: formData.maxAttendees || 50,
         currentAttendees: 0,
-        status: 'upcoming'
+        status: 'Upcoming',
+        organizer: 'Admin',
+        image: '/events/default.jpg'
       });
-
-      // Also create via API to sync with homepage
-      await eventsApi.create({
-        title: formData.title || '',
-        description: formData.description || '',
-        date: formData.date || '',
-        time: formData.time || '',
-        location: formData.location || '',
-        category: formData.category || '',
-        maxAttendees: formData.maxAttendees,
-        currentAttendees: 0,
-        status: 'upcoming'
-      });
-
-      setEvents([...events, newEvent]);
+      
+      setEvents(EventStorage.getEvents());
       setIsCreateModalOpen(false);
       setFormData({});
     } catch (error) {
-      console.error('Failed to create event:', error);
-      alert('Failed to create event. Please try again.');
+      console.error('Error creating event:', error);
     }
   };
 
   const handleUpdate = () => {
     if (!selectedEvent) return;
 
-    const updatedEvent = eventManager.update(selectedEvent.id, formData);
-    if (updatedEvent) {
-      setEvents(events.map(e => e.id === selectedEvent.id ? updatedEvent : e));
-      setIsEditModalOpen(false);
-      setSelectedEvent(null);
-      setFormData({});
-    }
+    EventStorage.updateEvent(selectedEvent.id, {
+      ...selectedEvent,
+      ...formData
+    });
+    
+    setEvents(EventStorage.getEvents());
+    setIsEditModalOpen(false);
+    setSelectedEvent(null);
+    setFormData({});
   };
 
   const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this event?')) {
-      eventManager.delete(id);
-      setEvents(events.filter(e => e.id !== id));
+      EventStorage.deleteEvent(id);
+      setEvents(EventStorage.getEvents());
     }
   };
 
@@ -390,10 +384,9 @@ const EventManager: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, status: e.target.value as Event['status'] })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  <option value="upcoming">Upcoming</option>
-                  <option value="ongoing">Ongoing</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
+                  <option value="Upcoming">Upcoming</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Cancelled">Cancelled</option>
                 </select>
                 <input
                   type="number"

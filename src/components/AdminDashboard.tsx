@@ -5,13 +5,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { eventSync, EVENT_TYPES } from '@/lib/eventSync';
 import SermonStorage from '@/lib/sermonStorage';
 import EventStorage from '@/lib/eventStorage';
+import MediaStorage, { Media } from '@/lib/mediaStorage';
+import QuranStorage, { QuranRecitation, QuranVerse } from '@/lib/quranStorage';
+import AnnouncementStorage, { AnnouncementItem } from '@/lib/announcementStorage';
 import { 
   FaUsers, FaCalendarAlt, FaChartBar, FaCog, FaBell, FaMosque, 
-  FaDonate, FaBook, FaComments, FaClock, FaChartLine, FaEye,
+  FaBook, FaComments, FaClock, FaChartLine, FaEye,
   FaEdit, FaTrash, FaPlus, FaDownload, FaUpload, FaSignOutAlt,
   FaUserCheck, FaUserTimes, FaEnvelope, FaFileAlt, FaImage,
   FaVideo, FaMicrophone, FaNewspaper, FaHandsHelping, FaPray,
-  FaGraduationCap, FaCheck, FaMapMarkerAlt, FaUser, FaPlay
+  FaGraduationCap, FaCheck, FaMapMarkerAlt, FaUser, FaPlay, FaStar, FaTimes
 } from 'react-icons/fa';
 
 interface AdminUser {
@@ -28,8 +31,6 @@ interface DashboardStats {
   activeMembers: number;
   totalEvents: number;
   upcomingEvents: number;
-  totalDonations: number;
-  monthlyDonations: number;
   totalSermons: number;
   recentSermons: number;
   communityPosts: number;
@@ -40,7 +41,7 @@ interface DashboardStats {
 
 interface Activity {
   id: string;
-  type: 'user' | 'event' | 'donation' | 'sermon' | 'post';
+  type: 'user' | 'event' | 'sermon' | 'post';
   title: string;
   description: string;
   timestamp: string;
@@ -96,8 +97,65 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
   const [showEditSermonModal, setShowEditSermonModal] = useState(false);
   const [selectedSermon, setSelectedSermon] = useState<any>(null);
   const [sermonFilter, setSermonFilter] = useState('all');
-  const [showAddDonationModal, setShowAddDonationModal] = useState(false);
+  
+  // Announcement States
+  const [announcements, setAnnouncements] = useState<AnnouncementItem[]>([]);
+  const [showAddAnnouncementModal, setShowAddAnnouncementModal] = useState(false);
+  const [showEditAnnouncementModal, setShowEditAnnouncementModal] = useState(false);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState<AnnouncementItem | null>(null);
+  const [announcementFilter, setAnnouncementFilter] = useState('all');
+
+  useEffect(() => {
+    setAnnouncements(AnnouncementStorage.getAnnouncements());
+  }, []);
+  
+  // Quran States
+  const [showAddQuranRecitationModal, setShowAddQuranRecitationModal] = useState(false);
+  const [showEditQuranRecitationModal, setShowEditQuranRecitationModal] = useState(false);
+  const [selectedQuranRecitation, setSelectedQuranRecitation] = useState<QuranRecitation | null>(null);
+  const [quranRecitationFilter, setQuranRecitationFilter] = useState('all');
+  const [showAddQuranVerseModal, setShowAddQuranVerseModal] = useState(false);
+  const [showEditQuranVerseModal, setShowEditQuranVerseModal] = useState(false);
+  const [selectedQuranVerse, setSelectedQuranVerse] = useState<Media | null>(null);
+  const [quranVerseFilter, setQuranVerseFilter] = useState('all');
+  
   const [sermons, setSermons] = useState(SermonStorage.getSermons());
+  const [quranRecitations, setQuranRecitations] = useState(QuranStorage.getRecitations());
+  const [quranVerses, setQuranVerses] = useState(MediaStorage.getMedia().filter(m => m.category === 'quran-verse'));
+  
+  // Services States
+  const [services, setServices] = useState(() => {
+    const servicesData = MediaStorage.getMedia().filter(m => m.category === 'service');
+    // If no services found, reset to defaults
+    if (servicesData.length === 0) {
+      console.log('AdminDashboard: No services found, resetting to defaults...');
+      MediaStorage.resetToDefaults();
+      return MediaStorage.getMedia().filter(m => m.category === 'service');
+    }
+    return servicesData;
+  });
+  const [showAddServiceModal, setShowAddServiceModal] = useState(false);
+  const [showEditServiceModal, setShowEditServiceModal] = useState(false);
+  const [selectedService, setSelectedService] = useState<Media | null>(null);
+  const [showAllServices, setShowAllServices] = useState(false);
+
+  // Set up real-time sync for data updates
+  useEffect(() => {
+    // Listen for media updates (includes Quran verses and services)
+    const unsubscribeMedia = eventSync.subscribe(EVENT_TYPES.MEDIA_UPDATED, () => {
+      setQuranVerses(MediaStorage.getMedia().filter(m => m.category === 'quran-verse'));
+      setServices(MediaStorage.getMedia().filter(m => m.category === 'service'));
+    });
+
+    const unsubscribeEvents = eventSync.subscribe(EVENT_TYPES.EVENTS_UPDATED, () => {
+      setEvents(EventStorage.getEvents());
+    });
+
+    return () => {
+      unsubscribeMedia();
+      unsubscribeEvents();
+    };
+  }, []);
   const [contents, setContents] = useState([
     {
       id: 1,
@@ -190,7 +248,15 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
       thumbnail: '/content/surah-rahman.jpg'
     }
   ]);
-  const [events, setEvents] = useState(EventStorage.getEvents());
+  const initialEvents = EventStorage.getEvents();
+  console.log('AdminDashboard: Initial events loaded:', initialEvents.length);
+  console.log('AdminDashboard: Events data:', initialEvents.map(e => ({
+    id: e.id,
+    title: e.title,
+    date: e.date,
+    status: e.status
+  })));
+  const [events, setEvents] = useState(initialEvents);
 
   // Member Management Functions
   const handleAddMember = (newMember: any) => {
@@ -225,8 +291,8 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
     const event = EventStorage.addEvent(newEvent);
     setEvents(EventStorage.getEvents());
     setShowAddEventModal(false);
-    // Emit real-time sync event
-    eventSync.emit(EVENT_TYPES.EVENTS_UPDATED);
+    // Emit real-time sync event (temporarily disabled)
+    // eventSync.emit(EVENT_TYPES.EVENTS_UPDATED);
   };
 
   const handleEditEvent = (updatedEvent: any) => {
@@ -234,16 +300,16 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
     setEvents(EventStorage.getEvents());
     setShowEditEventModal(false);
     setSelectedEvent(null);
-    // Emit real-time sync event
-    eventSync.emit(EVENT_TYPES.EVENTS_UPDATED);
+    // Emit real-time sync event (temporarily disabled)
+    // eventSync.emit(EVENT_TYPES.EVENTS_UPDATED);
   };
 
   const handleDeleteEvent = (eventId: string | number) => {
     if (window.confirm('Are you sure you want to delete this event?')) {
       EventStorage.deleteEvent(eventId.toString());
       setEvents(EventStorage.getEvents());
-      // Emit real-time sync event
-      eventSync.emit(EVENT_TYPES.EVENTS_UPDATED);
+      // Emit real-time sync event (temporarily disabled)
+      // eventSync.emit(EVENT_TYPES.EVENTS_UPDATED);
     }
   };
 
@@ -311,8 +377,8 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
     });
     setSermons(SermonStorage.getSermons());
     setShowAddSermonModal(false);
-    // Emit real-time sync event
-    eventSync.emit(EVENT_TYPES.SERMONS_UPDATED);
+    // Emit real-time sync event (temporarily disabled)
+    // eventSync.emit(EVENT_TYPES.SERMONS_UPDATED);
   };
 
   const handleEditSermon = (updatedSermon: any) => {
@@ -320,22 +386,126 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
     setSermons(SermonStorage.getSermons());
     setShowEditSermonModal(false);
     setSelectedSermon(null);
-    // Emit real-time sync event
-    eventSync.emit(EVENT_TYPES.SERMONS_UPDATED);
+    // Emit real-time sync event (temporarily disabled)
+    // eventSync.emit(EVENT_TYPES.SERMONS_UPDATED);
   };
 
   const handleDeleteSermon = (sermonId: string | number) => {
     if (window.confirm('Are you sure you want to delete this sermon?')) {
       SermonStorage.deleteSermon(sermonId.toString());
       setSermons(SermonStorage.getSermons());
-      // Emit real-time sync event
-      eventSync.emit(EVENT_TYPES.SERMONS_UPDATED);
+      // Emit real-time sync event (temporarily disabled)
+      // eventSync.emit(EVENT_TYPES.SERMONS_UPDATED);
     }
   };
 
   const openEditSermonModal = (sermon: any) => {
     setSelectedSermon(sermon);
     setShowEditSermonModal(true);
+  };
+
+  // Quran Recitation Management Functions
+  const handleAddQuranRecitation = (newRecitation: Omit<QuranRecitation, 'id'>) => {
+    const recitation = QuranStorage.addRecitation(newRecitation);
+    setQuranRecitations(QuranStorage.getRecitations());
+    setShowAddQuranRecitationModal(false);
+    // Emit real-time sync event (temporarily disabled)
+    // eventSync.emit(EVENT_TYPES.QURAN_RECITATIONS_UPDATED);
+  };
+
+  const handleEditQuranRecitation = (updatedRecitation: QuranRecitation) => {
+    QuranStorage.updateRecitation(updatedRecitation.id, updatedRecitation);
+    setQuranRecitations(QuranStorage.getRecitations());
+    setShowEditQuranRecitationModal(false);
+    setSelectedQuranRecitation(null);
+    // Emit real-time sync event (temporarily disabled)
+    // eventSync.emit(EVENT_TYPES.QURAN_RECITATIONS_UPDATED);
+  };
+
+  const handleDeleteQuranRecitation = (recitationId: string) => {
+    if (window.confirm('Are you sure you want to delete this Quran recitation?')) {
+      QuranStorage.deleteRecitation(recitationId);
+      setQuranRecitations(QuranStorage.getRecitations());
+      // Emit real-time sync event (temporarily disabled)
+      // eventSync.emit(EVENT_TYPES.QURAN_RECITATIONS_UPDATED);
+    }
+  };
+
+  const openEditQuranRecitationModal = (recitation: QuranRecitation) => {
+    setSelectedQuranRecitation(recitation);
+    setShowEditQuranRecitationModal(true);
+  };
+
+  // Quran Verse Management Functions
+  const handleAddQuranVerse = (newVerse: Omit<Media, 'id' | 'created_at' | 'updated_at'>) => {
+    const verse = MediaStorage.addMedia({
+      ...newVerse,
+      category: 'quran-verse',
+      type: 'document'
+    });
+    setQuranVerses(MediaStorage.getMedia().filter(m => m.category === 'quran-verse'));
+    setShowAddQuranVerseModal(false);
+    // Emit real-time sync event
+    eventSync.emit(EVENT_TYPES.MEDIA_UPDATED);
+  };
+
+  const handleEditQuranVerse = (updatedVerse: Media) => {
+    MediaStorage.updateMedia(updatedVerse.id, updatedVerse);
+    setQuranVerses(MediaStorage.getMedia().filter(m => m.category === 'quran-verse'));
+    setShowEditQuranVerseModal(false);
+    setSelectedQuranVerse(null);
+    // Emit real-time sync event
+    eventSync.emit(EVENT_TYPES.MEDIA_UPDATED);
+  };
+
+  const handleDeleteQuranVerse = (verseId: string) => {
+    if (window.confirm('Are you sure you want to delete this Quran verse?')) {
+      MediaStorage.deleteMedia(verseId);
+      setQuranVerses(MediaStorage.getMedia().filter(m => m.category === 'quran-verse'));
+      // Emit real-time sync event
+      eventSync.emit(EVENT_TYPES.MEDIA_UPDATED);
+    }
+  };
+
+  const openEditQuranVerseModal = (verse: Media) => {
+    setSelectedQuranVerse(verse);
+    setShowEditQuranVerseModal(true);
+  };
+
+  // Services Management Functions
+  const handleAddService = (newService: Omit<Media, 'id' | 'created_at' | 'updated_at'>) => {
+    const service = MediaStorage.addMedia({
+      ...newService,
+      category: 'service',
+      type: 'document'
+    });
+    setServices(MediaStorage.getMedia().filter(m => m.category === 'service'));
+    setShowAddServiceModal(false);
+    // Emit real-time sync event
+    eventSync.emit(EVENT_TYPES.MEDIA_UPDATED);
+  };
+
+  const handleEditService = (updatedService: Media) => {
+    MediaStorage.updateMedia(updatedService.id, updatedService);
+    setServices(MediaStorage.getMedia().filter(m => m.category === 'service'));
+    setShowEditServiceModal(false);
+    setSelectedService(null);
+    // Emit real-time sync event
+    eventSync.emit(EVENT_TYPES.MEDIA_UPDATED);
+  };
+
+  const handleDeleteService = (serviceId: string) => {
+    if (window.confirm('Are you sure you want to delete this service?')) {
+      MediaStorage.deleteMedia(serviceId);
+      setServices(MediaStorage.getMedia().filter(m => m.category === 'service'));
+      // Emit real-time sync event
+      eventSync.emit(EVENT_TYPES.MEDIA_UPDATED);
+    }
+  };
+
+  const openEditServiceModal = (service: Media) => {
+    setSelectedService(service);
+    setShowEditServiceModal(true);
   };
 
   const handleUploadSermonVideo = (file: File) => {
@@ -421,8 +591,8 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
       console.log('Sermon uploaded successfully:', sermon);
       console.log('=== UPLOAD COMPLETE ===');
       
-      // Emit real-time sync event for sermon upload
-      eventSync.emit(EVENT_TYPES.SERMONS_UPDATED);
+      // Emit real-time sync event for sermon upload (temporarily disabled)
+      // eventSync.emit(EVENT_TYPES.SERMONS_UPDATED);
       
       // Show success message
       alert(`Sermon "${file.name}" uploaded successfully! It will appear in the homepage.`);
@@ -432,22 +602,6 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
     }
   };
 
-  const handleAddDonation = (newDonation: any) => {
-    // Store donation in localStorage for now
-    const donations = JSON.parse(localStorage.getItem('donations') || '[]');
-    const donation = {
-      ...newDonation,
-      id: Date.now().toString(),
-      date: new Date().toISOString().split('T')[0],
-      timestamp: new Date().toISOString()
-    };
-    donations.push(donation);
-    localStorage.setItem('donations', JSON.stringify(donations));
-    setShowAddDonationModal(false);
-    // Emit real-time sync event
-    eventSync.emit(EVENT_TYPES.DONATIONS_UPDATED);
-    alert('Donation recorded successfully!');
-  };
 
   const handleResetSermonStorage = () => {
     if (confirm('Are you sure you want to reset sermon storage? This will load working sample videos.')) {
@@ -471,8 +625,6 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
     activeMembers: 892,
     totalEvents: 45,
     upcomingEvents: 8,
-    totalDonations: 45678,
-    monthlyDonations: 12345,
     totalSermons: 234,
     recentSermons: 12,
     communityPosts: 156,
@@ -499,14 +651,6 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
       status: 'success'
     },
     {
-      id: '3',
-      type: 'donation',
-      title: 'New Donation Received',
-      description: '$500 received from anonymous donor',
-      timestamp: '5 hours ago',
-      status: 'success'
-    },
-    {
       id: '4',
       type: 'sermon',
       title: 'Sermon Uploaded',
@@ -528,8 +672,11 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
     { id: 'overview', name: 'Overview', icon: FaChartBar },
     { id: 'events', name: 'Events', icon: FaCalendarAlt },
     { id: 'sermons', name: 'Sermons', icon: FaMicrophone },
-    { id: 'donations', name: 'Donations', icon: FaDonate },
-    { id: 'community', name: 'Community', icon: FaComments },
+    { id: 'announcements', name: 'Announcements', icon: FaBell },
+    { id: 'quran-recitations', name: 'Quran Recitations', icon: FaBook },
+    { id: 'quran-verses', name: 'Quran Verses', icon: FaPray },
+    { id: 'services', name: 'Services', icon: FaCog },
+        { id: 'community', name: 'Community', icon: FaComments },
     { id: 'volunteers', name: 'Volunteers', icon: FaHandsHelping },
     { id: 'settings', name: 'Settings', icon: FaCog }
   ];
@@ -537,9 +684,10 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
   const activityIcons = {
     user: FaUserCheck,
     event: FaCalendarAlt,
-    donation: FaDonate,
     sermon: FaMicrophone,
-    post: FaComments
+    post: FaComments,
+    'quran-recitation': FaBook,
+    'quran-verse': FaPray
   };
 
   const statusColors = {
@@ -589,13 +737,6 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
           icon={FaCalendarAlt}
           trend={12}
           color="bg-blue-500"
-        />
-        <StatCard
-          title="Monthly Donations"
-          value={`$${stats.monthlyDonations.toLocaleString()}`}
-          icon={FaDonate}
-          trend={15}
-          color="bg-emerald-500"
         />
         <StatCard
           title="Total Sermons"
@@ -677,6 +818,7 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
         </div>
 
         {/* Tab Content */}
+        <div className="tab-content-container">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -685,69 +827,70 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
           >
-            {activeTab === 'overview' && <OverviewTab />}
-            {activeTab === 'sermons' && (
-              <div className="space-y-6">
-                {/* Sermon Library Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-gray-600 text-sm">Total Sermons</p>
-                        <p className="text-2xl font-bold text-gray-800">{sermons.length}</p>
-                        <p className="text-xs text-emerald-600 mt-1">All Categories</p>
+            <div>
+              {activeTab === 'overview' && <OverviewTab />}
+              {activeTab === 'sermons' && (
+                <div className="space-y-6">
+                  {/* Sermon Library Stats */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-gray-600 text-sm">Total Sermons</p>
+                          <p className="text-2xl font-bold text-gray-800">{sermons.length}</p>
+                          <p className="text-xs text-emerald-600 mt-1">All Categories</p>
+                        </div>
+                        <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                          <FaMicrophone className="text-amber-600 text-xl" />
+                        </div>
                       </div>
-                      <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
-                        <FaMicrophone className="text-amber-600 text-xl" />
+                    </div>
+                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-gray-600 text-sm">Published</p>
+                          <p className="text-2xl font-bold text-gray-800">{sermons.filter(s => s.status === 'Published').length}</p>
+                          <p className="text-xs text-green-600 mt-1">Live Content</p>
+                        </div>
+                        <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                          <FaCheck className="text-green-600 text-xl" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-gray-600 text-sm">Total Views</p>
+                          <p className="text-2xl font-bold text-gray-800">{sermons.reduce((sum, s) => sum + s.views, 0).toLocaleString()}</p>
+                          <p className="text-xs text-blue-600 mt-1">All Time</p>
+                        </div>
+                        <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                          <FaEye className="text-blue-600 text-xl" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-gray-600 text-sm">Storage Used</p>
+                          <p className="text-2xl font-bold text-gray-800">{(sermons.reduce((sum, s) => sum + parseFloat(s.fileSize), 0)).toFixed(1)} GB</p>
+                          <p className="text-xs text-purple-600 mt-1">Video Files</p>
+                        </div>
+                        <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                          <FaVideo className="text-purple-600 text-xl" />
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-gray-600 text-sm">Published</p>
-                        <p className="text-2xl font-bold text-gray-800">{sermons.filter(s => s.status === 'Published').length}</p>
-                        <p className="text-xs text-green-600 mt-1">Live Content</p>
-                      </div>
-                      <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                        <FaCheck className="text-green-600 text-xl" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-gray-600 text-sm">Total Views</p>
-                        <p className="text-2xl font-bold text-gray-800">{sermons.reduce((sum, s) => sum + s.views, 0).toLocaleString()}</p>
-                        <p className="text-xs text-blue-600 mt-1">All Time</p>
-                      </div>
-                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <FaEye className="text-blue-600 text-xl" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-gray-600 text-sm">Storage Used</p>
-                        <p className="text-2xl font-bold text-gray-800">{(sermons.reduce((sum, s) => sum + parseFloat(s.fileSize), 0)).toFixed(1)} GB</p>
-                        <p className="text-xs text-purple-600 mt-1">Video Files</p>
-                      </div>
-                      <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                        <FaVideo className="text-purple-600 text-xl" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
 
-                {/* Sermon Library Management */}
-                <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-                  <div className="flex justify-between items-center mb-6">
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-800">Sermon Library</h3>
-                      <p className="text-gray-600 text-sm mt-1">Manage sermon videos and audio recordings</p>
-                    </div>
-                    <div className="flex gap-3">
+                  {/* Sermon Library Management */}
+                  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                    <div className="flex justify-between items-center mb-6">
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-800">Sermon Library</h3>
+                        <p className="text-gray-600 text-sm mt-1">Manage sermon videos and audio recordings</p>
+                      </div>
+                      <div className="flex gap-3">
                       <button 
                         onClick={() => {
                           console.log('Upload button clicked');
@@ -1192,84 +1335,644 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
                 </div>
               </div>
             )}
-            {activeTab === 'donations' && (
+            {activeTab === 'announcements' && (
               <div className="space-y-6">
-                {/* Donation Stats */}
+                {/* Announcement Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-gray-600 text-sm">Total Donations</p>
-                        <p className="text-2xl font-bold text-gray-800">${stats.totalDonations.toLocaleString()}</p>
-                        <p className="text-xs text-green-600 mt-1">+12% from last month</p>
+                        <p className="text-gray-600 text-sm">Total Announcements</p>
+                        <p className="text-2xl font-bold text-gray-800">{announcements.length}</p>
                       </div>
-                      <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
-                        <FaDonate className="text-emerald-600 text-xl" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-gray-600 text-sm">Monthly Donations</p>
-                        <p className="text-2xl font-bold text-gray-800">${stats.monthlyDonations.toLocaleString()}</p>
-                        <p className="text-xs text-blue-600 mt-1">Current month</p>
-                      </div>
-                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <FaChartLine className="text-blue-600 text-xl" />
+                      <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                        <FaBell className="text-yellow-600 text-xl" />
                       </div>
                     </div>
                   </div>
                   <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-gray-600 text-sm">Active Donors</p>
-                        <p className="text-2xl font-bold text-gray-800">892</p>
-                        <p className="text-xs text-purple-600 mt-1">This month</p>
+                        <p className="text-gray-600 text-sm">Active</p>
+                        <p className="text-2xl font-bold text-green-600">
+                          {announcements.filter(a => a.status === 'active').length}
+                        </p>
                       </div>
-                      <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                        <FaUsers className="text-purple-600 text-xl" />
+                      <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <FaCheck className="text-green-600 text-xl" />
                       </div>
                     </div>
                   </div>
                   <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-gray-600 text-sm">Avg. Donation</p>
-                        <p className="text-2xl font-bold text-gray-800">$156</p>
-                        <p className="text-xs text-amber-600 mt-1">Per donor</p>
+                        <p className="text-gray-600 text-sm">High Priority</p>
+                        <p className="text-2xl font-bold text-red-600">
+                          {announcements.filter(a => a.priority === 'high').length}
+                        </p>
                       </div>
-                      <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
-                        <FaChartBar className="text-amber-600 text-xl" />
+                      <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                        <FaBell className="text-red-600 text-xl" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-gray-600 text-sm">Expired</p>
+                        <p className="text-2xl font-bold text-gray-600">
+                          {announcements.filter(a => new Date(a.expiresAt) < new Date()).length}
+                        </p>
+                      </div>
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <FaClock className="text-gray-600 text-xl" />
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Donation Management */}
+                {/* Announcement Management */}
+                <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-bold text-gray-800">Announcement Management</h2>
+                    <div className="flex gap-3">
+                      <select
+                        value={announcementFilter}
+                        onChange={(e) => setAnnouncementFilter(e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      >
+                        <option value="all">All Announcements</option>
+                        <option value="active">Active</option>
+                        <option value="expired">Expired</option>
+                        <option value="high">High Priority</option>
+                      </select>
+                      <button
+                        onClick={() => setShowAddAnnouncementModal(true)}
+                        className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 flex items-center gap-2"
+                      >
+                        <FaPlus />
+                        Add Announcement
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Announcements List */}
+                  <div className="space-y-4">
+                    {announcements
+                      .filter(announcement => {
+                        if (announcementFilter === 'all') return true;
+                        if (announcementFilter === 'active') return announcement.status === 'active';
+                        if (announcementFilter === 'expired') return new Date(announcement.expiresAt) < new Date();
+                        if (announcementFilter === 'high') return announcement.priority === 'high';
+                        return true;
+                      })
+                      .map((announcement) => (
+                        <div key={announcement.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <h3 className="text-lg font-semibold text-gray-800">{announcement.title}</h3>
+                                <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                                  announcement.priority === 'high' 
+                                    ? 'bg-red-100 text-red-600'
+                                    : announcement.priority === 'medium'
+                                    ? 'bg-yellow-100 text-yellow-600'
+                                    : 'bg-gray-100 text-gray-600'
+                                }`}>
+                                  {announcement.priority}
+                                </span>
+                                <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                                  announcement.status === 'active'
+                                    ? 'bg-green-100 text-green-600'
+                                    : 'bg-gray-100 text-gray-600'
+                                }`}>
+                                  {announcement.status}
+                                </span>
+                              </div>
+                              <p className="text-gray-600 mb-2">{announcement.content}</p>
+                              <div className="flex items-center gap-4 text-sm text-gray-500">
+                                <span>Type: {announcement.type}</span>
+                                <span>Created: {new Date(announcement.createdAt).toLocaleDateString()}</span>
+                                <span>Expires: {new Date(announcement.expiresAt).toLocaleDateString()}</span>
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => {
+                                  setSelectedAnnouncement(announcement);
+                                  setShowEditAnnouncementModal(true);
+                                }}
+                                className="px-3 py-1 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600"
+                              >
+                                <FaEdit />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  if (confirm('Are you sure you want to delete this announcement?')) {
+                                    const updatedList = announcements.filter(a => a.id !== announcement.id);
+                                    AnnouncementStorage.saveAnnouncements(updatedList);
+                                    setAnnouncements(updatedList);
+                                  }
+                                }}
+                                className="px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600"
+                              >
+                                <FaTrash />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              </div>
+            )}
+            {activeTab === 'quran-recitations' && (
+            <div className="space-y-6">
+              {/* Quran Recitations Stats Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-600 text-sm">Total Recitations</p>
+                      <p className="text-2xl font-bold text-gray-800">{quranRecitations.length}</p>
+                    </div>
+                    <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                      <FaBook className="text-emerald-600 text-xl" />
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-600 text-sm">Published</p>
+                      <p className="text-2xl font-bold text-gray-800">{quranRecitations.filter(r => r.status === 'Published').length}</p>
+                    </div>
+                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                      <FaCheck className="text-green-600 text-xl" />
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-600 text-sm">Total Plays</p>
+                      <p className="text-2xl font-bold text-gray-800">{quranRecitations.reduce((sum, r) => sum + r.views, 0).toLocaleString()}</p>
+                    </div>
+                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <FaPlay className="text-blue-600 text-xl" />
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-600 text-sm">Downloads</p>
+                      <p className="text-2xl font-bold text-gray-800">{quranRecitations.reduce((sum, r) => sum + r.downloads, 0).toLocaleString()}</p>
+                    </div>
+                    <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                      <FaDownload className="text-purple-600 text-xl" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+                {/* Quran Recitations Management */}
                 <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
                   <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-xl font-bold text-gray-800">Donation Management</h3>
-                    <button 
-                      onClick={() => setShowAddDonationModal(true)}
-                      className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 flex items-center gap-2"
-                    >
-                      <FaPlus />
-                      Record Donation
-                    </button>
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-800">Quran Recitations</h3>
+                      <p className="text-gray-600 text-sm mt-1">Manage Quran audio and video recitations</p>
+                    </div>
+                    <div className="flex gap-3">
+                      <button 
+                        onClick={() => setShowAddQuranRecitationModal(true)}
+                        className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 flex items-center gap-2"
+                      >
+                        <FaPlus />
+                        Add Recitation
+                      </button>
+                    </div>
                   </div>
                   
-                  <div className="text-center py-8">
-                    <FaDonate className="text-6xl text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">No donations recorded yet</h3>
-                    <p className="text-gray-600 mb-4">Start by recording your first donation</p>
-                    <button 
-                      onClick={() => setShowAddDonationModal(true)}
-                      className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600"
-                    >
-                      Record First Donation
-                    </button>
+                  {/* Recitations Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {quranRecitations.filter(recitation => {
+                      if (quranRecitationFilter === 'all') return true;
+                      if (quranRecitationFilter === 'published') return recitation.status === 'Published';
+                      if (quranRecitationFilter === 'draft') return recitation.status === 'Draft';
+                      return true;
+                    }).map((recitation) => (
+                      <div key={recitation.id} className="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
+                        {/* Recitation Thumbnail */}
+                        <div className="h-48 bg-gradient-to-br from-emerald-400 to-blue-500 relative">
+                          <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                            <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center">
+                              <FaPlay className="text-emerald-600 text-2xl ml-1" />
+                            </div>
+                          </div>
+                          <div className="absolute top-4 right-4">
+                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                              recitation.status === 'Published' ? 'bg-green-100 text-green-600' :
+                              'bg-yellow-100 text-yellow-600'
+                            }`}>
+                              {recitation.status}
+                            </span>
+                          </div>
+                          <div className="absolute bottom-4 left-4 bg-black/60 text-white px-2 py-1 rounded text-xs">
+                            {recitation.duration}
+                          </div>
+                        </div>
+                        
+                        {/* Recitation Details */}
+                        <div className="p-6">
+                          <h4 className="font-bold text-gray-800 mb-2">{recitation.title}</h4>
+                          <p className="text-gray-600 text-sm mb-4">{recitation.description}</p>
+                          
+                          <div className="space-y-2 text-sm text-gray-600">
+                            <div className="flex justify-between">
+                              <span>Reciter:</span>
+                              <span className="font-medium">{recitation.reciter}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Surah:</span>
+                              <span className="font-medium">{recitation.surahName}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Views:</span>
+                              <span className="font-medium">{recitation.views}</span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex gap-2 mt-4">
+                            <button 
+                              onClick={() => openEditQuranRecitationModal(recitation)}
+                              className="flex-1 px-3 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 flex items-center justify-center gap-2"
+                            >
+                              <FaEdit />
+                              Edit
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteQuranRecitation(recitation.id)}
+                              className="flex-1 px-3 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 flex items-center justify-center gap-2"
+                            >
+                              <FaTrash />
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
+                </div>
+              </div>
+            )}
+            {activeTab === 'quran-verses' && (
+              <div className="space-y-6">
+                {/* Quran Verses Stats Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-gray-600 text-sm">Total Verses</p>
+                        <p className="text-2xl font-bold text-gray-800">{quranVerses.length}</p>
+                      </div>
+                      <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                        <FaPray className="text-indigo-600 text-xl" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-gray-600 text-sm">Active</p>
+                        <p className="text-2xl font-bold text-gray-800">{quranVerses.filter(v => v.status === 'active').length}</p>
+                      </div>
+                      <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <FaCheck className="text-green-600 text-xl" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-gray-600 text-sm">Featured</p>
+                        <p className="text-2xl font-bold text-gray-800">{quranVerses.filter(v => v.featured).length}</p>
+                      </div>
+                      <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                        <FaStar className="text-yellow-600 text-xl" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-gray-600 text-sm">Active</p>
+                        <p className="text-2xl font-bold text-gray-800">{quranVerses.filter(v => v.status === 'active').length}</p>
+                      </div>
+                      <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                        <FaBook className="text-red-600 text-xl" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quran Verses Management */}
+                <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                  <div className="flex justify-between items-center mb-6">
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-800">Quran Verses</h3>
+                      <p className="text-gray-600 text-sm mt-1">Manage Quran verses with translations and tafsir</p>
+                    </div>
+                    <div className="flex gap-3">
+                      <button 
+                        onClick={() => setShowAddQuranVerseModal(true)}
+                        className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 flex items-center gap-2"
+                      >
+                        <FaPlus />
+                        Add Verse
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Verses Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {quranVerses.map((verse) => (
+                      <div key={verse.id} className="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
+                        {/* Verse Header */}
+                        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-4 text-white">
+                          <h4 className="font-bold text-lg mb-2">{verse.title}</h4>
+                          <div className="flex items-center gap-2">
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              verse.status === 'active' ? 'bg-green-100 text-green-800' :
+                              'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {verse.status}
+                            </span>
+                            {verse.featured && (
+                              <FaStar className="text-yellow-300 text-sm" />
+                            )}
+                          </div>
+                        </div>
+                        
+                        {/* Verse Content */}
+                        <div className="p-4">
+                          <div className="mb-4">
+                            <p 
+                              className="text-lg font-arabic text-right mb-2" 
+                              style={{ fontFamily: 'Amiri, Georgia, serif', direction: 'rtl' }}
+                            >
+                              {verse.description?.split(' - ')[0] || 'Arabic text'}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {verse.description?.split(' - ')[1] || 'Translation'}
+                            </p>
+                          </div>
+                          
+                          <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
+                            <span>Category: {verse.category}</span>
+                            <span>•</span>
+                            <span>Type: {verse.type}</span>
+                          </div>
+                          
+                          <div className="flex gap-2">
+                            <button 
+                              onClick={() => openEditQuranVerseModal(verse)}
+                              className="flex-1 px-3 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 flex items-center justify-center gap-2"
+                            >
+                              <FaEdit />
+                              Edit
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteQuranVerse(verse.id)}
+                              className="flex-1 px-3 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 flex items-center justify-center gap-2"
+                            >
+                              <FaTrash />
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+            {activeTab === 'services' && (
+              <div className="space-y-6">
+                {/* Services Stats Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-gray-600 text-sm">Total Services</p>
+                        <p className="text-2xl font-bold text-gray-800">{services.length}</p>
+                      </div>
+                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <FaCog className="text-blue-600 text-xl" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-gray-600 text-sm">Active</p>
+                        <p className="text-2xl font-bold text-gray-800">{services.filter(s => s.status === 'active').length}</p>
+                      </div>
+                      <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <FaCheck className="text-green-600 text-xl" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-gray-600 text-sm">Featured</p>
+                        <p className="text-2xl font-bold text-gray-800">{services.filter(s => s.featured).length}</p>
+                      </div>
+                      <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                        <FaStar className="text-yellow-600 text-xl" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-gray-600 text-sm">Draft</p>
+                        <p className="text-2xl font-bold text-gray-800">{services.filter(s => s.status === 'draft').length}</p>
+                      </div>
+                      <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                        <FaFileAlt className="text-red-600 text-xl" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Services Management */}
+                <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                  <div className="flex justify-between items-center mb-6">
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-800">Services</h3>
+                      <p className="text-gray-600 text-sm mt-1">Manage mosque services and programs</p>
+                    </div>
+                    <div className="flex gap-3">
+                      <button 
+                        onClick={() => setShowAddServiceModal(true)}
+                        className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 flex items-center gap-2"
+                      >
+                        <FaPlus />
+                        Add Service
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Debug Services Info */}
+                  <div className="text-center mb-4 p-4 bg-yellow-100 rounded-lg">
+                    <p className="text-sm text-gray-700">
+                      Debug: Services loaded: {services.length} | 
+                      Showing: {services.slice(0, 3).length} | 
+                      {services.length === 0 && 'No services found!'}
+                    </p>
+                    {services.length > 0 && (
+                      <div className="mt-2 text-xs text-gray-600">
+                        Services: {services.slice(0, 3).map(s => s.title).join(', ')}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Services Grid - Limited to 3 */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 bg-red-100 p-4 rounded-lg">
+                    {/* Test Text */}
+                    <div className="col-span-full text-center mb-4 p-4 bg-white rounded-lg">
+                      <p className="text-lg font-bold">TEST: Services Grid Rendering</p>
+                      <p className="text-sm">Should see 3 service cards below</p>
+                    </div>
+                    {services.slice(0, 3).map((service) => (
+                      <div key={service.id} className="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
+                        {/* Service Header */}
+                        <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-4 text-white">
+                          <h4 className="font-bold text-lg mb-2">{service.title}</h4>
+                          <div className="flex items-center gap-2">
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              service.status === 'active' ? 'bg-green-100 text-green-800' :
+                              'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {service.status}
+                            </span>
+                            {service.featured && (
+                              <FaStar className="text-yellow-300 text-sm" />
+                            )}
+                          </div>
+                        </div>
+                        
+                        {/* Service Content */}
+                        <div className="p-4">
+                          <div className="mb-4">
+                            <p className="text-sm text-gray-600 mb-2">
+                              {service.description?.split(' - ')[0] || 'Service description'}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              {service.description?.split(' - ')[1] || 'Service details'}
+                            </p>
+                          </div>
+                          
+                          <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
+                            <span>Category: {service.category}</span>
+                            <span>•</span>
+                            <span>Type: {service.type}</span>
+                          </div>
+                          
+                          <div className="flex gap-2">
+                            <button 
+                              onClick={() => openEditServiceModal(service)}
+                              className="flex-1 px-3 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 flex items-center justify-center gap-2"
+                            >
+                              <FaEdit />
+                              Edit
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteService(service.id)}
+                              className="flex-1 px-3 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 flex items-center justify-center gap-2"
+                            >
+                              <FaTrash />
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* View All Services Button */}
+                  {services.length > 3 && (
+                    <div className="text-center mt-6">
+                      <button 
+                        className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-300"
+                        onClick={() => setShowAllServices(!showAllServices)}
+                      >
+                        {showAllServices ? 'Show Less Services' : 'View All Services'} ({services.length} total)
+                      </button>
+                    </div>
+                  )}
+
+                  {/* All Services Grid */}
+                  {showAllServices && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {services.map((service) => (
+                        <div key={service.id} className="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
+                          {/* Service Header */}
+                          <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-4 text-white">
+                            <h4 className="font-bold text-lg mb-2">{service.title}</h4>
+                            <div className="flex items-center gap-2">
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                service.status === 'active' ? 'bg-green-100 text-green-800' :
+                                'bg-yellow-100 text-yellow-800'
+                              }`}>
+                                {service.status}
+                              </span>
+                              {service.featured && (
+                                <FaStar className="text-yellow-300 text-sm" />
+                              )}
+                            </div>
+                          </div>
+                          
+                          {/* Service Content */}
+                          <div className="p-4">
+                            <div className="mb-4">
+                              <p className="text-sm text-gray-600 mb-2">
+                                {service.description?.split(' - ')[0] || 'Service description'}
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                {service.description?.split(' - ')[1] || 'Service details'}
+                              </p>
+                            </div>
+                            
+                            <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
+                              <span>Category: {service.category}</span>
+                              <span>•</span>
+                              <span>Type: {service.type}</span>
+                            </div>
+                            
+                            <div className="flex gap-2">
+                              <button 
+                                onClick={() => openEditServiceModal(service)}
+                                className="flex-1 px-3 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 flex items-center justify-center gap-2"
+                              >
+                                <FaEdit />
+                                Edit
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteService(service.id)}
+                                className="flex-1 px-3 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 flex items-center justify-center gap-2"
+                              >
+                                <FaTrash />
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -1291,8 +1994,10 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
                 <p className="text-gray-600">Settings configuration coming soon...</p>
               </div>
             )}
+            </div>
           </motion.div>
         </AnimatePresence>
+      </div>
 
         {/* Event Modals */}
         <div>
@@ -1993,6 +2698,7 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
               </motion.div>
             </motion.div>
           )}
+        </AnimatePresence>
 
         {/* Edit Content Modal */}
         <AnimatePresence>
@@ -2154,7 +2860,6 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
             </motion.div>
           )}
         </AnimatePresence>
-        </AnimatePresence>
 
         {/* Add Sermon Modal */}
         <AnimatePresence>
@@ -2306,6 +3011,7 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
               </motion.div>
             </motion.div>
           )}
+        </AnimatePresence>
 
         {/* Edit Sermon Modal */}
         <AnimatePresence>
@@ -2462,18 +3168,17 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
             </motion.div>
           )}
         </AnimatePresence>
-        </AnimatePresence>
-        </div>
 
-        {/* Add Donation Modal */}
+        {/* Quran Recitations Modals */}
+        {/* Add Quran Recitation Modal */}
         <AnimatePresence>
-          {showAddDonationModal && (
+          {showAddQuranRecitationModal && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-              onClick={() => setShowAddDonationModal(false)}
+              onClick={() => setShowAddQuranRecitationModal(false)}
             >
               <motion.div
                 initial={{ scale: 0.9 }}
@@ -2482,117 +3187,208 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
                 className="bg-white rounded-xl p-8 max-w-md w-full mx-4"
                 onClick={(e) => e.stopPropagation()}
               >
-                <h3 className="text-2xl font-bold text-gray-800 mb-6">Record New Donation</h3>
+                <h3 className="text-2xl font-bold text-gray-800 mb-6">Add Quran Recitation</h3>
                 
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
                     const formData = new FormData(e.target as HTMLFormElement);
-                    const newDonation = {
-                      donorName: formData.get('donorName') as string,
-                      email: formData.get('email') as string,
-                      phone: formData.get('phone') as string,
-                      amount: parseFloat(formData.get('amount') as string),
-                      type: formData.get('type') as string,
-                      purpose: formData.get('purpose') as string,
-                      notes: formData.get('notes') as string
+                    const newRecitation = {
+                      title: formData.get('title') as string,
+                      description: formData.get('description') as string,
+                      reciter: formData.get('reciter') as string,
+                      surah: parseInt(formData.get('surah') as string),
+                      ayah: parseInt(formData.get('ayah') as string),
+                      surahName: formData.get('surahName') as string,
+                      audioUrl: formData.get('audioUrl') as string,
+                      duration: formData.get('duration') as string,
+                      fileSize: formData.get('fileSize') as string,
+                      thumbnail: formData.get('thumbnail') as string,
+                      category: formData.get('category') as string,
+                      status: formData.get('status') as 'Published' | 'Draft' | 'Archived',
+                      views: 0,
+                      downloads: 0,
+                      language: formData.get('language') as string,
+                      uploadDate: new Date().toISOString().split('T')[0],
+                      type: formData.get('type') as 'audio' | 'video'
                     };
-                    handleAddDonation(newDonation);
+                    handleAddQuranRecitation(newRecitation);
                   }}
                   className="space-y-4"
                 >
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Donor Name</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
                     <input
                       type="text"
-                      name="donorName"
+                      name="title"
                       required
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
-                      placeholder="Enter donor name"
+                      placeholder="e.g., Surah Al-Fatiha Recitation"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                    <textarea
+                      name="description"
+                      required
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                      placeholder="Brief description of the recitation"
                     />
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Reciter</label>
                       <input
-                        type="email"
-                        name="email"
+                        type="text"
+                        name="reciter"
+                        required
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
-                        placeholder="donor@example.com"
+                        placeholder="e.g., Sheikh Mishary Rashid"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                      <input
-                        type="tel"
-                        name="phone"
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Language</label>
+                      <select
+                        name="language"
+                        required
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
-                        placeholder="+1 234-567-8900"
+                      >
+                        <option value="Arabic">Arabic</option>
+                        <option value="English">English</option>
+                        <option value="Bangla">Bangla</option>
+                        <option value="Urdu">Urdu</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Surah</label>
+                      <input
+                        type="number"
+                        name="surah"
+                        required
+                        min="1"
+                        max="114"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                        placeholder="1"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Ayah</label>
+                      <input
+                        type="number"
+                        name="ayah"
+                        required
+                        min="1"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                        placeholder="7"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Surah Name</label>
+                      <input
+                        type="text"
+                        name="surahName"
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                        placeholder="Al-Fatiha"
                       />
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Amount ($)</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Duration</label>
                       <input
-                        type="number"
-                        name="amount"
+                        type="text"
+                        name="duration"
                         required
-                        min="1"
-                        step="0.01"
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
-                        placeholder="100.00"
+                        placeholder="e.g., 3:45"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Donation Type</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">File Size</label>
+                      <input
+                        type="text"
+                        name="fileSize"
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                        placeholder="e.g., 2.8 MB"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Audio URL</label>
+                    <input
+                      type="url"
+                      name="audioUrl"
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                      placeholder="https://example.com/audio.mp3"
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                      <select
+                        name="category"
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                      >
+                        <option value="Daily Recitation">Daily Recitation</option>
+                        <option value="Memorization">Memorization</option>
+                        <option value="Special Event">Special Event</option>
+                        <option value="Educational">Educational</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
                       <select
                         name="type"
                         required
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
                       >
-                        <option value="one-time">One-time</option>
-                        <option value="monthly">Monthly</option>
-                        <option value="zakat">Zakat</option>
-                        <option value="sadaqah">Sadaqah</option>
-                        <option value="fundraising">Fundraising</option>
+                        <option value="audio">Audio</option>
+                        <option value="video">Video</option>
                       </select>
                     </div>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Purpose</label>
-                    <select
-                      name="purpose"
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Thumbnail</label>
+                    <input
+                      type="text"
+                      name="thumbnail"
                       required
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
-                    >
-                      <option value="general">General Fund</option>
-                      <option value="mosque">Mosque Maintenance</option>
-                      <option value="education">Education Programs</option>
-                      <option value="community">Community Services</option>
-                      <option value="ramadan">Ramadan Programs</option>
-                      <option value="eid">Eid Programs</option>
-                      <option value="other">Other</option>
-                    </select>
+                      placeholder="/quran/thumbnails/al-fatiha.jpg"
+                    />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
-                    <textarea
-                      name="notes"
-                      rows={3}
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select
+                      name="status"
+                      required
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
-                      placeholder="Any additional notes..."
-                    />
+                    >
+                      <option value="Published">Published</option>
+                      <option value="Draft">Draft</option>
+                      <option value="Archived">Archived</option>
+                    </select>
                   </div>
                   
                   <div className="flex gap-4">
                     <button
                       type="button"
-                      onClick={() => setShowAddDonationModal(false)}
+                      onClick={() => setShowAddQuranRecitationModal(false)}
                       className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300"
                     >
                       Cancel
@@ -2601,7 +3397,7 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
                       type="submit"
                       className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600"
                     >
-                      Record Donation
+                      Add Recitation
                     </button>
                   </div>
                 </form>
@@ -2609,6 +3405,411 @@ const AdminDashboard: React.FC<{ user: AdminUser | null; onLogout: () => void }>
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Add Quran Verse Modal */}
+        <AnimatePresence>
+          {showAddQuranVerseModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+              onClick={() => setShowAddQuranVerseModal(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.9 }}
+                className="bg-white rounded-xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h3 className="text-2xl font-bold text-gray-800 mb-6">Add Quran Verse</h3>
+                
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.target as HTMLFormElement);
+                    const arabicText = formData.get('arabicText') as string;
+                    const translation = formData.get('translation') as string;
+                    const newVerse = {
+                      title: formData.get('title') as string,
+                      description: `${arabicText} - ${translation}`,
+                      type: 'document' as const,
+                      file_url: formData.get('fileUrl') as string,
+                      thumbnail_url: formData.get('thumbnailUrl') as string,
+                      category: 'quran-verse',
+                      tags: (formData.get('tags') as string).split(',').map(tag => tag.trim()).filter(tag => tag),
+                      status: (formData.get('status') as 'active' | 'inactive' | 'draft') || 'active',
+                      featured: formData.get('featured') === 'on'
+                    };
+                    handleAddQuranVerse(newVerse);
+                  }}
+                  className="space-y-4"
+                >
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                    <input
+                      type="text"
+                      name="title"
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                      placeholder="Surah Al-Fatiha - Verse 1"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Arabic Text</label>
+                    <textarea
+                      name="arabicText"
+                      required
+                      rows={2}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500 font-arabic text-right"
+                      style={{ fontFamily: 'var(--font-amiri), sans-serif' }}
+                      placeholder="بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Translation</label>
+                    <textarea
+                      name="translation"
+                      required
+                      rows={2}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                      placeholder="In the name of Allah, the Entirely Merciful, the Especially Merciful."
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                      <select
+                        name="status"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                      >
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="draft">Draft</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">File URL</label>
+                      <input
+                        type="url"
+                        name="fileUrl"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                        placeholder="https://example.com/file.txt"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Thumbnail URL</label>
+                    <input
+                      type="url"
+                      name="thumbnailUrl"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                      placeholder="https://example.com/thumbnail.jpg"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+                    <input
+                      type="text"
+                      name="tags"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                      placeholder="quran, verse, mercy, faith"
+                    />
+                  </div>
+                  
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="featured"
+                      className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+                    />
+                    <label className="ml-2 text-sm font-medium text-gray-700">
+                      Featured Verse
+                    </label>
+                  </div>
+                  
+                  <div className="flex gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddQuranVerseModal(false)}
+                      className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600"
+                    >
+                      Save Verse
+                    </button>
+                  </div>
+
+                </form>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Add Announcement Modal */}
+        <AnimatePresence>
+          {showAddAnnouncementModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+              onClick={() => setShowAddAnnouncementModal(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.9 }}
+                className="bg-white rounded-xl p-8 max-w-md w-full mx-4"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h3 className="text-2xl font-bold text-gray-800 mb-6">Add New Announcement</h3>
+                
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.currentTarget);
+                    const newAnnouncement = AnnouncementStorage.addAnnouncement({
+                      title: formData.get('title') as string,
+                      content: formData.get('content') as string,
+                      type: formData.get('type') as string,
+                      priority: formData.get('priority') as 'low' | 'medium' | 'high',
+                      status: 'active',
+                      expiresAt: formData.get('expiresAt') as string
+                    });
+                    setAnnouncements((prev) => [...prev, newAnnouncement]);
+                    setShowAddAnnouncementModal(false);
+                    e.currentTarget.reset();
+                  }}
+                  className="space-y-4"
+                >
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                    <input
+                      type="text"
+                      name="title"
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                      placeholder="Enter announcement title"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
+                    <textarea
+                      name="content"
+                      required
+                      rows={4}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                      placeholder="Enter announcement content"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                      <select
+                        name="type"
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                      >
+                        <option value="prayer">Prayer</option>
+                        <option value="event">Event</option>
+                        <option value="education">Education</option>
+                        <option value="general">General</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+                      <select
+                        name="priority"
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                      >
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Expiry Date</label>
+                    <input
+                      type="datetime-local"
+                      name="expiresAt"
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+
+                  <div className="flex gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddAnnouncementModal(false)}
+                      className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600"
+                    >
+                      Add Announcement
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+          {/* Edit Announcement Modal */}
+          <AnimatePresence>
+            {showEditAnnouncementModal && selectedAnnouncement && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+                onClick={() => setShowEditAnnouncementModal(false)}
+              >
+                <motion.div
+                  initial={{ y: -50, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -50, opacity: 0 }}
+                  className="bg-white rounded-xl shadow-2xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-bold text-gray-800">Edit Announcement</h3>
+                    <button
+                      onClick={() => setShowEditAnnouncementModal(false)}
+                      className="text-gray-400 hover:text-gray-600"
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
+
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const formData = new FormData(e.currentTarget);
+                      if (!selectedAnnouncement) return;
+
+                      const updatedAnnouncement = AnnouncementStorage.updateAnnouncement(selectedAnnouncement.id, {
+                        title: formData.get('title') as string,
+                        content: formData.get('content') as string,
+                        type: formData.get('type') as string,
+                        priority: formData.get('priority') as 'low' | 'medium' | 'high',
+                        expiresAt: formData.get('expiresAt') as string
+                      });
+
+                      if (updatedAnnouncement) {
+                        setAnnouncements(announcements.map(a => a.id === selectedAnnouncement.id ? updatedAnnouncement : a));
+                      }
+
+                      setShowEditAnnouncementModal(false);
+                      setSelectedAnnouncement(null);
+                    }}
+                    className="space-y-4"
+                  >
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                      <input
+                        type="text"
+                        name="title"
+                        required
+                        defaultValue={selectedAnnouncement.title}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
+                      <textarea
+                        name="content"
+                        required
+                        rows={4}
+                        defaultValue={selectedAnnouncement.content}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                        <select
+                          name="type"
+                          required
+                          defaultValue={selectedAnnouncement.type}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                        >
+                          <option value="prayer">Prayer</option>
+                          <option value="event">Event</option>
+                          <option value="education">Education</option>
+                          <option value="general">General</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+                        <select
+                          name="priority"
+                          required
+                          defaultValue={selectedAnnouncement.priority}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                        >
+                          <option value="low">Low</option>
+                          <option value="medium">Medium</option>
+                          <option value="high">High</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Expiry Date</label>
+                      <input
+                        type="datetime-local"
+                        name="expiresAt"
+                        required
+                        defaultValue={selectedAnnouncement.expiresAt}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
+                      />
+                    </div>
+
+                    <div className="flex gap-4">
+                      <button
+                        type="button"
+                        onClick={() => setShowEditAnnouncementModal(false)}
+                        className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600"
+                      >
+                        Update Announcement
+                      </button>
+                    </div>
+                  </form>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </section>
   );

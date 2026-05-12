@@ -37,12 +37,12 @@ const DynamicDonations: React.FC = () => {
     // Initial load
     loadDonations();
 
-    // Listen for real-time updates from admin dashboard
-    const unsubscribe = eventSync.subscribe(EVENT_TYPES.DONATIONS_UPDATED, loadDonations);
+    // Listen for real-time updates from admin dashboard (temporarily disabled)
+    // const unsubscribe = eventSync.subscribe(EVENT_TYPES.DONATIONS_UPDATED, loadDonations);
 
-    return () => {
-      unsubscribe();
-    };
+    // return () => {
+    //   unsubscribe();
+    // };
   }, []);
 
   if (loading) {

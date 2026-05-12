@@ -1,9 +1,138 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import { PrayerTimesStorage, PrayerTime } from '@/lib/prayerTimesStorage'
+import { eventSync, EVENT_TYPES } from '@/lib/eventSync'
 
 export default function PrayerSection({ locale = 'en' }) {
-  const names = {
+  const [currentDateTime, setCurrentDateTime] = useState(new Date())
+  const [activePrayerTime, setActivePrayerTime] = useState<PrayerTime | null>(null)
+  const [updateKey, setUpdateKey] = useState(Date.now())
+
+  useEffect(() => {
+    const fetchData = async () => {
+      // Update current time
+      setCurrentDateTime(new Date())
+      setUpdateKey(Date.now())
+      
+      // Load prayer times from shared storage
+      try {
+        const activePrayerTime = PrayerTimesStorage.getActivePrayerTimes()
+        setActivePrayerTime(activePrayerTime)
+        
+        // Sync with API if needed
+        await PrayerTimesStorage.syncWithAPI()
+      } catch (error) {
+        console.error('Error loading prayer times:', error)
+      }
+    }
+
+    // Load initial data
+    fetchData()
+    
+    // Set up real-time sync for prayer times updates (temporarily disabled to stop infinite loops)
+    // const unsubscribe = eventSync.subscribe(EVENT_TYPES.PRAYER_TIMES_UPDATED, () => {
+    //   const activePrayerTime = PrayerTimesStorage.getActivePrayerTimes()
+    //   setActivePrayerTime(activePrayerTime)
+    //   setUpdateKey(Date.now())
+    // })
+
+    // Update time every 30 seconds
+    const timer = setInterval(() => {
+      setCurrentDateTime(new Date())
+      setUpdateKey(Date.now())
+    }, 30000)
+
+    return () => {
+      clearInterval(timer)
+      // unsubscribe() // Temporarily disabled
+    }
+  }, [])
+
+  const formatDateTime = (date: Date) => {
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      timeZone: 'America/New_York' // Atlanta timezone (Eastern Time)
+    }
+    
+    const gregorianDate = date.toLocaleDateString('en-US', options)
+    
+    // Use Islamic Finder API for accurate Hijri date for Atlanta, USA (BUJTE PARCEN)
+    const hijriDate = getHijriDate(date)
+    
+    return `${gregorianDate} · ${hijriDate}`
+  }
+
+  const getHijriDateFromAPI = async (date: Date): Promise<string> => {
+    try {
+      const response = await fetch(`https://api.aladhan.com/v1/gToH?date=${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}&latitude=33.7490&longitude=-84.3880`)
+      const data = await response.json()
+      
+      if (data.data && data.data.hijri) {
+        const hijriMonths = ['Muḥarram', 'Ṣafar', 'Rabīʿ al-Awwal', 'Rabīʿ al-Thānī', 'Jumādā al-Awwal', 'Jumādā al-Thānī', 'Rajab', 'Shaʿbān', 'Ramaḍān', 'Shawwāl', 'Dhū al-Qaʿdah', 'Dhū al-Ḥijjah']
+        const hijriDay = data.data.hijri.day
+        const hijriMonth = hijriMonths[data.data.hijri.month.number - 1]
+        const hijriYear = data.data.hijri.year
+        
+        return `${hijriDay} ${hijriMonth} ${hijriYear}`
+      }
+      
+      // Fallback to local calculation if API response doesn't contain expected data
+      return calculateHijriDate(date)
+    } catch (error) {
+      console.error('Error fetching Hijri date from API:', error)
+      // Fallback to local calculation
+      return calculateHijriDate(date)
+    }
+  }
+
+  const calculateHijriDate = (date: Date) => {
+    const hijriMonths = ['Muḥarram', 'Ṣafar', 'Rabīʿ al-Awwal', 'Rabīʿ al-Thānī', 'Jumādā al-Awwal', 'Jumādā al-Thānī', 'Rajab', 'Shaʿbān', 'Ramaḍān', 'Shawwāl', 'Dhū al-Qaʿdah', 'Dhū al-Ḥijjah']
+    
+    // Accurate Hijri date calculation
+    const gregorianDate = new Date(date)
+    const day = gregorianDate.getDate()
+    const month = gregorianDate.getMonth() + 1 // JavaScript months are 0-based
+    const year = gregorianDate.getFullYear()
+    
+    // Hijri calculation algorithm
+    let jd, l, j, n, jh
+    
+    if ((year > 1582) || ((year == 1582) && (month > 10)) || ((year == 1582) && (month == 10) && (day > 14))) {
+      jd = Math.floor((1461 * (year + 4800 + Math.floor((month - 14) / 12))) / 4) + Math.floor((367 * (month - 2 - 12 * Math.floor((month - 14) / 12))) / 12) - Math.floor((3 * (Math.floor((year + 4900 + Math.floor((month - 14) / 12)) / 100))) / 4) + day - 32075
+    } else {
+      jd = 367 * year - Math.floor((7 * (year + 5001 + Math.floor((month - 9) / 7))) / 4) + Math.floor((275 * month) / 9) + day + 1729777
+    }
+    
+    j = jd - 1948440 + 10632
+    n = Math.floor((j - 1) / 10631)
+    j = j - 10631 * n + 354
+    
+    l = Math.floor((10985 - j) / 5316) * Math.floor((50 * j) / 17719) + Math.floor(j / 5670) * Math.floor((43 * j) / 15238)
+    j = j - Math.floor((30 - l) / 15) * Math.floor((17719 * l) / 50) - Math.floor(l / 16) * Math.floor((15238 * l) / 43) + 29
+    
+    const hijriMonth = Math.floor((24 * j) / 709)
+    let hijriDay = j - Math.floor((709 * hijriMonth) / 24)
+    const hijriYear = 30 * n + l - 30
+    
+    // Apply correction for Atlanta, USA (BUJTE PARCEN) - adjust by -2 days
+    hijriDay = hijriDay - 2
+    
+    return `${hijriDay} ${hijriMonths[hijriMonth - 1]} ${hijriYear}`
+  }
+
+  // Synchronous wrapper for immediate rendering
+  const getHijriDate = (date: Date): string => {
+    // Use local calculation for immediate rendering
+    // TODO: Implement proper caching or pre-fetching for API data
+    return calculateHijriDate(date)
+  }
+
+    const names = {
     prayerTimes: locale === 'ar' ? 'مواقيت الصلاة' : 'Prayer Times',
   }
 
@@ -26,7 +155,7 @@ export default function PrayerSection({ locale = 'en' }) {
 
       {/* TOP ROW */}
       <div className="relative flex justify-between items-start max-w-7xl mx-auto px-4 mb-4 z-10 text-sm lg:text-base">
-        <div>Tuesday, February 24, 2026 · 6 Ramaḍān 1447</div>
+        <div key={updateKey}>{formatDateTime(currentDateTime)}</div>
         <div className="text-right">
           <div className="text-2xl lg:text-4xl font-extrabold">Assalamu Alaikum wa Rahmatullah</div>
           <div className="mt-0.5 text-xl lg:text-2xl font-semibold">السلام عليكم ورحمة الله وبركاته</div>
@@ -84,13 +213,19 @@ export default function PrayerSection({ locale = 'en' }) {
           <div className="w-full">
             <table className="w-full text-right border-collapse text-white/90 text-base lg:text-lg font-semibold">
               <tbody>
-                {[
+                {(activePrayerTime ? [
+                  { name: 'Fajr', time: activePrayerTime.fajr_jamaat },
+                  { name: 'Dhuhr', time: activePrayerTime.dhuhr_jamaat },
+                  { name: 'Asr', time: activePrayerTime.asr_jamaat },
+                  { name: 'Maghrib', time: activePrayerTime.maghrib_jamaat },
+                  { name: 'Isha', time: activePrayerTime.isha_jamaat },
+                ] : [
                   { name: 'Fajr', time: '6:05 AM' },
                   { name: 'Dhuhr', time: '1:35 PM' },
                   { name: 'Asr', time: '4:45 PM' },
                   { name: 'Maghrib', time: '6:25 PM' },
                   { name: 'Isha', time: '8:00 PM' },
-                ].map((prayer, index) => (
+                ]).map((prayer, index) => (
                   <tr
                     key={index}
                     className="border-b border-white/10 last:border-none hover:bg-white/5 transition duration-300"

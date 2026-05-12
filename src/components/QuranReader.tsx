@@ -2,22 +2,13 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { FaBook, FaMosque, FaSyncAlt } from 'react-icons/fa';
+import { FaMosque, FaSyncAlt } from 'react-icons/fa';
 import WaveAnimation from '@/components/WaveAnimation';
-
-interface Verse {
-  id: number;
-  verse_key: string;
-  text_uthmani: string;
-  translations: Array<{
-    text: string;
-    language_name: string;
-  }>;
-  audio: string;
-}
+import MediaStorage, { Media } from '@/lib/mediaStorage';
+import { eventSync, EVENT_TYPES } from '@/lib/eventSync';
 
 const QuranReader: React.FC = () => {
-  const [verse, setVerse] = useState<Verse | null>(null);
+  const [verse, setVerse] = useState<Media | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentSurah, setCurrentSurah] = useState(1);
@@ -27,6 +18,29 @@ const QuranReader: React.FC = () => {
   const [autoPlay, setAutoPlay] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const playbackIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [verses, setVerses] = useState<Media[]>([]);
+
+  // Load verses from MediaStorage and set up real-time sync
+  useEffect(() => {
+    console.log('QuranReader: Loading Quran verses from storage...');
+    // Load initial verses (only quran-verse category)
+    const allMedia = MediaStorage.getMedia();
+    const quranVerses = allMedia.filter(media => media.category === 'quran-verse');
+    console.log('QuranReader: Found Quran verses:', quranVerses.length);
+    setVerses(quranVerses);
+    
+    // Set up real-time sync for media updates
+    const unsubscribe = eventSync.subscribe(EVENT_TYPES.MEDIA_UPDATED, () => {
+      console.log('QuranReader: Received MEDIA_UPDATED event, reloading verses...');
+      const allMedia = MediaStorage.getMedia();
+      const quranVerses = allMedia.filter(media => media.category === 'quran-verse');
+      setVerses(quranVerses);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const fetchNextVerse = async () => {
     const ayahsInSurah = [7, 286, 200, 176, 120, 165, 206, 75, 129, 109, 123, 111, 43, 52, 99, 128, 111, 110, 98, 135, 112, 78, 118, 64, 77, 227, 93, 88, 69, 60, 34, 30, 73, 54, 45, 83, 182, 88, 75, 85, 54, 53, 89, 59, 37, 35, 38, 29, 18, 45, 60, 49, 62, 55, 78, 96, 29, 22, 24, 13, 14, 11, 11, 18, 12, 12, 30, 52, 44, 28, 28, 20, 56, 40, 31, 50, 40, 46, 42, 29, 19, 36, 25, 22, 26, 30, 20, 15, 21, 11, 8, 8, 19, 5, 8, 8, 11, 11, 8, 3, 9, 5, 4, 7, 3, 6, 3, 5, 4, 5, 6];
@@ -88,42 +102,50 @@ const QuranReader: React.FC = () => {
     setIsPlaying(false);
     
     try {
-      const response = await fetch(
-        `/api/quran?surah=${surah}&ayah=${ayah}`
-      );
+      // Find verse in local storage (use index for simplicity)
+      const verseIndex = (surah - 1) * 100 + ayah - 1; // Simple indexing
+      const foundVerse = verses[verseIndex % verses.length] || verses[0];
       
-      if (!response.ok) {
-        throw new Error('Failed to fetch verse');
+      if (foundVerse) {
+        setVerse(foundVerse);
+        setCurrentSurah(surah);
+        setCurrentAyah(ayah);
+        
+        // Increment views would be handled by QuranStorage if needed
+        
+        // Auto play if enabled (only for audio files)
+        if (autoPlay && foundVerse.type === 'audio' && foundVerse.file_url) {
+          audioRef.current = new Audio(foundVerse.file_url);
+        }
+      } else {
+        // Fallback to default verse if not found
+        const defaultVerse: Media = {
+          id: Date.now().toString(),
+          title: `Surah ${surah}, Ayah ${ayah}`,
+          description: 'Arabic text - English translation',
+          type: 'document',
+          file_url: '',
+          category: 'quran-verse',
+          tags: ['quran', 'verse'],
+          status: 'active',
+          featured: false,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        
+        setVerse(defaultVerse);
+        setCurrentSurah(surah);
+        setCurrentAyah(ayah);
       }
-      
-      const data = await response.json();
-      
-      // Transform the data to match our interface
-      const transformedVerse: Verse = {
-        id: data.data[0].number,
-        verse_key: data.data[0].surah.number + ':' + data.data[0].numberInSurah,
-        text_uthmani: data.data[0].text,
-        translations: [{
-          text: data.data[1]?.text || 'Translation not available',
-          language_name: 'en'
-        }],
-        audio: data.data[0].audio || ''
-      };
-      
-      setVerse(transformedVerse);
-      setCurrentSurah(surah);
-      setCurrentAyah(ayah);
-      
-      // Auto-play audio if enabled and audio is available
-      // Auto-play disabled - removed automatic playback
     } catch (err) {
-      setError('Failed to load Quran verse. Please try again.');
-      console.error('Quran API Error:', err);
+      setError('Failed to load verse. Please try again.');
+      console.error('Error loading verse:', err);
     } finally {
       setLoading(false);
     }
   };
 
+  
   useEffect(() => {
     // Only fetch on client-side to prevent hydration issues
     if (typeof window !== 'undefined') {
@@ -142,40 +164,31 @@ const QuranReader: React.FC = () => {
     };
   }, []);
 
-  const playAudio = (audioUrl?: string) => {
-    const url = audioUrl || verse?.audio;
-    if (url) {
-      // Stop current audio if playing
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-      
-      const audio = new Audio(url);
-      audioRef.current = audio;
-      
-      audio.addEventListener('play', () => {
-        setIsPlaying(true);
-      });
-      
-      audio.addEventListener('pause', () => {
-        setIsPlaying(false);
-      });
-      
-      audio.addEventListener('ended', () => {
-        setIsPlaying(false);
-        audioRef.current = null;
-        // Auto-play next verse functionality removed
-      });
-      
-      audio.addEventListener('error', (err) => {
-        console.error('Audio playback failed:', err);
-        setIsPlaying(false);
-        audioRef.current = null;
-      });
-      
-      audio.play().catch(err => console.error('Audio playback failed:', err));
-    }
+  const playAudio = (url: string) => {
+    const audio = new Audio(url);
+    audioRef.current = audio;
+    
+    audio.addEventListener('play', () => {
+      setIsPlaying(true);
+    });
+    
+    audio.addEventListener('pause', () => {
+      setIsPlaying(false);
+    });
+    
+    audio.addEventListener('ended', () => {
+      setIsPlaying(false);
+      audioRef.current = null;
+      // Auto-play next verse functionality removed
+    });
+    
+    audio.addEventListener('error', (err: Event) => {
+      console.error('Audio playback failed:', err);
+      setIsPlaying(false);
+      audioRef.current = null;
+    });
+    
+    audio.play().catch((err: Error) => console.error('Audio playback failed:', err));
   };
 
   const pauseAudio = () => {
@@ -194,8 +207,8 @@ const QuranReader: React.FC = () => {
       }).catch(err => console.error('Audio resume failed:', err));
     } else {
       // If no audio is playing, start playing current verse
-      if (verse?.audio) {
-        playAudio(verse.audio);
+      if (verse?.file_url && verse.type === 'audio') {
+        playAudio(verse.file_url);
         setIsPaused(false);
       }
     }
@@ -259,7 +272,7 @@ const QuranReader: React.FC = () => {
           className="text-center mb-12"
         >
           <div className="flex items-center justify-center gap-3 mb-4">
-            <FaBook className="text-emerald-600 text-2xl" />
+            <FaMosque className="text-emerald-600 text-2xl" />
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-800" style={{ fontFamily: 'var(--font-philosopher), sans-serif' }}>
               Quran Reader
             </h2>
@@ -302,10 +315,10 @@ const QuranReader: React.FC = () => {
                   className="text-2xl lg:text-3xl font-bold text-gray-800 leading-relaxed mb-4"
                   style={{ fontFamily: 'Amiri, Georgia, serif', direction: 'rtl', textAlign: 'center' }}
                 >
-                  {verse.text_uthmani}
+                  {verse.description?.split(' - ')[0] || verse.title}
                 </p>
                 <p className="text-sm text-gray-500 mb-2">
-                  {verse.verse_key}
+                  {verse.title}
                 </p>
               </motion.div>
 
@@ -317,7 +330,7 @@ const QuranReader: React.FC = () => {
                 transition={{ duration: 0.8, delay: 0.6 }}
               >
                 <p className="text-lg text-gray-700 leading-relaxed italic">
-                  {verse.translations?.[0]?.text || 'Translation not available'}
+                  {verse.description?.split(' - ')[1] || verse.description || 'Translation not available'}
                 </p>
               </motion.div>
 
@@ -335,7 +348,7 @@ const QuranReader: React.FC = () => {
                   <FaSyncAlt className="rotate-180" />
                   Previous Verse
                 </button>
-                <button
+                                <button
                   onClick={fetchNextVerse}
                   className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
                 >

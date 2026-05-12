@@ -63,5 +63,9 @@ export const EVENT_TYPES = {
   EVENTS_UPDATED: 'events-updated',
   MEMBERS_UPDATED: 'members-updated',
   DONATIONS_UPDATED: 'donations-updated',
-  CONTENT_UPDATED: 'content-updated'
+  CONTENT_UPDATED: 'content-updated',
+  QURAN_RECITATIONS_UPDATED: 'quran-recitations-updated',
+  QURAN_VERSES_UPDATED: 'quran-verses-updated',
+  PRAYER_TIMES_UPDATED: 'prayer-times-updated',
+  MEDIA_UPDATED: 'media-updated',
 } as const;

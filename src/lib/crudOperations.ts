@@ -30,20 +30,6 @@ export interface Member {
   updatedAt: string;
 }
 
-export interface Donation {
-  id: string;
-  donorName: string;
-  email: string;
-  amount: number;
-  type: 'one-time' | 'monthly' | 'zakat' | 'sadaqa';
-  purpose: string;
-  status: 'pending' | 'completed' | 'failed';
-  paymentMethod: string;
-  date: string;
-  recurring?: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
 
 export interface Content {
   id: string;
@@ -62,7 +48,6 @@ export interface Content {
 const STORAGE_KEYS = {
   EVENTS: 'admin_events',
   MEMBERS: 'admin_members',
-  DONATIONS: 'admin_donations',
   CONTENT: 'admin_content'
 };
 
@@ -170,7 +155,6 @@ class CRUDManager<T extends { id: string; createdAt: string; updatedAt: string }
 // Export specific managers
 export const eventManager = new CRUDManager<Event>(STORAGE_KEYS.EVENTS);
 export const memberManager = new CRUDManager<Member>(STORAGE_KEYS.MEMBERS);
-export const donationManager = new CRUDManager<Donation>(STORAGE_KEYS.DONATIONS);
 export const contentManager = new CRUDManager<Content>(STORAGE_KEYS.CONTENT);
 
 // Initialize sample data if empty
@@ -235,34 +219,6 @@ export const initializeSampleData = () => {
     sampleMembers.forEach(member => memberManager.create(member));
   }
 
-  // Sample Donations
-  if (donationManager.readAll().length === 0) {
-    const sampleDonations: Omit<Donation, 'id' | 'createdAt' | 'updatedAt'>[] = [
-      {
-        donorName: 'Mohammed Ali',
-        email: 'mohammed@example.com',
-        amount: 5000,
-        type: 'zakat',
-        purpose: 'Mosque Maintenance',
-        status: 'completed',
-        paymentMethod: 'Bank Transfer',
-        date: new Date().toISOString().split('T')[0]
-      },
-      {
-        donorName: 'Aisha Begum',
-        email: 'aisha@example.com',
-        amount: 1000,
-        type: 'sadaqa',
-        purpose: 'Community Programs',
-        status: 'completed',
-        paymentMethod: 'Cash',
-        date: new Date(Date.now() - 86400000).toISOString().split('T')[0]
-      }
-    ];
-
-    sampleDonations.forEach(donation => donationManager.create(donation));
-  }
-
   // Sample Content
   if (contentManager.readAll().length === 0) {
     const sampleContent: Omit<Content, 'id' | 'createdAt' | 'updatedAt'>[] = [
@@ -294,7 +250,6 @@ export const initializeSampleData = () => {
 export const getDashboardStats = () => {
   const events = eventManager.readAll();
   const members = memberManager.readAll();
-  const donations = donationManager.readAll();
   const content = contentManager.readAll();
 
   return {
@@ -302,15 +257,6 @@ export const getDashboardStats = () => {
     upcomingEvents: events.filter((e: Event) => e.status === 'upcoming').length,
     totalMembers: members.length,
     activeMembers: members.filter((m: Member) => m.status === 'active').length,
-    totalDonations: donations.length,
-    monthlyDonations: donations
-      .filter((d: Donation) => {
-        const donationDate = new Date(d.date);
-        const now = new Date();
-        return donationDate.getMonth() === now.getMonth() && 
-               donationDate.getFullYear() === now.getFullYear();
-      })
-      .reduce((sum: number, d: Donation) => sum + d.amount, 0),
     totalContent: content.length,
     publishedContent: content.filter((c: Content) => c.status === 'published').length
   };

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Media Sync Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug { background: #f5f5f5; padding: 10px; margin: 10px 0; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e8; color: #2e7d32; }
+        pre { background: #f8f8f8; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Media Synchronization Debug</h1>
+    <button onclick="checkLocalStorage()">Check LocalStorage</button>
+    <button onclick="resetToDefaults()">Reset to Defaults</button>
+    <button onclick="clearAll()">Clear All Media</button>
+    
+    <div id="output"></div>
+    
+    <script>
+        function checkLocalStorage() {
+            const output = document.getElementById('output');
+            let html = '<div class="debug"><h3>LocalStorage Check</h3>';
+            
+            try {
+                // Check mosque_media key
+                const mosqueMedia = localStorage.getItem('mosque_media');
+                html += `<p>mosque_media exists: ${!!mosqueMedia}</p>`;
+                
+                if (mosqueMedia) {
+                    const parsed = JSON.parse(mosqueMedia);
+                    html += `<p>Total media items: ${parsed.length}</p>`;
+                    
+                    // Count by type
+                    const audioCount = parsed.filter(m => m.type === 'audio').length;
+                    const videoCount = parsed.filter(m => m.type === 'video').length;
+                    const imageCount = parsed.filter(m => m.type === 'image').length;
+                    
+                    html += `<p>Audio: ${audioCount}, Video: ${videoCount}, Image: ${imageCount}</p>`;
+                    
+                    html += '<h4>All Media Items:</h4>';
+                    html += '<pre>' + JSON.stringify(parsed, null, 2) + '</pre>';
+                } else {
+                    html += '<p class="error">No mosque_media found in localStorage</p>';
+                }
+                
+                // Check all keys
+                const keys = Object.keys(localStorage);
+                html += `<h4>All LocalStorage Keys:</h4><p>${keys.join(', ')}</p>`;
+                
+            } catch (error) {
+                html += `<p class="error">Error: ${error.message}</p>`;
+            }
+            
+            html += '</div>';
+            output.innerHTML = html;
+        }
+        
+        function resetToDefaults() {
+            try {
+                // Default media data
+                const defaultMedia = [
+                    {
+                        id: '1',
+                        title: 'Friday Jumu\'ah Prayer',
+                        description: 'Weekly congregational prayer with sermon',
+                        type: 'video',
+                        file_url: '/videos/friday-prayer.mp4',
+                        thumbnail_url: '/thumbnails/friday-prayer.jpg',
+                        category: 'sermon',
+                        tags: ['friday', 'prayer', 'jumuah', 'sermon'],
+                        file_size: 52428800,
+                        duration: '45:30',
+                        status: 'active',
+                        featured: true,
+                        created_at: '2026-05-09T00:00:00Z',
+                        updated_at: '2026-05-09T00:00:00Z'
+                    },
+                    {
+                        id: '2',
+                        title: 'Ramadan Iftar Dinner',
+                        description: 'Community iftar during Ramadan 2026',
+                        type: 'image',
+                        file_url: '/images/iftar-2026.jpg',
+                        thumbnail_url: '/thumbnails/iftar-2026.jpg',
+                        category: 'event',
+                        tags: ['ramadan', 'iftar', 'community', 'event'],
+                        file_size: 2097152,
+                        status: 'active',
+                        featured: true,
+                        created_at: '2026-05-15T00:00:00Z',
+                        updated_at: '2026-05-15T00:00:00Z'
+                    },
+                    {
+                        id: '3',
+                        title: 'Eid Mubarak Celebration',
+                        description: 'Eid prayer and celebration highlights',
+                        type: 'video',
+                        file_url: '/videos/eid-celebration.mp4',
+                        thumbnail_url: '/thumbnails/eid-celebration.jpg',
+                        category: 'announcement',
+                        tags: ['eid', 'celebration', 'prayer', 'festival'],
+                        file_size: 78643200,
+                        duration: '12:15',
+                        status: 'active',
+                        featured: false,
+                        created_at: '2026-05-20T00:00:00Z',
+                        updated_at: '2026-05-20T00:00:00Z'
+                    },
+                    {
+                        id: '4',
+                        title: 'Quran Recitation - Surah Al-Fatiha',
+                        description: 'Beautiful recitation of Surah Al-Fatiha',
+                        type: 'audio',
+                        file_url: '/audio/surah-fatiha.mp3',
+                        thumbnail_url: '/thumbnails/quran-recitation.jpg',
+                        category: 'sermon',
+                        tags: ['quran', 'recitation', 'surah', 'fatiha'],
+                        file_size: 3145728,
+                        duration: '3:45',
+                        status: 'active',
+                        featured: false,
+                        created_at: '2026-05-10T00:00:00Z',
+                        updated_at: '2026-05-10T00:00:00Z'
+                    },
+                    {
+                        id: '5',
+                        title: 'Islamic Lecture Series',
+                        description: 'Weekly educational lecture on Islamic topics',
+                        type: 'video',
+                        file_url: '/videos/islamic-lecture.mp4',
+                        thumbnail_url: '/thumbnails/islamic-lecture.jpg',
+                        category: 'education',
+                        tags: ['lecture', 'education', 'islamic', 'learning'],
+                        file_size: 104857600,
+                        duration: '1:15:30',
+                        status: 'active',
+                        featured: true,
+                        created_at: '2026-05-12T00:00:00Z',
+                        updated_at: '2026-05-12T00:00:00Z'
+                    },
+                    {
+                        id: '6',
+                        title: 'Surah Al-Fatiha - Mishari Rashid',
+                        description: 'Beautiful recitation of Surah Al-Fatiha by Mishari Rashid',
+                        type: 'audio',
+                        file_url: '/audio/surah-fatiha-mishari.mp3',
+                        thumbnail_url: '/thumbnails/quran-recitation.jpg',
+                        category: 'quran',
+                        tags: ['quran', 'surah', 'fatiha', 'mishari', 'recitation'],
+                        file_size: 3145728,
+                        duration: '3:45',
+                        status: 'active',
+                        featured: true,
+                        created_at: '2026-05-10T00:00:00Z',
+                        updated_at: '2026-05-10T00:00:00Z'
+                    },
+                    {
+                        id: '7',
+                        title: 'Surah Al-Baqarah - Abdul Rahman Al-Sudais',
+                        description: 'Recitation of Surah Al-Baqarah verses 1-10',
+                        type: 'audio',
+                        file_url: '/audio/surah-baqarah-sudais.mp3',
+                        thumbnail_url: '/thumbnails/quran-recitation.jpg',
+                        category: 'quran',
+                        tags: ['quran', 'surah', 'baqarah', 'sudais', 'recitation'],
+                        file_size: 5242880,
+                        duration: '6:20',
+                        status: 'active',
+                        featured: false,
+                        created_at: '2026-05-11T00:00:00Z',
+                        updated_at: '2026-05-11T00:00:00Z'
+                    },
+                    {
+                        id: '8',
+                        title: 'Surah Ar-Rahman - Saad Al-Ghamdi',
+                        description: 'Melodious recitation of Surah Ar-Rahman',
+                        type: 'audio',
+                        file_url: '/audio/surah-rahman-ghamdi.mp3',
+                        thumbnail_url: '/thumbnails/quran-recitation.jpg',
+                        category: 'quran',
+                        tags: ['quran', 'surah', 'rahman', 'ghamdi', 'recitation'],
+                        file_size: 8388608,
+                        duration: '8:15',
+                        status: 'active',
+                        featured: true,
+                        created_at: '2026-05-12T00:00:00Z',
+                        updated_at: '2026-05-12T00:00:00Z'
+                    }
+                ];
+                
+                localStorage.setItem('mosque_media', JSON.stringify(defaultMedia));
+                
+                const output = document.getElementById('output');
+                output.innerHTML = '<div class="success"><h3>Reset to Defaults</h3><p>Media has been reset to default values. Refresh your pages to see the changes.</p></div>';
+                
+            } catch (error) {
+                const output = document.getElementById('output');
+                output.innerHTML = `<div class="error"><h3>Error</h3><p>${error.message}</p></div>`;
+            }
+        }
+        
+        function clearAll() {
+            try {
+                localStorage.removeItem('mosque_media');
+                const output = document.getElementById('output');
+                output.innerHTML = '<div class="success"><h3>Cleared</h3><p>All media has been cleared from localStorage.</p></div>';
+            } catch (error) {
+                const output = document.getElementById('output');
+                output.innerHTML = `<div class="error"><h3>Error</h3><p>${error.message}</p></div>`;
+            }
+        }
+    </script>
+</body>
+</html>

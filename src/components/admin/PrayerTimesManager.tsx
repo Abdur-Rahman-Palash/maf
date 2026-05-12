@@ -2,24 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { FaClock, FaSave, FaEdit, FaTimes, FaCheck, FaMosque, FaTrash, FaPlus } from 'react-icons/fa';
-
-interface PrayerTime {
-  id: number;
-  fajr_begins: string;
-  fajr_jamaat: string;
-  dhuhr_begins: string;
-  dhuhr_jamaat: string;
-  asr_begins: string;
-  asr_jamaat: string;
-  maghrib_begins: string;
-  maghrib_jamaat: string;
-  isha_begins: string;
-  isha_jamaat: string;
-  jumuah_time: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
+import { PrayerTimesStorage, PrayerTime } from '@/lib/prayerTimesStorage';
+import { eventSync, EVENT_TYPES } from '@/lib/eventSync';
 
 interface PrayerTimesManagerProps {
   onDataUpdate?: () => void;
@@ -34,15 +18,15 @@ const PrayerTimesManager: React.FC<PrayerTimesManagerProps> = ({ onDataUpdate })
     id: 0,
     fajr_begins: '05:45',
     fajr_jamaat: '06:00',
-    dhuhr_begins: '13:00',
-    dhuhr_jamaat: '13:30',
-    asr_begins: '15:30',
-    asr_jamaat: '16:00',
-    maghrib_begins: '18:15',
-    maghrib_jamaat: '18:15',
-    isha_begins: '19:30',
-    isha_jamaat: '20:00',
-    jumuah_time: '13:30',
+    dhuhr_begins: '13:30',
+    dhuhr_jamaat: '13:45',
+    asr_begins: '17:00',
+    asr_jamaat: '17:15',
+    maghrib_begins: '20:15',
+    maghrib_jamaat: '20:30',
+    isha_begins: '21:30',
+    isha_jamaat: '21:45',
+    date: new Date().toISOString().split('T')[0],
     is_active: false,
     created_at: '',
     updated_at: ''
@@ -56,18 +40,12 @@ const PrayerTimesManager: React.FC<PrayerTimesManagerProps> = ({ onDataUpdate })
 
   const fetchPrayerTimes = async () => {
     try {
-      const response = await fetch('/api/prayer-times/');
-      if (response.ok) {
-        const data = await response.json();
-        setPrayerTimes(data);
-        
-        // Get active prayer time
-        const activeResponse = await fetch('/api/prayer-times/active');
-        if (activeResponse.ok) {
-          const activeData = await activeResponse.json();
-          setActivePrayerTime(activeData);
-        }
-      }
+      const prayerTimesData = PrayerTimesStorage.getPrayerTimes();
+      setPrayerTimes(prayerTimesData);
+      
+      // Get active prayer time
+      const activePrayerTimeData = PrayerTimesStorage.getActivePrayerTimes();
+      setActivePrayerTime(activePrayerTimeData);
     } catch (error) {
       console.error('Error fetching prayer times:', error);
     }
@@ -85,15 +63,15 @@ const PrayerTimesManager: React.FC<PrayerTimesManagerProps> = ({ onDataUpdate })
       id: 0,
       fajr_begins: '05:45',
       fajr_jamaat: '06:00',
-      dhuhr_begins: '13:00',
-      dhuhr_jamaat: '13:30',
-      asr_begins: '15:30',
-      asr_jamaat: '16:00',
-      maghrib_begins: '18:15',
+      dhuhr_begins: '13:30',
+      dhuhr_jamaat: '13:45',
+      asr_begins: '17:00',
+      asr_jamaat: '17:15',
+      maghrib_begins: '18:00',
       maghrib_jamaat: '18:15',
       isha_begins: '19:30',
       isha_jamaat: '20:00',
-      jumuah_time: '13:30',
+      date: new Date().toISOString().split('T')[0],
       is_active: false,
       created_at: '',
       updated_at: ''
@@ -115,44 +93,22 @@ const PrayerTimesManager: React.FC<PrayerTimesManagerProps> = ({ onDataUpdate })
     try {
       if (isCreating) {
         // Create new prayer time
-        const response = await fetch('/api/prayer-times/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(currentPrayerTime),
-        });
-        
-        if (response.ok) {
-          setMessage('Prayer times created successfully!');
-          setIsEditing(false);
-          setIsCreating(false);
-          fetchPrayerTimes();
-          if (onDataUpdate) onDataUpdate();
-        } else {
-          setMessage('Error creating prayer times. Please try again.');
-        }
+        PrayerTimesStorage.addPrayerTime(currentPrayerTime);
+        setMessage('Prayer times created successfully!');
       } else {
         // Update existing prayer time
-        const response = await fetch(`/api/prayer-times/${currentPrayerTime.id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(currentPrayerTime),
-        });
-        
-        if (response.ok) {
-          setMessage('Prayer times updated successfully!');
-          setIsEditing(false);
-          setIsCreating(false);
-          fetchPrayerTimes();
-          if (onDataUpdate) onDataUpdate();
-        } else {
-          setMessage('Error updating prayer times. Please try again.');
-        }
+        PrayerTimesStorage.updatePrayerTime(currentPrayerTime.id, currentPrayerTime);
+        setMessage('Prayer times updated successfully!');
       }
       
+      setIsEditing(false);
+      setIsCreating(false);
+      fetchPrayerTimes();
+      
+      // Emit real-time sync event (temporarily disabled)
+      // eventSync.emit(EVENT_TYPES.PRAYER_TIMES_UPDATED);
+      
+      if (onDataUpdate) onDataUpdate();
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       setMessage('Error saving prayer times. Please try again.');
@@ -167,18 +123,14 @@ const PrayerTimesManager: React.FC<PrayerTimesManagerProps> = ({ onDataUpdate })
     }
     
     try {
-      const response = await fetch(`/api/prayer-times/${id}`, {
-        method: 'DELETE',
-      });
+      PrayerTimesStorage.deletePrayerTime(id);
+      setMessage('Prayer times deleted successfully!');
+      fetchPrayerTimes();
       
-      if (response.ok) {
-        setMessage('Prayer times deleted successfully!');
-        fetchPrayerTimes();
-        if (onDataUpdate) onDataUpdate();
-      } else {
-        setMessage('Error deleting prayer times. Please try again.');
-      }
+      // Emit real-time sync event (temporarily disabled)
+      // eventSync.emit(EVENT_TYPES.PRAYER_TIMES_UPDATED);
       
+      if (onDataUpdate) onDataUpdate();
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       setMessage('Error deleting prayer times. Please try again.');
@@ -187,18 +139,14 @@ const PrayerTimesManager: React.FC<PrayerTimesManagerProps> = ({ onDataUpdate })
 
   const handleActivate = async (id: number) => {
     try {
-      const response = await fetch(`/api/prayer-times/${id}/activate`, {
-        method: 'PUT',
-      });
+      PrayerTimesStorage.activatePrayerTime(id);
+      setMessage('Prayer times activated successfully!');
+      fetchPrayerTimes();
       
-      if (response.ok) {
-        setMessage('Prayer times activated successfully!');
-        fetchPrayerTimes();
-        if (onDataUpdate) onDataUpdate();
-      } else {
-        setMessage('Error activating prayer times. Please try again.');
-      }
+      // Emit real-time sync event (temporarily disabled)
+      // eventSync.emit(EVENT_TYPES.PRAYER_TIMES_UPDATED);
       
+      if (onDataUpdate) onDataUpdate();
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       setMessage('Error activating prayer times. Please try again.');
@@ -219,8 +167,7 @@ const PrayerTimesManager: React.FC<PrayerTimesManagerProps> = ({ onDataUpdate })
     maghrib_begins: 'Maghrib Begins',
     maghrib_jamaat: 'Maghrib Jamaat',
     isha_begins: 'Isha Begins',
-    isha_jamaat: 'Isha Jamaat',
-    jumuah_time: 'Jumu\'ah Time'
+    isha_jamaat: 'Isha Jamaat'
   };
 
   return (
@@ -353,7 +300,7 @@ const PrayerTimesManager: React.FC<PrayerTimesManagerProps> = ({ onDataUpdate })
                           <div>Isha: {prayerTime.isha_begins} / {prayerTime.isha_jamaat}</div>
                         </div>
                         <div className="text-xs text-gray-500 mt-2">
-                          Jumu'ah: {prayerTime.jumuah_time} | Created: {new Date(prayerTime.created_at).toLocaleDateString()}
+                          Created: {new Date(prayerTime.created_at).toLocaleDateString()}
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
