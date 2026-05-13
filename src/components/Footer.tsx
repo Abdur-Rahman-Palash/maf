@@ -83,7 +83,8 @@ export default function Footer() {
                   { name: 'Architecture', href: '/architecture/overview' },
                   { name: 'Visit Us', href: '/visitors/book-visit' },
                   { name: 'Contact', href: '/mosques/sheikh-zayed' },
-                  { name: 'Prayer Times', href: '/worshippers/prayer-timings' }
+                  { name: 'Prayer Times', href: '/worshippers/prayer-timings' },
+                  { name: 'Admin', href: '/admin' }
                 ].map((link) => (
                   <li key={link.name}>
                     <motion.div
@@ -238,12 +239,20 @@ export default function Footer() {
                 neubyte.tech
               </a>
             </p>
-            <div className="flex justify-center gap-4 mt-4">
-              <Link href="/privacy" className="hover:text-gold transition-colors">Privacy Policy</Link>
-              <span className="text-gold/30">•</span>
-              <Link href="/terms" className="hover:text-gold transition-colors">Terms of Use</Link>
-              <span className="text-gold/30">•</span>
-              <Link href="/accessibility" className="hover:text-gold transition-colors">Accessibility</Link>
+            <div className="flex flex-col items-center gap-3 mt-4">
+              <div className="flex justify-center gap-4">
+                <Link href="/privacy" className="hover:text-gold transition-colors">Privacy Policy</Link>
+                <span className="text-gold/30">•</span>
+                <Link href="/terms" className="hover:text-gold transition-colors">Terms of Use</Link>
+                <span className="text-gold/30">•</span>
+                <Link href="/accessibility" className="hover:text-gold transition-colors">Accessibility</Link>
+              </div>
+              <Link
+                href="/admin"
+                className="inline-flex items-center justify-center rounded-full border border-gold/70 bg-gold/10 px-5 py-2 text-gold font-semibold hover:bg-gold/20 transition-colors duration-300"
+              >
+                Admin Login
+              </Link>
             </div>
           </motion.div>
         </div>
