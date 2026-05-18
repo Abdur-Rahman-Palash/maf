@@ -157,7 +157,7 @@ export default function PrayerSection({ locale = 'en' }) {
       <div className="relative flex justify-between items-start max-w-7xl mx-auto px-4 mb-4 z-10 text-sm lg:text-base">
         <div key={updateKey}>{formatDateTime(currentDateTime)}</div>
         <div className="text-right">
-          <div className="text-2xl lg:text-4xl font-extrabold">Assalamu Alaikum wa Rahmatullah</div>
+         
           <div className="mt-0.5 text-xl lg:text-2xl font-semibold">السلام عليكم ورحمة الله وبركاته</div>
         </div>
       </div>
