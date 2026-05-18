@@ -1,9 +1,7 @@
-import {NextIntlClientProvider} from 'next-intl';
 import {getMessages} from 'next-intl/server';
 import {notFound} from 'next/navigation';
 import {routing} from '@/i18n/routing';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import LocaleLayoutClient from './LocaleLayoutClient';
 // import SmoothScroll from '@/components/SmoothScroll';
 // import UltraPremiumAnimations from '@/components/UltraPremiumAnimations';
 // import UltraPremiumPageTransitions from '@/components/UltraPremiumPageTransitions';
@@ -30,14 +28,8 @@ export default async function LocaleLayout({
   const messages = await getMessages({locale});
  
   return (
-    <NextIntlClientProvider messages={messages}>
-      <div className="flex flex-col min-h-screen">
-        <Header />
-        <main className="flex-1">
-          {children}
-        </main>
-        <Footer />
-      </div>
-    </NextIntlClientProvider>
+    <LocaleLayoutClient locale={locale} messages={messages}>
+      {children}
+    </LocaleLayoutClient>
   );
 }
